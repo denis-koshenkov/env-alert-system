@@ -1,0 +1,22 @@
+# syntax=docker/dockerfile:1
+FROM ubuntu:24.04
+
+RUN apt-get update && \
+    apt-get upgrade && \
+    apt-get install -y \
+        curl \
+        pip3 \
+        libusb-1.0-0
+
+WORKDIR /home/dev/downloads
+
+# Download nrfutil, make sure it is in $PATH, give it execution permissions
+RUN curl https://files.nordicsemi.com/artifactory/swtools/external/nrfutil/executables/x86_64-unknown-linux-gnu/nrfutil -o nrfutil
+RUN mv nrfutil /usr/bin
+ENV PATH="$PATH:/usr/bin"
+WORKDIR /usr/bin
+RUN chmod +x nrfutil
+
+RUN nrfutil install sdk-manager
+# TODO: write a script that outputs the current value of nrf sdk revision to access here instead of hardcoding
+RUN nrfutil sdk-manager toolchain install --ncs-version v3.0.2 --install-dir /home/dev/toolchains/nordic

@@ -46,6 +46,11 @@ Environmental alert system.
     ZEPHYR_SDK_INSTALL_DIR=~/zephyr-sdk-<version>
     ```
 
+# Installation using Docker
+TODO: install docker instructions
+
+docker build -t env-alert-system .
+
 # Building
 ```
 west build -b nrf52840dk/nrf52840 -p
