@@ -47,9 +47,14 @@ Environmental alert system.
     ```
 
 # Installation using Docker
-TODO: install docker instructions
+1. Install Docker by following the [instructions](https://docs.docker.com/engine/install/ubuntu/).
+2. Make sure `docker` can be run as non-root user by following the [instructions](https://docs.docker.com/engine/install/linux-postinstall/).
 
-docker build -t env-alert-system .
+This should be run from the env-alert-system dir (where `Dockerfile` is located):
+```
+docker build -f Dockerfile -t env-alert-system ..
+docker run --rm -it -v "..:/home/dev/env-alert-system-project" env-alert-system:latest bash
+```
 
 # Building
 ```
