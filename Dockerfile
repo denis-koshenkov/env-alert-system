@@ -24,40 +24,42 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 # Install west
 RUN pip3 install west
 
-# COPY . /home/dev/env-alert-system-project
-COPY env-alert-system/west.yml /home/dev/env-alert-system-project/env-alert-system/west.yml
-COPY .west /home/dev/env-alert-system-project/.west
+# Set ZEPHYR_BASE instead of exporting Zephyr CMake package
+# find_package(Zephyr) will work as long as ZEPHYR_BASE is set, so exporting the Zephyr CMake package is not necessary
+ENV ZEPHYR_BASE=/home/dev/env-alert-system-project/nrf-sdk/zephyr
 
-# Copy Zephyr west-related files to run Zephyr west commands 
-COPY nrf-sdk/zephyr/west.yml /home/dev/env-alert-system-project/nrf-sdk/zephyr/west.yml
-COPY nrf-sdk/zephyr/scripts/west-commands.yml /home/dev/env-alert-system-project/nrf-sdk/zephyr/scripts/west-commands.yml
-COPY nrf-sdk/zephyr/scripts/west_commands /home/dev/env-alert-system-project/nrf-sdk/zephyr/scripts/west_commands
+# Install Python dependencies
+COPY nrf-sdk/zephyr/scripts/requirements*.txt /tmp/requirements/zephyr/
+RUN pip3 install -r /tmp/requirements/zephyr/requirements.txt
 
-# Export Zephyr CMake package
-WORKDIR /home/dev/env-alert-system-project
-RUN west zephyr-export
+COPY nrf-sdk/nrf/scripts/requirements*.txt /tmp/requirements/nrf/
+RUN pip3 install -r /tmp/requirements/nrf/requirements.txt
 
-# # Set ZEPHYR_BASE instead of exporting Zephyr CMake package
-# # find_package(Zephyr) will work as long as ZEPHYR_BASE is set, so exporting the Zephyr CMake package is not necessary
-# ENV ZEPHYR_BASE=/home/dev/env-alert-system-project/nrf-sdk/zephyr
+COPY nrf-sdk/bootloader/mcuboot/scripts/requirements.txt /tmp/requirements/bootloader/requirements.txt
+RUN pip3 install -r /tmp/requirements/bootloader/requirements.txt
 
-# # Install Python dependencies
-# # COPY nrf-sdk/zephyr /home/dev/env-alert-system-project/nrf-sdk/zephyr
-# RUN pip3 install -r /home/dev/env-alert-system-project/nrf-sdk/zephyr/scripts/requirements.txt
+RUN rm -rf /tmp/requirements/
 
-# # COPY nrf-sdk/nrf /home/dev/env-alert-system-project/nrf-sdk/nrf
-# RUN pip3 install -r /home/dev/env-alert-system-project/nrf-sdk/nrf/scripts/requirements.txt
+SHELL ["/bin/bash", "-eo", "pipefail", "-c"]
 
-# RUN --mount=type=bind,source=nrf-sdk/bootloader/mcuboot/scripts/requirements.txt,dst=/home/dev/requirements/bootloader/requirements.txt \
-#   pip3 install -r /home/dev/requirements/bootloader/requirements.txt
+# Install Zephyr SDK
+COPY nrf-sdk/zephyr/SDK_VERSION tmp/ZEPHYR_SDK_VERSION
+RUN <<EOF
+  ZSDK_VERSION="$(cat tmp/ZEPHYR_SDK_VERSION)"
+  echo "The variable contains: $ZSDK_VERSION"
+  mkdir -p /opt/toolchains
+	cd /opt/toolchains
+	wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/zephyr-sdk-${ZSDK_VERSION}_linux-${HOSTTYPE}.tar.xz
+	tar xf zephyr-sdk-${ZSDK_VERSION}_linux-${HOSTTYPE}.tar.xz
+	zephyr-sdk-${ZSDK_VERSION}/setup.sh -t arm-zephyr-eabi -h -c
+	rm zephyr-sdk-${ZSDK_VERSION}_linux-${HOSTTYPE}.tar.xz
+EOF
+RUN rm /tmp/ZEPHYR_SDK_VERSION
 
-# # Install Zephyr SDK
-# WORKDIR /home/dev/env-alert-system-project/nrf-sdk/zephyr
-# RUN west sdk install --install-dir /home/dev/toolchains
+# This is done instead of `source zephyr-env.sh`. ZEPHYR_BASE is already set above, all that is left is to add $ZEPHYR_BASE/scripts to $PATH
+ENV PATH="$ZEPHYR_BASE/scripts:$PATH"
 
-# # This is done instead of `source zephyr-env.sh`. ZEPHYR_BASE is already set above, all that is left is to add $ZEPHYR_BASE/scripts to $PATH
-# ENV PATH="$ZEPHYR_BASE/scripts:$PATH"
+ENV ZEPHYR_TOOLCHAIN_VARIANT=zephyr
 
-# WORKDIR /home/dev/env-alert-system-project/env-alert-system
-
-RUN rm -rf /home/dev/env-alert-system-project
+# So that the user could immediately run `west build` in the container
+WORKDIR /home/dev/env-alert-system-project/env-alert-system

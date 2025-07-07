@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 4.0.3)
 
-find_package(Zephyr)
+find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(env-alert-system)
 
 target_sources(app PRIVATE src/main.c)
