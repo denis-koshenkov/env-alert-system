@@ -49,10 +49,10 @@ RUN <<EOF
   echo "The variable contains: $ZSDK_VERSION"
   mkdir -p /opt/toolchains
 	cd /opt/toolchains
-	wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/zephyr-sdk-${ZSDK_VERSION}_linux-${HOSTTYPE}.tar.xz
-	tar xf zephyr-sdk-${ZSDK_VERSION}_linux-${HOSTTYPE}.tar.xz
-	zephyr-sdk-${ZSDK_VERSION}/setup.sh -t arm-zephyr-eabi -h -c
-	rm zephyr-sdk-${ZSDK_VERSION}_linux-${HOSTTYPE}.tar.xz
+	wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/zephyr-sdk-${ZSDK_VERSION}_linux-${HOSTTYPE}_minimal.tar.xz
+	tar xf zephyr-sdk-${ZSDK_VERSION}_linux-${HOSTTYPE}_minimal.tar.xz
+	zephyr-sdk-${ZSDK_VERSION}/setup.sh -t arm-zephyr-eabi -c
+	rm zephyr-sdk-${ZSDK_VERSION}_linux-${HOSTTYPE}_minimal.tar.xz
 EOF
 RUN rm /tmp/ZEPHYR_SDK_VERSION
 
