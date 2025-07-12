@@ -53,7 +53,9 @@ Environmental alert system.
 This should be run from the env-alert-system dir (where `Dockerfile` is located):
 ```
 docker build -f Dockerfile -t env-alert-system ..
-docker run --rm -it -v "..:/home/dev/env-alert-system-project" env-alert-system:latest bash
+docker run --rm -it -v "..:/home/$USER/env-alert-system-project" env-alert-system:latest bash
+
+docker build -f Dockerfile --build-arg UID=$(id -u) --build-arg GID=$(id -g) --build-arg USERNAME=$(id -u -n) -t env-alert-system ..
 ```
 
 # Building
