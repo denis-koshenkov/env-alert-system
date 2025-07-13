@@ -63,3 +63,10 @@ ENV ZEPHYR_TOOLCHAIN_VARIANT=zephyr
 
 # So that the user could immediately run `west build` in the container
 WORKDIR /home/dev/env-alert-system-project/env-alert-system
+
+# Avoid git dubious ownership errors
+RUN <<EOF
+	git config --global --add safe.directory /home/dev/env-alert-system-project/nrf-sdk/nrf
+	git config --global --add safe.directory /home/dev/env-alert-system-project/nrf-sdk/zephyr
+	git config --global --add safe.directory /home/dev/env-alert-system-project/nrf-sdk/tools/bsim
+EOF
