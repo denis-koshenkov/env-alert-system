@@ -2,67 +2,79 @@
 Environmental alert system.
 
 # Installtion
-1. Install prerequisites for nRF Connect SDK:
+1. Install `pip`, because it is needed to install `west`:
+    ```
+    sudo apt install python3-pip
+    ```
 
-    - nRF Util with `device` command installed
+2. Install `west`:
+    ```
+    pip3 install west
+    ```
+
+3. Install nRF Util, including its prerequisites, by following the [instructions](https://docs.nordicsemi.com/bundle/nrfutil/page/guides/installing.html). The prerquisites are:
     - SEGGER J-Link
-    - `nrf-udev` module
-    - nRF Connect SDK toolchain - should be the same version as the version of the `nrf` project specified in `west.yml`
+    - libusb-1.0-0
+    - nrf-udev
 
-    See the [nRF Connect SDK installation guide](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/installation/install_ncs.html) for details on how to install each of these tools.
+4. Install the `device` command for `nrfutil`:
+    ```
+    nrfutil install device
+    ```
+    Check [here](https://docs.nordicsemi.com/bundle/nrfutil/page/guides/installing_commands.html) for more advanced installation information.
 
-2. Clone the project and its dependencies:
+5. Install Docker by following the [instructions](https://docs.docker.com/engine/install/ubuntu/).
+
+6. Make sure `docker` can be run as non-root user by following the [instructions](https://docs.docker.com/engine/install/linux-postinstall/).
+
+7. Clone the project and its dependencies:
     ```
     west init -m git@github.com:denis-koshenkov/env-alert-system env-alert-system-project
     cd env-alert-system-project
     west update
     ```
 
-3. Export Zephyr CMake package:
-    ```
-    west zephyr-export
-    ```
-
-3. Install python dependencies:
-    ```
-    pip3 install -r zephyr/scripts/requirements.txt
-    pip3 install -r nrf/scripts/requirements.txt
-    pip3 install -r bootloader/mcuboot/scripts/requirements.txt
-    ``` 
-
-4. Install the Zephyr SDK:
-    ```
-    cd zephyr
-    west sdk install
-    ```
-
-5. Set the following Zephyr environmental variables:
-    ```
-    export ZEPHYR_BASE=<absolute_path_to_proj>/env-alert-system-project/zephyr
-    export ZEPHYR_SDK_INSTALL_DIR=<absolute_path_to_zephyr_sdk>/zephyr-sdk-<version>
-    ```
-    Zephyr SDK is installed by default into the home directory, i.e. `~`, so the path to the Zephyr SDK is likely:
-    ```
-    ZEPHYR_SDK_INSTALL_DIR=~/zephyr-sdk-<version>
-    ```
-
-# Installation using Docker
-1. Install Docker by following the [instructions](https://docs.docker.com/engine/install/ubuntu/).
-2. Make sure `docker` can be run as non-root user by following the [instructions](https://docs.docker.com/engine/install/linux-postinstall/).
-
-This should be run from the env-alert-system dir (where `Dockerfile` is located):
-```
-docker build -f Dockerfile -t env-alert-system ..
-docker run --rm -it -v "..:/home/dev/env-alert-system-project" env-alert-system:latest bash
-```
+Explanation:
+- `west` is used to clone the project source code and the source code of third-party dependencies, such as `nrf-sdk`.
+- nRF Util `device` command is used for flashing the firmware to the target hardware.
+- `docker` is used for containerization of the build system. All dependencies necessary for producing the firmware binary are managed by the docker image, so they do not have to be installed on the host machine.
 
 # Building
+The following should be run from the `env-alert-system` dir.
+
+Build the docker image:
+```
+docker build -f Dockerfile -t env-alert-system ..
+```
+
+Start the docker container based on that image:
+```
+docker run --rm -it -v "..:/workdir/env-alert-system-project" env-alert-system:latest bash
+```
+
+Inside the docker container, build the firmware:
 ```
 west build -b nrf52840dk/nrf52840 -p
 ```
 
+The resulting firmware is the `build/merged.hex` file.
+
+## Rebuilding the Docker image
+In the usual workflow, it is not necessary to rebuild the docker image. However, the docker image should be rebuilt when the version of `nrf-sdk` used for this project is updated.
+
+The reason for this is that the docker image uses various `requirements*.txt` files to install python dependencies necessary for `nrf-sdk`, `zephyr`, and `mcuboot`. It also uses the `nrf-sdk/zephyr/SDK_VERSION` file to determine the version of the Zephyr SDK to be installed.
+
+As the `nrf-sdk` version changes, the dependencies listed in the `requirements*.txt` may change. The `SDK_VERSION` that is used in `zephyr` may also change. Because of this, if any of the following files are changed, the docker image needs to be rebuilt:
+- `nrf-sdk/zephyr/scripts/requirements*.txt` - `*` stands for wildcard, as there are several requirements files the names of which start with `requirements` . If any of these files change, the docker image should be rebuilt. 
+- `nrf-sdk/nrf/scripts/requirements*.txt` - the wildcard explanation above also applies here.
+- `nrf-sdk/bootloader/mcuboot/scripts/requirements.txt`
+- `nrf-sdk/zephyr/SDK_VERSION`
+
+In order not to keep track if these files were updated as a part of a `nrf-sdk` version update, it is easier to always rebuild the docker image whenever the `nrf-sdk` version used in this project changes. In order to rebuild the docker image, use the `docker build` command mentioned above.
+
+
 # Flashing
-Run from outside the docker container from the `env-alert-system` directory:
+Run the following outside the docker container from the `env-alert-system` directory:
 ```
 nrfutil device program --firmware build/merged.hex --options chip_erase_mode=ERASE_ALL,reset=RESET_SYSTEM
 ```
