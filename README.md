@@ -62,6 +62,9 @@ west build -b nrf52840dk/nrf52840 -p
 ```
 
 # Flashing
+Run from outside the docker container from the `env-alert-system` directory:
 ```
-west flash
+nrfutil device program --firmware build/merged.hex --options chip_erase_mode=ERASE_ALL,reset=RESET_SYSTEM
 ```
+
+Flashing the firmware happens outside of the docker container. The purpose of the docker container is create the firmware binary in a reproducable manner, not upload the firmware to the target hardware. The reasoning for this is to allow developers to use GUI-based debuggers (e.g. SEGGER Ozone) which is impossible from inside the docker container.
