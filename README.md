@@ -57,6 +57,13 @@ Inside the docker container, build the firmware:
 west build -b nrf52840dk/nrf52840 -p
 ```
 
+Build unit tests:
+```
+mkdir build
+cd build
+cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -GNinja ..
+```
+
 The resulting firmware is the `build/merged.hex` file.
 
 ## Rebuilding the Docker image
