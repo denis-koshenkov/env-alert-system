@@ -57,11 +57,16 @@ Inside the docker container, build the firmware:
 west build -b nrf52840dk/nrf52840 -p
 ```
 
+Or build the firmware using CMake directly:
+```
+cmake -GNinja -Bbuild -DBOARD=nrf52840dk/nrf52840 -DAPP_DIR=. ../nrf-sdk/zephyr/share/sysbuild
+ninja -Cbuild
+```
+
 Build unit tests:
 ```
-mkdir build
-cd build
-cmake -GNinja -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/gcc.cmake ..
+cmake -GNinja -Bbuild -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/gcc.cmake -DBUILD_TESTS=ON
+ninja -Cbuild
 ```
 
 The resulting firmware is the `build/merged.hex` file.
