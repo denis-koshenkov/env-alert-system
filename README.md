@@ -61,7 +61,7 @@ Build unit tests:
 ```
 mkdir build
 cd build
-cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -GNinja ..
+cmake -GNinja -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/gcc.cmake ..
 ```
 
 The resulting firmware is the `build/merged.hex` file.
