@@ -1,0 +1,6 @@
+west-commands:
+  - file: scripts/west-commands/eas-build-tests.py
+    commands:
+      - name: eas-build-tests
+        class: EasBuildTests
+        help: build unit test executable
