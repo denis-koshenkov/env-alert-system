@@ -4,3 +4,8 @@ west-commands:
       - name: eas-build-tests
         class: EasBuildTests
         help: build unit test executable
+  - file: scripts/west-commands/eas-build-nrf.py
+    commands:
+      - name: eas-build-nrf
+        class: EasBuildNrf
+        help: build firmware for nrf52840
