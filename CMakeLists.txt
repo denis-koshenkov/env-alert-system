@@ -13,6 +13,10 @@ if (BUILD_TESTS)
     target_sources(app_tests PRIVATE test/main.cpp)
     target_sources(app_tests PRIVATE test/first_test.cpp)
 
+    # The policy allows us to change options of external projects using set()
+    cmake_policy(SET CMP0077 NEW)
+    set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+
     set(TESTS OFF) # Disable cpputest self-tests
     add_subdirectory(
         ${CMAKE_CURRENT_SOURCE_DIR}/../cpputest
