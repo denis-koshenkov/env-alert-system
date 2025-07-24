@@ -11,7 +11,15 @@ project(env-alert-system)
 if (BUILD_TESTS)
     add_executable(app_tests)
     target_sources(app_tests PRIVATE test/main.cpp)
-    target_sources(app_tests PRIVATE test/first_test.cpp)
+
+    # Application sources
+    target_sources(app_tests PRIVATE src/temperature_value.c)
+
+    # Include directories
+    target_include_directories(app_tests PRIVATE src src/hal)
+    
+    # Test sources
+    target_sources(app_tests PRIVATE test/temperature_value.cpp)
 
     # The policy allows us to change options of external projects using set()
     cmake_policy(SET CMP0077 NEW)
