@@ -2,8 +2,10 @@
 
 static temperature temperature_value;
 
-void temperature_value_set(temperature temperature) {}
+void temperature_value_set(temperature temperature) {
+    temperature_value = temperature;
+}
 
 temperature temperature_value_get() {
-    return 0;
+    return temperature_value;
 }
