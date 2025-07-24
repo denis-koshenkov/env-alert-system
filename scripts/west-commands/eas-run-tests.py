@@ -5,12 +5,12 @@ import shutil
 import subprocess
 from pathlib import Path
 
-class EasBuildTests(WestCommand):
+class EasRunTests(WestCommand):
 
     def __init__(self):
         super().__init__(
-            'eas-build-tests',
-            'Build unit test executable',
+            'eas-run-tests',
+            'Build and run unit test executable',
             ''
         )
 
@@ -40,6 +40,13 @@ class EasBuildTests(WestCommand):
         p.check_returncode() # Raises an exception if the return code is not 0
 
         cmd = cmake + ' --build ' + str(build_dir_path) + ' --' 
+        print('Running command: ' + cmd)
+        p = subprocess.run(cmd, shell=True)
+        p.check_returncode() # Raises an exception if the return code is not 0
+
+        # Run the produced test executable
+        app_tests_executable_path = Path(manifest.repo_abspath) / 'build' / 'app_tests'
+        cmd = str(app_tests_executable_path)
         print('Running command: ' + cmd)
         p = subprocess.run(cmd, shell=True)
         p.check_returncode() # Raises an exception if the return code is not 0

@@ -1,9 +1,9 @@
 west-commands:
-  - file: scripts/west-commands/eas-build-tests.py
+  - file: scripts/west-commands/eas-run-tests.py
     commands:
-      - name: eas-build-tests
-        class: EasBuildTests
-        help: build unit test executable
+      - name: eas-run-tests
+        class: EasRunTests
+        help: build and run unit test executable
   - file: scripts/west-commands/eas-build-nrf.py
     commands:
       - name: eas-build-nrf
