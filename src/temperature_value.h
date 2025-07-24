@@ -3,8 +3,12 @@
 
 #include "hal/temperature.h"
 
-void temperature_value_set(temperature temperature);
+struct temperature_value {
+    temperature value;
+};
 
-temperature temperature_value_get();
+void temperature_value_set(struct temperature_value *temperature_value, temperature value);
+
+temperature temperature_value_get(struct temperature_value *temperature_value);
 
 #endif
