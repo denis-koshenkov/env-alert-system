@@ -17,6 +17,7 @@ if (BUILD_TESTS)
 
     # Include directories
     target_include_directories(app_tests PRIVATE src src/hal)
+    target_include_directories(app_tests PRIVATE port/unit-test-off-target/include)
     
     # Test sources
     target_sources(app_tests PRIVATE test/temperature_value.cpp)
@@ -35,5 +36,6 @@ if (BUILD_TESTS)
         CppUTest
         CppUTestExt)
 else()
+    # TODO: add port/prod-fw/include to include directories when building prod fw for target hw - needed to access the EAS_ASSERT macro
     target_sources(app PRIVATE src/main.c)
 endif()
