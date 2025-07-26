@@ -9,6 +9,10 @@ endif()
 project(env-alert-system)
 
 if (BUILD_TESTS)
+    # Needed so that asserts actually fire
+    # TODO: to -DCMAKE_BUILD_TYPE=Debug in the west command implementation instead of this
+    set(CMAKE_BUILD_TYPE "Debug")
+
     add_executable(app_tests)
     target_sources(app_tests PRIVATE test/main.cpp)
 
@@ -17,6 +21,7 @@ if (BUILD_TESTS)
 
     # Include directories
     target_include_directories(app_tests PRIVATE src src/hal)
+    target_include_directories(app_tests PRIVATE port/unit-test-desktop/include)
     
     # Test sources
     target_sources(app_tests PRIVATE test/temperature_value.cpp)
