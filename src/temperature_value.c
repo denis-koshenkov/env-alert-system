@@ -13,3 +13,9 @@ temperature temperature_value_get(struct temperature_value *temperature_value)
     EAS_ASSERT(temperature_value);
     return temperature_value->value;
 }
+
+bool temperature_value_is_value_changed(struct temperature_value *temperature_value)
+{
+    EAS_ASSERT(temperature_value);
+    return true;
+}

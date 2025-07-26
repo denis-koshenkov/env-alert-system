@@ -24,3 +24,11 @@ TEST(TemperatureValue, GetWhatWeSetValue22)
     temperature retrieved_temperature = temperature_value_get(&temperature_value);
     CHECK_EQUAL(set_temperature, retrieved_temperature);
 }
+
+TEST(TemperatureValue, IsValueChangedReturnsTrueAfterSetIsCalled)
+{
+    temperature_value temperature_value;
+    temperature_value_set(&temperature_value, 23);
+    bool is_value_changed = temperature_value_is_value_changed(&temperature_value);
+    CHECK(is_value_changed);
+}
