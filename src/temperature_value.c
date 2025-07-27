@@ -1,19 +1,32 @@
+#include <stddef.h>
+
+#include "config.h"
+#include "eas_assert.h"
 #include "temperature_value.h"
 
-#include "eas_assert.h"
+#ifndef CONFIG_TEMPERATURE_VALUE_MAX_NUM_INSTANCES
+#define CONFIG_TEMPERATURE_VALUE_MAX_NUM_INSTANCES 1
+#endif
 
-void temperature_value_set(struct temperature_value *temperature_value, temperature value)
+struct temperature_value_struct {
+    temperature value;
+};
+
+static struct temperature_value_struct instances[CONFIG_TEMPERATURE_VALUE_MAX_NUM_INSTANCES];
+static size_t instance_idx = 0;
+
+temperature_value temperature_value_create()
 {
-    temperature_value->value = value;
+    EAS_ASSERT(instance_idx < CONFIG_TEMPERATURE_VALUE_MAX_NUM_INSTANCES);
+    return &instances[instance_idx++];
 }
 
-temperature temperature_value_get(struct temperature_value *temperature_value)
+void temperature_value_set(temperature_value t, temperature value)
 {
-    return temperature_value->value;
+    t->value = value;
 }
 
-temperature temperature_value_assert_test(struct temperature_value *temperature_value)
+temperature temperature_value_get(temperature_value t)
 {
-    EAS_ASSERT(temperature_value);
-    return temperature_value->value;
+    return t->value;
 }

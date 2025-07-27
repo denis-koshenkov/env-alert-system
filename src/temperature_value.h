@@ -3,14 +3,12 @@
 
 #include "hal/temperature.h"
 
-struct temperature_value {
-    temperature value;
-};
+typedef struct temperature_value_struct *temperature_value;
 
-void temperature_value_set(struct temperature_value *temperature_value, temperature value);
+temperature_value temperature_value_create();
 
-temperature temperature_value_get(struct temperature_value *temperature_value);
+void temperature_value_set(temperature_value t, temperature value);
 
-temperature temperature_value_assert_test(struct temperature_value *temperature_value);
+temperature temperature_value_get(temperature_value t);
 
 #endif
