@@ -42,3 +42,9 @@ bool temperature_value_is_value_changed(struct temperature_value *temperature_va
 
     return temperature_value->value_changed;
 }
+
+bool temperature_value_assert_test(struct temperature_value *temperature_value)
+{
+    EAS_ASSERT(temperature_value);
+    return temperature_value->initialized;
+}

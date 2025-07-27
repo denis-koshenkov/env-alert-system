@@ -1,4 +1,5 @@
 #include "CppUTest/TestHarness.h"
+#include "CppUTestExt/TestAssertPlugin.h"
 
 extern "C"
 {
@@ -81,4 +82,12 @@ TEST(TemperatureValue, IsValueChangedReturnsFalseAfterSetIsCalledManyTimesAndFin
     temperature_value_set(&temperature_value, 20);
     bool is_value_changed = temperature_value_is_value_changed(&temperature_value);
     CHECK(!is_value_changed);
+}
+
+TEST(TemperatureValue, AssertTest)
+{
+    temperature_value temperature_value;
+    temperature_value_init(&temperature_value);
+    TestAssertPlugin::expectAssertion();
+    temperature_value_assert_test(NULL);
 }

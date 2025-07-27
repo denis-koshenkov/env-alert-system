@@ -2,8 +2,8 @@ manifest:
   remotes:
     - name: nrfconnect
       url-base: https://github.com/nrfconnect
-    - name: cpputest
-      url-base: https://github.com/cpputest
+    - name: denis-koshenkov
+      url-base: https://github.com/denis-koshenkov
 
   projects:
     - name: nrf
@@ -13,8 +13,8 @@ manifest:
       import:
         path-prefix: nrf-sdk
     - name: cpputest
-      remote: cpputest
-      revision: v4.0
+      remote: denis-koshenkov
+      revision: 90f3383b20c0db7666d6cfeff25367accf129889 # v4.0 + test assert plugin
 
   self:
     west-commands: scripts/west-commands.yml

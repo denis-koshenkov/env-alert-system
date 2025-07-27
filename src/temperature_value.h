@@ -28,4 +28,6 @@ temperature temperature_value_get(struct temperature_value *temperature_value);
 
 bool temperature_value_is_value_changed(struct temperature_value *temperature_value);
 
+bool temperature_value_assert_test(struct temperature_value *temperature_value);
+
 #endif
