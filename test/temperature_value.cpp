@@ -25,3 +25,16 @@ TEST(TemperatureValue, GetWhatWeSetValue22)
     temperature retrieved_temperature = temperature_value_get(t);
     CHECK_EQUAL(set_temperature, retrieved_temperature);
 }
+
+TEST(TemperatureValue, SetRaisesAssertNullPointer)
+{
+    temperature set_temperature = 22;
+    TestAssertPlugin::expectAssertion();
+    temperature_value_set(NULL, set_temperature);
+}
+
+TEST(TemperatureValue, GetRaisesAssertNullPointer)
+{
+    TestAssertPlugin::expectAssertion();
+    temperature value = temperature_value_get(NULL);
+}

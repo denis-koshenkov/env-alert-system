@@ -23,10 +23,12 @@ temperature_value temperature_value_create()
 
 void temperature_value_set(temperature_value t, temperature value)
 {
+    EAS_ASSERT(t);
     t->value = value;
 }
 
 temperature temperature_value_get(temperature_value t)
 {
+    EAS_ASSERT(t);
     return t->value;
 }
