@@ -38,3 +38,27 @@ TEST(TemperatureValue, GetRaisesAssertNullPointer)
     TestAssertPlugin::expectAssertion();
     temperature value = temperature_value_get(NULL);
 }
+
+TEST(TemperatureValue, IsValueChangedRaisesAssertIfCalledBeforeSet)
+{
+    temperature_value t = temperature_value_create();
+    TestAssertPlugin::expectAssertion();
+    temperature value = temperature_value_is_value_changed(t);
+}
+
+TEST(TemperatureValue, IsValueChangedReturnsTrueAfterSetIsCalledOnce)
+{
+    temperature_value t = temperature_value_create();
+    temperature_value_set(t, 30);
+    bool is_value_changed = temperature_value_is_value_changed(t);
+    CHECK(is_value_changed);
+}
+
+TEST(TemperatureValue, IsValueChangedReturnsFalseAfterTwoDifferentValuesAreSet)
+{
+    temperature_value t = temperature_value_create();
+    temperature_value_set(t, 30);
+    temperature_value_set(t, 20);
+    bool is_value_changed = temperature_value_is_value_changed(t);
+    CHECK(!is_value_changed);
+}
