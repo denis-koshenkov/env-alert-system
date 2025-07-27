@@ -1,4 +1,5 @@
 #include "CppUTest/TestHarness.h"
+#include "CppUTestExt/TestAssertPlugin.h"
 
 extern "C"
 {
@@ -23,4 +24,11 @@ TEST(TemperatureValue, GetWhatWeSetValue22)
     temperature_value_set(&temperature_value, set_temperature);
     temperature retrieved_temperature = temperature_value_get(&temperature_value);
     CHECK_EQUAL(set_temperature, retrieved_temperature);
+}
+
+TEST(TemperatureValue, MinimalAssertTest)
+{
+    temperature_value temperature_value;
+    TestAssertPlugin::expectAssertion();
+    temperature_value_assert_test(&temperature_value);
 }

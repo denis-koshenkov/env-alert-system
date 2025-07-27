@@ -1,5 +1,7 @@
 #include "temperature_value.h"
 
+#include "eas_assert.h"
+
 void temperature_value_set(struct temperature_value *temperature_value, temperature value)
 {
     temperature_value->value = value;
@@ -7,5 +9,11 @@ void temperature_value_set(struct temperature_value *temperature_value, temperat
 
 temperature temperature_value_get(struct temperature_value *temperature_value)
 {
+    return temperature_value->value;
+}
+
+temperature temperature_value_assert_test(struct temperature_value *temperature_value)
+{
+    EAS_ASSERT(temperature_value);
     return temperature_value->value;
 }

@@ -11,4 +11,6 @@ void temperature_value_set(struct temperature_value *temperature_value, temperat
 
 temperature temperature_value_get(struct temperature_value *temperature_value);
 
+temperature temperature_value_assert_test(struct temperature_value *temperature_value);
+
 #endif
