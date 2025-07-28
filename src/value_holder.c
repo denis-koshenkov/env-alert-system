@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <string.h>
 
 #include "config.h"
@@ -11,6 +12,7 @@
 struct value_holder_struct {
     uint8_t *value_buf;
     size_t value_size;
+    bool set_has_been_called;
 };
 
 static struct value_holder_struct instances[CONFIG_VALUE_HOLDER_MAX_NUM_INSTANCES];
@@ -24,6 +26,7 @@ value_holder value_holder_create(uint8_t *value_buf, size_t value_size)
 
     instance->value_buf = value_buf;
     instance->value_size = value_size;
+    instance->set_has_been_called = false;
 
     return instance;
 }
@@ -33,9 +36,13 @@ void value_holder_set(value_holder t, void *value)
     EAS_ASSERT(t);
     EAS_ASSERT(value);
     memcpy(t->value_buf, value, t->value_size);
+    t->set_has_been_called = true;
 }
 
 void value_holder_get(value_holder t, void *value)
 {
+    EAS_ASSERT(t);
+    EAS_ASSERT(value);
+    EAS_ASSERT(t->set_has_been_called);
     memcpy(value, t->value_buf, t->value_size);
 }
