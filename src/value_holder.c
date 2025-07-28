@@ -30,6 +30,8 @@ value_holder value_holder_create(uint8_t *value_buf, size_t value_size)
 
 void value_holder_set(value_holder t, void *value)
 {
+    EAS_ASSERT(t);
+    EAS_ASSERT(value);
     memcpy(t->value_buf, value, t->value_size);
 }
 

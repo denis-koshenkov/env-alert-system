@@ -42,3 +42,24 @@ TEST(ValueHolder, GetWhatWeSet8bytes)
     value_holder_get(vh, (void *)&value_get);
     CHECK(memcmp(value_set, value_get, 8) == 0);
 }
+
+TEST(ValueHolder, SetRaisesAssertVhNullPointer)
+{
+    uint8_t dummy_buf;
+    TestAssertPlugin::expectAssertion();
+    value_holder_set(NULL, (void *)&dummy_buf);
+}
+
+TEST(ValueHolder, SetRaisesAssertValueNullPointer)
+{
+    uint8_t value_buf;
+    value_holder vh = value_holder_create(&value_buf, sizeof(uint8_t));
+    TestAssertPlugin::expectAssertion();
+    value_holder_set(vh, NULL);
+}
+
+TEST(ValueHolder, SetRaisesAssertVhAndValueNullPointer)
+{
+    TestAssertPlugin::expectAssertion();
+    value_holder_set(NULL, NULL);
+}
