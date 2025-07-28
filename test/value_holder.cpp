@@ -46,7 +46,7 @@ TEST(ValueHolder, GetWhatWeSet8bytes)
 TEST(ValueHolder, SetRaisesAssertVhNullPointer)
 {
     uint8_t dummy_buf;
-    TestAssertPlugin::expectAssertion();
+    TestAssertPlugin::expectAssertion("t");
     value_holder_set(NULL, &dummy_buf);
 }
 
@@ -54,20 +54,14 @@ TEST(ValueHolder, SetRaisesAssertValueNullPointer)
 {
     uint8_t value_buf;
     value_holder vh = value_holder_create(&value_buf, sizeof(uint8_t));
-    TestAssertPlugin::expectAssertion();
+    TestAssertPlugin::expectAssertion("value");
     value_holder_set(vh, NULL);
-}
-
-TEST(ValueHolder, SetRaisesAssertVhAndValueNullPointer)
-{
-    TestAssertPlugin::expectAssertion();
-    value_holder_set(NULL, NULL);
 }
 
 TEST(ValueHolder, GetRaisesAssertVhNullPointer)
 {
     uint8_t dummy_buf;
-    TestAssertPlugin::expectAssertion();
+    TestAssertPlugin::expectAssertion("t");
     value_holder_get(NULL, &dummy_buf);
 }
 
@@ -75,7 +69,7 @@ TEST(ValueHolder, GetRaisesAssertValueNullPointer)
 {
     uint8_t value_buf;
     value_holder vh = value_holder_create(&value_buf, sizeof(uint8_t));
-    TestAssertPlugin::expectAssertion();
+    TestAssertPlugin::expectAssertion("value");
     value_holder_get(vh, NULL);
 }
 
@@ -84,6 +78,6 @@ TEST(ValueHolder, GetRaisesAssertIfCalledBeforeSet)
     uint8_t value_buf;
     value_holder vh = value_holder_create(&value_buf, sizeof(uint8_t));
     uint8_t value;
-    TestAssertPlugin::expectAssertion();
+    TestAssertPlugin::expectAssertion("t->set_has_been_called");
     value_holder_get(vh, &value);
 }

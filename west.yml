@@ -14,7 +14,7 @@ manifest:
         path-prefix: nrf-sdk
     - name: cpputest
       remote: denis-koshenkov
-      revision: 933dd48fede5e10eb0907ce2174ef114b86e2059 # v4.0 + test assert plugin
+      revision: 7710d1a37719150aac97110df954f40527002080 # v4.0 + test assert plugin
 
   self:
     west-commands: scripts/west-commands.yml
