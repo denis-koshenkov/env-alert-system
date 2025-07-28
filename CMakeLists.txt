@@ -13,14 +13,14 @@ if (BUILD_TESTS)
     target_sources(app_tests PRIVATE test/main.cpp)
 
     # Application sources
-    target_sources(app_tests PRIVATE src/temperature_value.c)
+    target_sources(app_tests PRIVATE src/value_holder.c)
 
     # Include directories
-    target_include_directories(app_tests PRIVATE src src/hal)
+    target_include_directories(app_tests PRIVATE src)
     target_include_directories(app_tests PRIVATE port/unit-test-off-target/include)
     
     # Test sources
-    target_sources(app_tests PRIVATE test/temperature_value.cpp)
+    target_sources(app_tests PRIVATE test/value_holder.cpp)
 
     # The policy allows us to change options of external projects using set()
     cmake_policy(SET CMP0077 NEW)

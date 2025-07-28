@@ -1,5 +1,5 @@
-#ifndef TEMPERATURE_H
-#define TEMPERATURE_H
+#ifndef TEMPERATURE_VALUE_H
+#define TEMPERATURE_VALUE_H
 
 #include <stdbool.h>
 
