@@ -13,6 +13,7 @@ struct value_holder_struct {
     uint8_t *value_buf;
     size_t value_size;
     bool set_has_been_called;
+    bool value_changed;
 };
 
 static struct value_holder_struct instances[CONFIG_VALUE_HOLDER_MAX_NUM_INSTANCES];
@@ -27,22 +28,38 @@ value_holder value_holder_create(uint8_t *value_buf, size_t value_size)
     instance->value_buf = value_buf;
     instance->value_size = value_size;
     instance->set_has_been_called = false;
+    instance->value_changed = false;
 
     return instance;
 }
 
-void value_holder_set(value_holder t, void *value)
+void value_holder_set(value_holder vh, void *value)
 {
-    EAS_ASSERT(t);
+    EAS_ASSERT(vh);
     EAS_ASSERT(value);
-    memcpy(t->value_buf, value, t->value_size);
-    t->set_has_been_called = true;
+
+    if (vh->set_has_been_called) {
+        vh->value_changed = memcmp(value, vh->value_buf, vh->value_size);
+    } else {
+        /* Value is being set for the first time ever -> it has changed */
+        vh->value_changed = true;
+    }
+
+    memcpy(vh->value_buf, value, vh->value_size);
+    vh->set_has_been_called = true;
 }
 
-void value_holder_get(value_holder t, void *value)
+void value_holder_get(value_holder vh, void *value)
 {
-    EAS_ASSERT(t);
+    EAS_ASSERT(vh);
     EAS_ASSERT(value);
-    EAS_ASSERT(t->set_has_been_called);
-    memcpy(value, t->value_buf, t->value_size);
+    EAS_ASSERT(vh->set_has_been_called);
+    memcpy(value, vh->value_buf, vh->value_size);
+}
+
+bool value_holder_is_value_changed(value_holder vh)
+{
+    EAS_ASSERT(vh);
+    EAS_ASSERT(vh->set_has_been_called);
+    return vh->value_changed;
 }
