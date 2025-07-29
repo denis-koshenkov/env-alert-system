@@ -163,7 +163,7 @@ IndentAccessModifiers: false
 IndentCaseBlocks: false
 IndentCaseLabels: false
 IndentExportBlock: true
-IndentExternBlock: AfterExternBlock
+IndentExternBlock: NoIndent
 IndentGotoLabels: true
 IndentPPDirectives: None
 IndentRequiresClause: true

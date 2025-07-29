@@ -3,10 +3,7 @@
 #include "CppUTest/TestHarness.h"
 #include "CppUTestExt/TestAssertPlugin.h"
 
-extern "C"
-{
 #include "value_holder.h"
-}
 
 TEST_GROUP(ValueHolder){};
 

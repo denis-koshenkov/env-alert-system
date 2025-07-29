@@ -1,6 +1,11 @@
 #ifndef TEMPERATURE_VALUE_H
 #define TEMPERATURE_VALUE_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <stdbool.h>
 
 #include "hal/temperature.h"
@@ -14,5 +19,9 @@ void temperature_value_set(temperature_value t, temperature value);
 temperature temperature_value_get(temperature_value t);
 
 bool temperature_value_is_value_changed(temperature_value t);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

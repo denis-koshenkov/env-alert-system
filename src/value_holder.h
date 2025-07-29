@@ -1,6 +1,11 @@
 #ifndef VALUE_HOLDER_H
 #define VALUE_HOLDER_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -20,5 +25,9 @@ void value_holder_get(value_holder vh, void *value);
 
 /* TODO: write that it returns true after the first time set() is called, regardless of the value. */
 bool value_holder_is_value_changed(value_holder vh);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
