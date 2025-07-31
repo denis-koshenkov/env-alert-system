@@ -6,19 +6,9 @@ extern "C"
 {
 #endif
 
-#include <stdbool.h>
-
-#include "hal/temperature.h"
-
 typedef struct temperature_value_struct *temperature_value;
 
 temperature_value temperature_value_create();
-
-void temperature_value_set(temperature_value t, temperature value);
-
-temperature temperature_value_get(temperature_value t);
-
-bool temperature_value_is_value_changed(temperature_value t);
 
 #ifdef __cplusplus
 }
