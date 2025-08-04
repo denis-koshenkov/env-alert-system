@@ -26,7 +26,6 @@ class EasBuildNrf(WestCommand):
             print('west is not installed or cannot be found; cannot build.')
             return
 
-        cmd = 'west build -b nrf52840dk/nrf52840'
-        print('Running command: ' + cmd)
-        p = subprocess.run(cmd, shell=True)
-        p.check_returncode() # Raises an exception if the return code is not 0
+        cmd = ['west', 'build', '-b', 'nrf52840dk/nrf52840']
+        print('Running command: ' + ' '.join(cmd))
+        p = subprocess.run(cmd, check=True)

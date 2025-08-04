@@ -33,19 +33,17 @@ class EasRunTests(WestCommand):
         source_dir_path = Path(manifest.repo_abspath)
         toolchain_file_path = Path(manifest.repo_abspath) / 'cmake' / 'toolchains' / 'gcc.cmake'
 
-        cmd = cmake + ' -GNinja -B' + str(build_dir_path) + ' -S' + str(source_dir_path) + \
-            ' -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_TOOLCHAIN_FILE=' + str(toolchain_file_path) + ' -DBUILD_TESTS=ON'
-        print('Running command: ' + cmd)
-        p = subprocess.run(cmd, shell=True)
-        p.check_returncode() # Raises an exception if the return code is not 0
+        cmd = [cmake, '-GNinja', '-B', str(build_dir_path), '-S', str(source_dir_path),
+            '-DCMAKE_POLICY_VERSION_MINIMUM=3.5', '-DCMAKE_TOOLCHAIN_FILE=' + str(toolchain_file_path),
+            '-DBUILD_TESTS=ON']
+        print('Running command: ' + ' '.join(cmd))
+        p = subprocess.run(cmd, check=True)
 
-        cmd = cmake + ' --build ' + str(build_dir_path) + ' --' 
-        print('Running command: ' + cmd)
-        p = subprocess.run(cmd, shell=True)
-        p.check_returncode() # Raises an exception if the return code is not 0
+        cmd = [cmake, '--build', str(build_dir_path), '--']
+        print('Running command: ' + ' '.join(cmd))
+        p = subprocess.run(cmd, check=True)
 
         # Run tests
-        cmd = 'ctest --output-on-failure'
-        print('Running command: ' + cmd)
-        p = subprocess.run(cmd, shell=True, cwd=str(build_dir_path))
-        p.check_returncode() # Raises an exception if the return code is not 0
+        cmd = ['ctest', '--output-on-failure']
+        print('Running command: ' + ' '.join(cmd))
+        p = subprocess.run(cmd, check=True, cwd=str(build_dir_path))
