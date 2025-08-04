@@ -54,22 +54,14 @@ docker run --rm -it -v "..:/workdir/env-alert-system-project" env-alert-system:l
 
 Inside the docker container, build the firmware:
 ```
-west build -b nrf52840dk/nrf52840 -p
+west eas-build-nrf
 ```
-
-Or build the firmware using CMake directly:
-```
-cmake -GNinja -Bbuild -DBOARD=nrf52840dk/nrf52840 -DAPP_DIR=. ../nrf-sdk/zephyr/share/sysbuild
-ninja -Cbuild
-```
-
-Build unit tests:
-```
-cmake -GNinja -Bbuild -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/gcc.cmake -DBUILD_TESTS=ON
-ninja -Cbuild
-```
-
 The resulting firmware is the `build/merged.hex` file.
+
+Build and run unit tests on development machine:
+```
+west eas-run-tests
+```
 
 ## Rebuilding the Docker image
 In the usual workflow, it is not necessary to rebuild the docker image. However, the docker image should be rebuilt when the version of `nrf-sdk` used for this project is updated.
