@@ -13,3 +13,12 @@ TEST(TemperatureValue, GetWhatWeSet22)
     temperature value_get = temperature_value_get(tv);
     CHECK_EQUAL(value_set, value_get);
 }
+
+TEST(TemperatureValue, GetWhatWeSet1)
+{
+    temperature_value tv = temperature_value_create();
+    temperature value_set = 1;
+    temperature_value_set(tv, value_set);
+    temperature value_get = temperature_value_get(tv);
+    CHECK_EQUAL(value_set, value_get);
+}
