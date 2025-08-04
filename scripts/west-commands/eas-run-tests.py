@@ -44,10 +44,8 @@ class EasRunTests(WestCommand):
         p = subprocess.run(cmd, shell=True)
         p.check_returncode() # Raises an exception if the return code is not 0
 
-        # Run the produced test executable
-        # TODO: run all test executables, probably using CTest
-        app_tests_executable_path = Path(manifest.repo_abspath) / 'build' / 'test' / 'exec1' / 'test_exec1'
-        cmd = str(app_tests_executable_path)
+        # Run tests
+        cmd = 'ctest --output-on-failure'
         print('Running command: ' + cmd)
-        p = subprocess.run(cmd, shell=True)
+        p = subprocess.run(cmd, shell=True, cwd=str(build_dir_path))
         p.check_returncode() # Raises an exception if the return code is not 0

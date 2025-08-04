@@ -17,4 +17,6 @@ target_link_libraries(test_common INTERFACE
 add_subdirectory(exec1)
 add_subdirectory(exec2)
 
-# TODO: register all unit test executables with CTest
+# Register all unit test executables with CTest
+add_test(NAME test_exec1 COMMAND test_exec1)
+add_test(NAME test_exec2 COMMAND test_exec2)
