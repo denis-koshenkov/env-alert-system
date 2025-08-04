@@ -8,5 +8,4 @@ target_sources(eas INTERFACE
 
 target_include_directories(eas INTERFACE
     .
-    hal
 )

@@ -6,6 +6,8 @@ extern "C"
 {
 #endif
 
+#include "hal/temperature.h"
+
 typedef struct temperature_value_struct *temperature_value;
 
 temperature_value temperature_value_create();
