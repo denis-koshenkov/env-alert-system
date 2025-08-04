@@ -14,6 +14,7 @@ if (BUILD_TESTS)
 
     # Application sources
     target_sources(app_tests PRIVATE src/value_holder.c)
+    target_sources(app_tests PRIVATE src/temperature_value.c)
 
     # Include directories
     target_include_directories(app_tests PRIVATE src)
@@ -21,6 +22,7 @@ if (BUILD_TESTS)
     
     # Test sources
     target_sources(app_tests PRIVATE test/value_holder.cpp)
+    target_sources(app_tests PRIVATE test/temperature_value.cpp)
 
     # The policy allows us to change options of external projects using set()
     cmake_policy(SET CMP0077 NEW)
@@ -34,7 +36,8 @@ if (BUILD_TESTS)
 
     target_link_libraries(app_tests PRIVATE
         CppUTest
-        CppUTestExt)
+        CppUTestExt
+    )
 else()
     # TODO: add port/prod-fw/include to include directories when building prod fw for target hw - needed to access the EAS_ASSERT macro
     target_sources(app PRIVATE src/main.c)
