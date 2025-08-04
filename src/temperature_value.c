@@ -21,3 +21,12 @@ temperature_value temperature_value_create()
 
     return instance;
 }
+
+void temperature_value_set(temperature_value tv, temperature t)
+{
+}
+
+temperature temperature_value_get(temperature_value tv)
+{
+    return 22;
+}
