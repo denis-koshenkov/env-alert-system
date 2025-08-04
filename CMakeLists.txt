@@ -8,37 +8,18 @@ endif()
 
 project(env-alert-system)
 
+# The policy allows us to change options of external projects using set()
+# Needed for CppUTest
+cmake_policy(SET CMP0077 NEW)
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+
+add_subdirectory(src)
+
 if (BUILD_TESTS)
-    add_executable(app_tests)
-    target_sources(app_tests PRIVATE test/main.cpp)
-
-    # Application sources
-    target_sources(app_tests PRIVATE src/value_holder.c)
-    target_sources(app_tests PRIVATE src/temperature_value.c)
-
-    # Include directories
-    target_include_directories(app_tests PRIVATE src)
-    target_include_directories(app_tests PRIVATE port/unit-test-off-target/include)
-    
-    # Test sources
-    target_sources(app_tests PRIVATE test/value_holder.cpp)
-    target_sources(app_tests PRIVATE test/temperature_value.cpp)
-
-    # The policy allows us to change options of external projects using set()
-    cmake_policy(SET CMP0077 NEW)
-    set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
-
-    set(TESTS OFF) # Disable cpputest self-tests
-    add_subdirectory(
-        ${CMAKE_CURRENT_SOURCE_DIR}/../cpputest
-        ${CMAKE_CURRENT_BINARY_DIR}/cpputest
-    )
-
-    target_link_libraries(app_tests PRIVATE
-        CppUTest
-        CppUTestExt
-    )
+    add_subdirectory(test)
 else()
-    # TODO: add port/prod-fw/include to include directories when building prod fw for target hw - needed to access the EAS_ASSERT macro
+    # Building production firmware
     target_sources(app PRIVATE src/main.c)
+    target_include_directories(app PRIVATE ${CMAKE_SOURCE_DIR}/port/prod-fw/include)
+    target_link_libraries(app PRIVATE eas)
 endif()
