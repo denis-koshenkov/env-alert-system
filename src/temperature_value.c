@@ -9,7 +9,9 @@
 #define CONFIG_TEMPERATURE_VALUE_MAX_NUM_INSTANCES 1
 #endif
 
-struct temperature_value_struct {};
+struct temperature_value_struct {
+    value_holder value_holder;
+};
 
 static struct temperature_value_struct instances[CONFIG_TEMPERATURE_VALUE_MAX_NUM_INSTANCES];
 static size_t instance_idx = 0;
@@ -20,7 +22,11 @@ temperature_value temperature_value_create()
     struct temperature_value_struct *instance = &instances[instance_idx];
     instance_idx++;
 
-    value_holder_create(NULL, sizeof(temperature));
-
+    instance->value_holder = value_holder_create(NULL, sizeof(temperature));
     return instance;
+}
+
+void temperature_value_set(temperature_value tv, temperature temperature)
+{
+    value_holder_set(tv->value_holder, NULL);
 }

@@ -12,6 +12,8 @@ typedef struct temperature_value_struct *temperature_value;
 
 temperature_value temperature_value_create();
 
+void temperature_value_set(temperature_value tv, temperature temperature);
+
 #ifdef __cplusplus
 }
 #endif
