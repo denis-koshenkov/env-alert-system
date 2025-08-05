@@ -39,3 +39,17 @@ TEST(TemperatureValue, setPassesPointerToArgumentToValueHolderSet)
     temperature_value tv = temperature_value_create();
     temperature_value_set(tv, t);
 }
+
+TEST(TemperatureValue, getReturnsValueReceivedFromValueHolderGet)
+{
+    temperature t = 65;
+    mock().expectOneCall("value_holder_create").withParameter("value_size", 2).andReturnValue((void *)NULL);
+    mock()
+        .expectOneCall("value_holder_get")
+        .withOutputParameterReturning("value", &t, sizeof(temperature))
+        .ignoreOtherParameters();
+
+    temperature_value tv = temperature_value_create();
+    temperature received_temperature = temperature_value_get(tv);
+    CHECK_EQUAL(t, received_temperature);
+}

@@ -14,6 +14,8 @@ temperature_value temperature_value_create();
 
 void temperature_value_set(temperature_value tv, temperature temperature);
 
+temperature temperature_value_get(temperature_value tv);
+
 #ifdef __cplusplus
 }
 #endif

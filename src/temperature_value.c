@@ -31,3 +31,10 @@ void temperature_value_set(temperature_value tv, temperature temperature)
 {
     value_holder_set(tv->value_holder, &temperature);
 }
+
+temperature temperature_value_get(temperature_value tv)
+{
+    temperature temperature;
+    value_holder_get(NULL, &temperature);
+    return temperature;
+}

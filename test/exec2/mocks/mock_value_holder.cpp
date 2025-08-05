@@ -20,3 +20,8 @@ void value_holder_set(value_holder vh, const void *value)
         .withParameter("vh", vh)
         .withMemoryBufferParameter("value", (const uint8_t *)value, value_size);
 }
+
+void value_holder_get(value_holder vh, void *value)
+{
+    mock().actualCall("value_holder_get").withParameter("vh", vh).withOutputParameter("value", value);
+}
