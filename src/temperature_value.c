@@ -38,3 +38,8 @@ temperature temperature_value_get(temperature_value tv)
     value_holder_get(tv->value_holder, &temperature);
     return temperature;
 }
+
+bool temperature_value_is_value_changed(temperature_value tv)
+{
+    return value_holder_is_value_changed(NULL);
+}

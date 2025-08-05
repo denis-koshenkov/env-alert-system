@@ -25,3 +25,9 @@ void value_holder_get(value_holder vh, void *value)
 {
     mock().actualCall("value_holder_get").withParameter("vh", vh).withOutputParameter("value", value);
 }
+
+bool value_holder_is_value_changed(value_holder vh)
+{
+    mock().actualCall("value_holder_is_value_changed").withParameter("vh", vh);
+    return mock().boolReturnValue();
+}

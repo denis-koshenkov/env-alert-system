@@ -17,6 +17,8 @@ void value_holder_set(value_holder vh, const void *value);
 
 void value_holder_get(value_holder vh, void *value);
 
+bool value_holder_is_value_changed(value_holder vh);
+
 #ifdef __cplusplus
 }
 #endif
