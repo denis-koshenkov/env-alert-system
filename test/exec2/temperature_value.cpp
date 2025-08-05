@@ -9,18 +9,33 @@ TEST_GROUP(TemperatureValue){};
 TEST(TemperatureValue, createCallsValueHolderCreateWithSize2)
 {
     mock().expectOneCall("value_holder_create").withParameter("value_size", 2).andReturnValue((void *)NULL);
+
     temperature_value tv = temperature_value_create();
 }
 
 TEST(TemperatureValue, setCallsValueHolderUsingInstanceReturnedByCreate)
 {
     void *value_holder_instance_address = (void *)0x5A;
-    mock()
-        .expectOneCall("value_holder_create")
-        .withParameter("value_size", 2)
-        .andReturnValue(value_holder_instance_address);
+    mock().expectOneCall("value_holder_create").ignoreOtherParameters().andReturnValue(value_holder_instance_address);
+    mock().expectOneCall("value_holder_set").withParameter("vh", value_holder_instance_address).ignoreOtherParameters();
+
     temperature_value tv = temperature_value_create();
     temperature t = 22;
-    mock().expectOneCall("value_holder_set").withParameter("vh", value_holder_instance_address);
+    temperature_value_set(tv, t);
+}
+
+TEST(TemperatureValue, setPassesPointerToArgumentToValueHolderSet)
+{
+    /* Pass value size to mock object, so that it can pass it to the `size` parameter of `withMemoryBufferParameter()`*/
+    mock().setData("value_holder_value_size", (unsigned int)sizeof(temperature));
+
+    temperature t = 33;
+    mock().expectOneCall("value_holder_create").withParameter("value_size", 2).andReturnValue((void *)NULL);
+    mock()
+        .expectOneCall("value_holder_set")
+        .withMemoryBufferParameter("value", (const uint8_t *)&t, sizeof(temperature))
+        .ignoreOtherParameters();
+
+    temperature_value tv = temperature_value_create();
     temperature_value_set(tv, t);
 }

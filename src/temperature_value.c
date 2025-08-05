@@ -28,5 +28,5 @@ temperature_value temperature_value_create()
 
 void temperature_value_set(temperature_value tv, temperature temperature)
 {
-    value_holder_set(tv->value_holder, NULL);
+    value_holder_set(tv->value_holder, &temperature);
 }

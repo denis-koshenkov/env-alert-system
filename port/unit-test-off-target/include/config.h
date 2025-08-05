@@ -3,6 +3,6 @@
 
 /** Should correspond to the number of times <module_name>_create() will be called in the unit test program. */
 #define CONFIG_VALUE_HOLDER_MAX_NUM_INSTANCES 14
-#define CONFIG_TEMPERATURE_VALUE_MAX_NUM_INSTANCES 2
+#define CONFIG_TEMPERATURE_VALUE_MAX_NUM_INSTANCES 3
 
 #endif

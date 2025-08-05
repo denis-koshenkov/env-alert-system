@@ -14,5 +14,9 @@ value_holder value_holder_create(uint8_t *value_buf, size_t value_size)
 
 void value_holder_set(value_holder vh, const void *value)
 {
-    mock().actualCall("value_holder_set").withParameter("vh", vh);
+    size_t value_size = mock().getData("value_holder_value_size").getUnsignedIntValue();
+    mock()
+        .actualCall("value_holder_set")
+        .withParameter("vh", vh)
+        .withMemoryBufferParameter("value", (const uint8_t *)value, value_size);
 }
