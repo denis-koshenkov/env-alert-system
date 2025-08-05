@@ -8,11 +8,11 @@ struct value_holder_struct {};
 
 value_holder value_holder_create(uint8_t *value_buf, size_t value_size)
 {
-    mock().actualCall("value_holder_create").withParameter("p2", value_size);
+    mock().actualCall("value_holder_create").withParameter("value_size", value_size);
     return (value_holder)mock().pointerReturnValue();
 }
 
 void value_holder_set(value_holder vh, const void *value)
 {
-    mock().actualCall("value_holder_set").withParameter("p1", vh);
+    mock().actualCall("value_holder_set").withParameter("vh", vh);
 }
