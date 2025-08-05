@@ -53,3 +53,13 @@ TEST(TemperatureValue, getReturnsValueReceivedFromValueHolderGet)
     temperature received_temperature = temperature_value_get(tv);
     CHECK_EQUAL(t, received_temperature);
 }
+
+TEST(TemperatureValue, getCallsValueHolderGetUsingInstanceReturnedByCreate)
+{
+    void *value_holder_instance_address = (void *)0xFF5A;
+    mock().expectOneCall("value_holder_create").ignoreOtherParameters().andReturnValue(value_holder_instance_address);
+    mock().expectOneCall("value_holder_get").withParameter("vh", value_holder_instance_address).ignoreOtherParameters();
+
+    temperature_value tv = temperature_value_create();
+    temperature temperature = temperature_value_get(tv);
+}

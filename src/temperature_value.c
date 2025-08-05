@@ -35,6 +35,6 @@ void temperature_value_set(temperature_value tv, temperature temperature)
 temperature temperature_value_get(temperature_value tv)
 {
     temperature temperature;
-    value_holder_get(NULL, &temperature);
+    value_holder_get(tv->value_holder, &temperature);
     return temperature;
 }
