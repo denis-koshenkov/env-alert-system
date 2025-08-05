@@ -41,5 +41,5 @@ temperature temperature_value_get(temperature_value tv)
 
 bool temperature_value_is_value_changed(temperature_value tv)
 {
-    return value_holder_is_value_changed(NULL);
+    return value_holder_is_value_changed(tv->value_holder);
 }

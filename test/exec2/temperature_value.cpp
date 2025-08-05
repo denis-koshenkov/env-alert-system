@@ -91,3 +91,17 @@ TEST(TemperatureValue, isValueChangedReturnsValueReceivedFromValueHolderValueTru
     bool is_value_changed_from_temperature_value = temperature_value_is_value_changed(tv);
     CHECK_EQUAL(is_value_changed_from_value_holder, is_value_changed_from_temperature_value);
 }
+
+TEST(TemperatureValue, isValueChangedCallsValueHolderUsingInstanceReturnedByCreate)
+{
+    void *value_holder_instance_address = (void *)0x11;
+    mock().expectOneCall("value_holder_create").ignoreOtherParameters().andReturnValue(value_holder_instance_address);
+    mock()
+        .expectOneCall("value_holder_is_value_changed")
+        .withParameter("vh", value_holder_instance_address)
+        .ignoreOtherParameters()
+        .andReturnValue(true);
+
+    temperature_value tv = temperature_value_create();
+    bool is_value_changed = temperature_value_is_value_changed(tv);
+}
