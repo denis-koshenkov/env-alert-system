@@ -5,6 +5,7 @@ target_sources(test_exec2 PRIVATE
     temperature_value.cpp
     pressure_value.cpp
     humidity_value.cpp
+    light_intensity_value.cpp
 
     mocks/mock_value_holder.cpp
 )
