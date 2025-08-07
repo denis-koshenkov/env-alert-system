@@ -4,6 +4,7 @@ target_sources(test_exec2 PRIVATE
     main.cpp
     temperature_value.cpp
     pressure_value.cpp
+    humidity_value.cpp
 
     mocks/mock_value_holder.cpp
 )
