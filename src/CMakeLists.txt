@@ -7,6 +7,8 @@ target_sources(eas INTERFACE
     pressure_value.c
     humidity_value.c
     light_intensity_value.c
+    variable_requirement.c
+    temperature_requirement.c
 )
 
 target_include_directories(eas INTERFACE
