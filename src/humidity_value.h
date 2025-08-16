@@ -13,14 +13,14 @@ extern "C"
 /**
  * @brief Stores a humidity value and reports when it changes.
  */
-typedef struct humidity_value_struct *humidity_value;
+typedef struct HumidityValueStruct *HumidityValue;
 
 /**
  * @brief Create a humidity value instance.
  *
- * @return humidity_value Humidity value instance.
+ * @return HumidityValue Humidity value instance.
  */
-humidity_value humidity_value_create();
+HumidityValue humidity_value_create();
 
 /**
  * @brief Set humidity value.
@@ -28,7 +28,7 @@ humidity_value humidity_value_create();
  * @param hv Humidity value instance returned by @ref humidity_value_create.
  * @param humidity Humidity value to set.
  */
-void humidity_value_set(humidity_value hv, humidity humidity);
+void humidity_value_set(HumidityValue hv, Humidity humidity);
 
 /**
  * @brief Get humidity value.
@@ -39,7 +39,7 @@ void humidity_value_set(humidity_value hv, humidity humidity);
  *
  * @return humidity Humidity value.
  */
-humidity humidity_value_get(humidity_value hv);
+Humidity humidity_value_get(HumidityValue hv);
 
 /**
  * @brief Check whether the humidity value has changed.
@@ -52,7 +52,7 @@ humidity humidity_value_get(humidity_value hv);
  * humidity_value_set has been called only once so far.
  * @return false The last two calls to @ref humidity_value_set had differing values as arguments.
  */
-bool humidity_value_is_value_changed(humidity_value hv);
+bool humidity_value_is_value_changed(HumidityValue hv);
 
 #ifdef __cplusplus
 }

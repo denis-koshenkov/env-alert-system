@@ -10,7 +10,7 @@ TEST(HumidityValue, createCallsValueHolderCreateWithSize1)
 {
     mock().expectOneCall("value_holder_create").withParameter("value_size", 1).andReturnValue((void *)NULL);
 
-    humidity_value hv = humidity_value_create();
+    HumidityValue hv = humidity_value_create();
 }
 
 TEST(HumidityValue, setCallsValueHolderUsingInstanceReturnedByCreate)
@@ -19,38 +19,38 @@ TEST(HumidityValue, setCallsValueHolderUsingInstanceReturnedByCreate)
     mock().expectOneCall("value_holder_create").ignoreOtherParameters().andReturnValue(value_holder_instance_address);
     mock().expectOneCall("value_holder_set").withParameter("vh", value_holder_instance_address).ignoreOtherParameters();
 
-    humidity_value hv = humidity_value_create();
-    humidity humidity = 78;
+    HumidityValue hv = humidity_value_create();
+    Humidity humidity = 78;
     humidity_value_set(hv, humidity);
 }
 
 TEST(HumidityValue, setPassesPointerToArgumentToValueHolderSet)
 {
     /* Pass value size to mock object, so that it can pass it to the `size` parameter of `withMemoryBufferParameter()`*/
-    mock().setData("value_holder_value_size", (unsigned int)sizeof(humidity));
+    mock().setData("value_holder_value_size", (unsigned int)sizeof(Humidity));
 
-    humidity humidity = 1;
+    Humidity humidity = 1;
     mock().expectOneCall("value_holder_create").withParameter("value_size", 1).andReturnValue((void *)NULL);
     mock()
         .expectOneCall("value_holder_set")
-        .withMemoryBufferParameter("value", (const uint8_t *)&humidity, sizeof(humidity))
+        .withMemoryBufferParameter("value", (const uint8_t *)&humidity, sizeof(Humidity))
         .ignoreOtherParameters();
 
-    humidity_value hv = humidity_value_create();
+    HumidityValue hv = humidity_value_create();
     humidity_value_set(hv, humidity);
 }
 
 TEST(HumidityValue, getReturnsValueReceivedFromValueHolderGet)
 {
-    humidity h = 65;
+    Humidity h = 65;
     mock().expectOneCall("value_holder_create").withParameter("value_size", 1).andReturnValue((void *)NULL);
     mock()
         .expectOneCall("value_holder_get")
-        .withOutputParameterReturning("value", &h, sizeof(humidity))
+        .withOutputParameterReturning("value", &h, sizeof(Humidity))
         .ignoreOtherParameters();
 
-    humidity_value hv = humidity_value_create();
-    humidity received_humidity = humidity_value_get(hv);
+    HumidityValue hv = humidity_value_create();
+    Humidity received_humidity = humidity_value_get(hv);
     CHECK_EQUAL(h, received_humidity);
 }
 
@@ -60,8 +60,8 @@ TEST(HumidityValue, getCallsValueHolderGetUsingInstanceReturnedByCreate)
     mock().expectOneCall("value_holder_create").ignoreOtherParameters().andReturnValue(value_holder_instance_address);
     mock().expectOneCall("value_holder_get").withParameter("vh", value_holder_instance_address).ignoreOtherParameters();
 
-    humidity_value hv = humidity_value_create();
-    humidity humidity = humidity_value_get(hv);
+    HumidityValue hv = humidity_value_create();
+    Humidity humidity = humidity_value_get(hv);
 }
 
 TEST(HumidityValue, isValueChangedReturnsValueReceivedFromValueHolderValueFalse)
@@ -73,7 +73,7 @@ TEST(HumidityValue, isValueChangedReturnsValueReceivedFromValueHolderValueFalse)
         .ignoreOtherParameters()
         .andReturnValue(is_value_changed_from_value_holder);
 
-    humidity_value hv = humidity_value_create();
+    HumidityValue hv = humidity_value_create();
     bool is_value_changed_from_humidity_value = humidity_value_is_value_changed(hv);
     CHECK_EQUAL(is_value_changed_from_value_holder, is_value_changed_from_humidity_value);
 }
@@ -87,7 +87,7 @@ TEST(HumidityValue, isValueChangedReturnsValueReceivedFromValueHolderValueTrue)
         .ignoreOtherParameters()
         .andReturnValue(is_value_changed_from_value_holder);
 
-    humidity_value hv = humidity_value_create();
+    HumidityValue hv = humidity_value_create();
     bool is_value_changed_from_humidity_value = humidity_value_is_value_changed(hv);
     CHECK_EQUAL(is_value_changed_from_value_holder, is_value_changed_from_humidity_value);
 }
@@ -102,6 +102,6 @@ TEST(HumidityValue, isValueChangedCallsValueHolderUsingInstanceReturnedByCreate)
         .ignoreOtherParameters()
         .andReturnValue(true);
 
-    humidity_value hv = humidity_value_create();
+    HumidityValue hv = humidity_value_create();
     bool is_value_changed = humidity_value_is_value_changed(hv);
 }

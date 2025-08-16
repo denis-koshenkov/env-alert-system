@@ -8,7 +8,7 @@ extern "C"
 
 #include <stdint.h>
 
-typedef uint8_t humidity;
+typedef uint8_t Humidity;
 
 #ifdef __cplusplus
 }
