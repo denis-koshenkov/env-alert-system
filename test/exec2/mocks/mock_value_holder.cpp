@@ -4,15 +4,15 @@
 #include "CppUTestExt/MockSupport.h"
 #include "mock_value_holder.h"
 
-struct value_holder_struct {};
+struct ValueHolderStruct {};
 
-value_holder value_holder_create(uint8_t *value_buf, size_t value_size)
+ValueHolder value_holder_create(uint8_t *value_buf, size_t value_size)
 {
     mock().actualCall("value_holder_create").withParameter("value_size", value_size);
-    return (value_holder)mock().pointerReturnValue();
+    return (ValueHolder)mock().pointerReturnValue();
 }
 
-void value_holder_set(value_holder vh, const void *value)
+void value_holder_set(ValueHolder vh, const void *value)
 {
     size_t value_size = mock().getData("value_holder_value_size").getUnsignedIntValue();
     mock()
@@ -21,12 +21,12 @@ void value_holder_set(value_holder vh, const void *value)
         .withMemoryBufferParameter("value", (const uint8_t *)value, value_size);
 }
 
-void value_holder_get(value_holder vh, void *value)
+void value_holder_get(ValueHolder vh, void *value)
 {
     mock().actualCall("value_holder_get").withParameter("vh", vh).withOutputParameter("value", value);
 }
 
-bool value_holder_is_value_changed(value_holder vh)
+bool value_holder_is_value_changed(ValueHolder vh)
 {
     mock().actualCall("value_holder_is_value_changed").withParameter("vh", vh);
     return mock().boolReturnValue();

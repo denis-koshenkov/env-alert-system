@@ -9,20 +9,20 @@
 #define CONFIG_VALUE_HOLDER_MAX_NUM_INSTANCES 1
 #endif
 
-struct value_holder_struct {
+struct ValueHolderStruct {
     uint8_t *value_buf;
     size_t value_size;
     bool set_has_been_called;
     bool value_changed;
 };
 
-static struct value_holder_struct instances[CONFIG_VALUE_HOLDER_MAX_NUM_INSTANCES];
+static struct ValueHolderStruct instances[CONFIG_VALUE_HOLDER_MAX_NUM_INSTANCES];
 static size_t instance_idx = 0;
 
-value_holder value_holder_create(uint8_t *value_buf, size_t value_size)
+ValueHolder value_holder_create(uint8_t *value_buf, size_t value_size)
 {
     EAS_ASSERT(instance_idx < CONFIG_VALUE_HOLDER_MAX_NUM_INSTANCES);
-    struct value_holder_struct *instance = &instances[instance_idx];
+    struct ValueHolderStruct *instance = &instances[instance_idx];
     instance_idx++;
 
     instance->value_buf = value_buf;
@@ -33,7 +33,7 @@ value_holder value_holder_create(uint8_t *value_buf, size_t value_size)
     return instance;
 }
 
-void value_holder_set(value_holder vh, const void *value)
+void value_holder_set(ValueHolder vh, const void *value)
 {
     EAS_ASSERT(vh);
     EAS_ASSERT(value);
@@ -49,7 +49,7 @@ void value_holder_set(value_holder vh, const void *value)
     vh->set_has_been_called = true;
 }
 
-void value_holder_get(value_holder vh, void *value)
+void value_holder_get(ValueHolder vh, void *value)
 {
     EAS_ASSERT(vh);
     EAS_ASSERT(value);
@@ -57,7 +57,7 @@ void value_holder_get(value_holder vh, void *value)
     memcpy(value, vh->value_buf, vh->value_size);
 }
 
-bool value_holder_is_value_changed(value_holder vh)
+bool value_holder_is_value_changed(ValueHolder vh)
 {
     EAS_ASSERT(vh);
     EAS_ASSERT(vh->set_has_been_called);

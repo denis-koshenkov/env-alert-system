@@ -10,7 +10,7 @@
 #endif
 
 struct HumidityValueStruct {
-    value_holder value_holder;
+    ValueHolder value_holder;
     Humidity value_buf;
 };
 

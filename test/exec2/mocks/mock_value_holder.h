@@ -9,15 +9,15 @@ extern "C"
 #include <stddef.h>
 #include <stdint.h>
 
-typedef struct value_holder_struct *value_holder;
+typedef struct ValueHolderStruct *ValueHolder;
 
-value_holder value_holder_create(uint8_t *value_buf, size_t value_size);
+ValueHolder value_holder_create(uint8_t *value_buf, size_t value_size);
 
-void value_holder_set(value_holder vh, const void *value);
+void value_holder_set(ValueHolder vh, const void *value);
 
-void value_holder_get(value_holder vh, void *value);
+void value_holder_get(ValueHolder vh, void *value);
 
-bool value_holder_is_value_changed(value_holder vh);
+bool value_holder_is_value_changed(ValueHolder vh);
 
 #ifdef __cplusplus
 }

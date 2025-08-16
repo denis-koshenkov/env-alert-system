@@ -10,7 +10,7 @@
 #endif
 
 struct LightIntensityValueStruct {
-    value_holder value_holder;
+    ValueHolder value_holder;
     LightIntensity value_buf;
 };
 

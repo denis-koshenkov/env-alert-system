@@ -10,7 +10,7 @@
 #endif
 
 struct PressureValueStruct {
-    value_holder value_holder;
+    ValueHolder value_holder;
     Pressure value_buf;
 };
 

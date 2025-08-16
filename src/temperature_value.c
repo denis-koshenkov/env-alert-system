@@ -10,7 +10,7 @@
 #endif
 
 struct TemperatureValueStruct {
-    value_holder value_holder;
+    ValueHolder value_holder;
     Temperature value_buf;
 };
 

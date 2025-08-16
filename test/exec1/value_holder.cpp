@@ -10,7 +10,7 @@ TEST_GROUP(ValueHolder){};
 TEST(ValueHolder, GetWhatWeSetUint32t)
 {
     uint32_t value_buf;
-    value_holder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint32_t));
+    ValueHolder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint32_t));
     uint32_t value_set = 1;
     value_holder_set(vh, &value_set);
     uint32_t value_get;
@@ -21,7 +21,7 @@ TEST(ValueHolder, GetWhatWeSetUint32t)
 TEST(ValueHolder, GetWhatWeSetUint8t)
 {
     uint8_t value_buf;
-    value_holder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint8_t));
+    ValueHolder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint8_t));
     uint8_t value_set = 0x5A;
     value_holder_set(vh, &value_set);
     uint8_t value_get;
@@ -32,7 +32,7 @@ TEST(ValueHolder, GetWhatWeSetUint8t)
 TEST(ValueHolder, GetWhatWeSet8bytes)
 {
     uint8_t value_buf[8];
-    value_holder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint8_t) * 8);
+    ValueHolder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint8_t) * 8);
     uint8_t value_set[8] = {0xFF, 0x5A, 0x00, 0xA5, 0x0F, 0xF0, 0x01, 0x65};
     value_holder_set(vh, &value_set);
     uint8_t value_get[8];
@@ -50,7 +50,7 @@ TEST(ValueHolder, SetRaisesAssertVhNullPointer)
 TEST(ValueHolder, SetRaisesAssertValueNullPointer)
 {
     uint8_t value_buf;
-    value_holder vh = value_holder_create(&value_buf, sizeof(uint8_t));
+    ValueHolder vh = value_holder_create(&value_buf, sizeof(uint8_t));
     TestAssertPlugin::expectAssertion("value");
     value_holder_set(vh, NULL);
 }
@@ -65,7 +65,7 @@ TEST(ValueHolder, GetRaisesAssertVhNullPointer)
 TEST(ValueHolder, GetRaisesAssertValueNullPointer)
 {
     uint8_t value_buf;
-    value_holder vh = value_holder_create(&value_buf, sizeof(uint8_t));
+    ValueHolder vh = value_holder_create(&value_buf, sizeof(uint8_t));
     TestAssertPlugin::expectAssertion("value");
     value_holder_get(vh, NULL);
 }
@@ -73,7 +73,7 @@ TEST(ValueHolder, GetRaisesAssertValueNullPointer)
 TEST(ValueHolder, GetRaisesAssertIfCalledBeforeSet)
 {
     uint8_t value_buf;
-    value_holder vh = value_holder_create(&value_buf, sizeof(uint8_t));
+    ValueHolder vh = value_holder_create(&value_buf, sizeof(uint8_t));
     uint8_t value;
     TestAssertPlugin::expectAssertion("vh->set_has_been_called");
     value_holder_get(vh, &value);
@@ -82,7 +82,7 @@ TEST(ValueHolder, GetRaisesAssertIfCalledBeforeSet)
 TEST(ValueHolder, IsValueChangedReturnsTrueAfterSetIsCalledOnce)
 {
     uint8_t value_buf;
-    value_holder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint8_t));
+    ValueHolder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint8_t));
     uint8_t value = 255;
     value_holder_set(vh, &value);
     bool is_value_changed = value_holder_is_value_changed(vh);
@@ -92,7 +92,7 @@ TEST(ValueHolder, IsValueChangedReturnsTrueAfterSetIsCalledOnce)
 TEST(ValueHolder, IsValueChangedReturnsTrueAfterSetIsCalledOnceAnotherValue)
 {
     uint32_t value_buf;
-    value_holder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint32_t));
+    ValueHolder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint32_t));
     uint32_t value = 0x5A5AA5A5;
     value_holder_set(vh, &value);
     bool is_value_changed = value_holder_is_value_changed(vh);
@@ -102,7 +102,7 @@ TEST(ValueHolder, IsValueChangedReturnsTrueAfterSetIsCalledOnceAnotherValue)
 TEST(ValueHolder, IsValueChangedReturnsFalseAfterSameValuesAreSet)
 {
     uint8_t value_buf;
-    value_holder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint8_t));
+    ValueHolder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint8_t));
     uint8_t value = 125;
     value_holder_set(vh, &value);
     value_holder_set(vh, &value);
@@ -113,7 +113,7 @@ TEST(ValueHolder, IsValueChangedReturnsFalseAfterSameValuesAreSet)
 TEST(ValueHolder, IsValueChangedReturnsTrueAfterDifferentValuesAreSet)
 {
     uint8_t value_buf;
-    value_holder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint8_t));
+    ValueHolder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint8_t));
     uint8_t value1 = 199;
     value_holder_set(vh, &value1);
     uint8_t value2 = 200;
@@ -125,7 +125,7 @@ TEST(ValueHolder, IsValueChangedReturnsTrueAfterDifferentValuesAreSet)
 TEST(ValueHolder, IsValueChangedRaisesAssertIfCalledBeforeSet)
 {
     uint32_t value_buf;
-    value_holder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint32_t));
+    ValueHolder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint32_t));
     TestAssertPlugin::expectAssertion("vh->set_has_been_called");
     value_holder_is_value_changed(vh);
 }
@@ -133,7 +133,7 @@ TEST(ValueHolder, IsValueChangedRaisesAssertIfCalledBeforeSet)
 TEST(ValueHolder, IsValueChangedRaisesAssertVhNullPointerAfterSetCalled)
 {
     uint8_t value_buf;
-    value_holder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint8_t));
+    ValueHolder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint8_t));
     uint8_t value = 0;
     value_holder_set(vh, &value);
     TestAssertPlugin::expectAssertion("vh");
@@ -143,7 +143,7 @@ TEST(ValueHolder, IsValueChangedRaisesAssertVhNullPointerAfterSetCalled)
 TEST(ValueHolder, IsValueChangedReturnsTrueAfterManyDifferentValuesAreSet)
 {
     uint16_t value_buf;
-    value_holder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint16_t));
+    ValueHolder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint16_t));
 
     /* The last two values are different, so we expect is_value_changed == true */
     uint16_t values[] = {2020, 1010, 0xFFFF, 65, 33333, 44, 1};
@@ -159,7 +159,7 @@ TEST(ValueHolder, IsValueChangedReturnsTrueAfterManyDifferentValuesAreSet)
 TEST(ValueHolder, IsValueChangedReturnsTrueAfterTwoLastValuesAreEqual)
 {
     uint8_t value_buf;
-    value_holder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint8_t));
+    ValueHolder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint8_t));
 
     /* The last two values are equal, so we expect is_value_changed == false */
     uint8_t values[] = {11, 111, 222, 0x5A, 255, 32, 23, 23};
