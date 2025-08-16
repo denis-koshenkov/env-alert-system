@@ -9,37 +9,37 @@
 #define CONFIG_LIGHT_INTENSITY_VALUE_MAX_NUM_INSTANCES 1
 #endif
 
-struct light_intensity_value_struct {
+struct LightIntensityValueStruct {
     value_holder value_holder;
-    light_intensity value_buf;
+    LightIntensity value_buf;
 };
 
-static struct light_intensity_value_struct instances[CONFIG_LIGHT_INTENSITY_VALUE_MAX_NUM_INSTANCES];
+static struct LightIntensityValueStruct instances[CONFIG_LIGHT_INTENSITY_VALUE_MAX_NUM_INSTANCES];
 static size_t instance_idx = 0;
 
-light_intensity_value light_intensity_value_create()
+LightIntensityValue light_intensity_value_create()
 {
     EAS_ASSERT(instance_idx < CONFIG_LIGHT_INTENSITY_VALUE_MAX_NUM_INSTANCES);
-    struct light_intensity_value_struct *instance = &instances[instance_idx];
+    struct LightIntensityValueStruct *instance = &instances[instance_idx];
     instance_idx++;
 
-    instance->value_holder = value_holder_create((uint8_t *)&instance->value_buf, sizeof(light_intensity));
+    instance->value_holder = value_holder_create((uint8_t *)&instance->value_buf, sizeof(LightIntensity));
     return instance;
 }
 
-void light_intensity_value_set(light_intensity_value liv, light_intensity light_intensity)
+void light_intensity_value_set(LightIntensityValue liv, LightIntensity light_intensity)
 {
     value_holder_set(liv->value_holder, &light_intensity);
 }
 
-light_intensity light_intensity_value_get(light_intensity_value liv)
+LightIntensity light_intensity_value_get(LightIntensityValue liv)
 {
-    light_intensity light_intensity;
+    LightIntensity light_intensity;
     value_holder_get(liv->value_holder, &light_intensity);
     return light_intensity;
 }
 
-bool light_intensity_value_is_value_changed(light_intensity_value liv)
+bool light_intensity_value_is_value_changed(LightIntensityValue liv)
 {
     return value_holder_is_value_changed(liv->value_holder);
 }

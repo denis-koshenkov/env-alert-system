@@ -10,7 +10,7 @@ TEST(LightIntensityValue, createCallsValueHolderCreateWithSize2)
 {
     mock().expectOneCall("value_holder_create").withParameter("value_size", 2).andReturnValue((void *)NULL);
 
-    light_intensity_value liv = light_intensity_value_create();
+    LightIntensityValue liv = light_intensity_value_create();
 }
 
 TEST(LightIntensityValue, setCallsValueHolderUsingInstanceReturnedByCreate)
@@ -19,38 +19,38 @@ TEST(LightIntensityValue, setCallsValueHolderUsingInstanceReturnedByCreate)
     mock().expectOneCall("value_holder_create").ignoreOtherParameters().andReturnValue(value_holder_instance_address);
     mock().expectOneCall("value_holder_set").withParameter("vh", value_holder_instance_address).ignoreOtherParameters();
 
-    light_intensity_value liv = light_intensity_value_create();
-    light_intensity light_intensity = 222;
+    LightIntensityValue liv = light_intensity_value_create();
+    LightIntensity light_intensity = 222;
     light_intensity_value_set(liv, light_intensity);
 }
 
 TEST(LightIntensityValue, setPassesPointerToArgumentToValueHolderSet)
 {
     /* Pass value size to mock object, so that it can pass it to the `size` parameter of `withMemoryBufferParameter()`*/
-    mock().setData("value_holder_value_size", (unsigned int)sizeof(light_intensity));
+    mock().setData("value_holder_value_size", (unsigned int)sizeof(LightIntensity));
 
-    light_intensity light_intensity = 11122;
+    LightIntensity light_intensity = 11122;
     mock().expectOneCall("value_holder_create").withParameter("value_size", 2).andReturnValue((void *)NULL);
     mock()
         .expectOneCall("value_holder_set")
-        .withMemoryBufferParameter("value", (const uint8_t *)&light_intensity, sizeof(light_intensity))
+        .withMemoryBufferParameter("value", (const uint8_t *)&light_intensity, sizeof(LightIntensity))
         .ignoreOtherParameters();
 
-    light_intensity_value liv = light_intensity_value_create();
+    LightIntensityValue liv = light_intensity_value_create();
     light_intensity_value_set(liv, light_intensity);
 }
 
 TEST(LightIntensityValue, getReturnsValueReceivedFromValueHolderGet)
 {
-    light_intensity l = 65;
+    LightIntensity l = 65;
     mock().expectOneCall("value_holder_create").withParameter("value_size", 2).andReturnValue((void *)NULL);
     mock()
         .expectOneCall("value_holder_get")
-        .withOutputParameterReturning("value", &l, sizeof(light_intensity))
+        .withOutputParameterReturning("value", &l, sizeof(LightIntensity))
         .ignoreOtherParameters();
 
-    light_intensity_value liv = light_intensity_value_create();
-    light_intensity received_light_intensity = light_intensity_value_get(liv);
+    LightIntensityValue liv = light_intensity_value_create();
+    LightIntensity received_light_intensity = light_intensity_value_get(liv);
     CHECK_EQUAL(l, received_light_intensity);
 }
 
@@ -60,8 +60,8 @@ TEST(LightIntensityValue, getCallsValueHolderGetUsingInstanceReturnedByCreate)
     mock().expectOneCall("value_holder_create").ignoreOtherParameters().andReturnValue(value_holder_instance_address);
     mock().expectOneCall("value_holder_get").withParameter("vh", value_holder_instance_address).ignoreOtherParameters();
 
-    light_intensity_value liv = light_intensity_value_create();
-    light_intensity light_intensity = light_intensity_value_get(liv);
+    LightIntensityValue liv = light_intensity_value_create();
+    LightIntensity light_intensity = light_intensity_value_get(liv);
 }
 
 TEST(LightIntensityValue, isValueChangedReturnsValueReceivedFromValueHolderValueFalse)
@@ -73,7 +73,7 @@ TEST(LightIntensityValue, isValueChangedReturnsValueReceivedFromValueHolderValue
         .ignoreOtherParameters()
         .andReturnValue(is_value_changed_from_value_holder);
 
-    light_intensity_value liv = light_intensity_value_create();
+    LightIntensityValue liv = light_intensity_value_create();
     bool is_value_changed_from_light_intensity_value = light_intensity_value_is_value_changed(liv);
     CHECK_EQUAL(is_value_changed_from_value_holder, is_value_changed_from_light_intensity_value);
 }
@@ -87,7 +87,7 @@ TEST(LightIntensityValue, isValueChangedReturnsValueReceivedFromValueHolderValue
         .ignoreOtherParameters()
         .andReturnValue(is_value_changed_from_value_holder);
 
-    light_intensity_value liv = light_intensity_value_create();
+    LightIntensityValue liv = light_intensity_value_create();
     bool is_value_changed_from_light_intensity_value = light_intensity_value_is_value_changed(liv);
     CHECK_EQUAL(is_value_changed_from_value_holder, is_value_changed_from_light_intensity_value);
 }
@@ -102,6 +102,6 @@ TEST(LightIntensityValue, isValueChangedCallsValueHolderUsingInstanceReturnedByC
         .ignoreOtherParameters()
         .andReturnValue(true);
 
-    light_intensity_value liv = light_intensity_value_create();
+    LightIntensityValue liv = light_intensity_value_create();
     bool is_value_changed = light_intensity_value_is_value_changed(liv);
 }

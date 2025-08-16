@@ -8,7 +8,7 @@ extern "C"
 
 #include <stdint.h>
 
-typedef uint16_t light_intensity;
+typedef uint16_t LightIntensity;
 
 #ifdef __cplusplus
 }

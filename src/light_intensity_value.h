@@ -13,14 +13,14 @@ extern "C"
 /**
  * @brief Stores a light_intensity value and reports when it changes.
  */
-typedef struct light_intensity_value_struct *light_intensity_value;
+typedef struct LightIntensityValueStruct *LightIntensityValue;
 
 /**
  * @brief Create a light_intensity value instance.
  *
- * @return light_intensity_value Light intensity value instance.
+ * @return LightIntensityValue Light intensity value instance.
  */
-light_intensity_value light_intensity_value_create();
+LightIntensityValue light_intensity_value_create();
 
 /**
  * @brief Set light_intensity value.
@@ -28,7 +28,7 @@ light_intensity_value light_intensity_value_create();
  * @param liv Light intensity value instance returned by @ref light_intensity_value_create.
  * @param light_intensity Light intensity value to set.
  */
-void light_intensity_value_set(light_intensity_value liv, light_intensity light_intensity);
+void light_intensity_value_set(LightIntensityValue liv, LightIntensity light_intensity);
 
 /**
  * @brief Get light_intensity value.
@@ -39,7 +39,7 @@ void light_intensity_value_set(light_intensity_value liv, light_intensity light_
  *
  * @return light_intensity Light intensity value.
  */
-light_intensity light_intensity_value_get(light_intensity_value liv);
+LightIntensity light_intensity_value_get(LightIntensityValue liv);
 
 /**
  * @brief Check whether the light_intensity value has changed.
@@ -52,7 +52,7 @@ light_intensity light_intensity_value_get(light_intensity_value liv);
  * light_intensity_value_set has been called only once so far.
  * @return false The last two calls to @ref light_intensity_value_set had differing values as arguments.
  */
-bool light_intensity_value_is_value_changed(light_intensity_value liv);
+bool light_intensity_value_is_value_changed(LightIntensityValue liv);
 
 #ifdef __cplusplus
 }
