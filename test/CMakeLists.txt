@@ -16,6 +16,7 @@ target_link_libraries(test_common INTERFACE
 
 add_subdirectory(exec1)
 add_subdirectory(exec2)
+add_subdirectory(zephyr-minimal)
 
 # Register all unit test executables with CTest
 add_test(NAME test_exec1 COMMAND test_exec1)

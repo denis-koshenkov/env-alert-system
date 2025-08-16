@@ -8,4 +8,7 @@
 #define CONFIG_HUMIDITY_VALUE_MAX_NUM_INSTANCES 8
 #define CONFIG_LIGHT_INTENSITY_VALUE_MAX_NUM_INSTANCES 8
 
+/// Defines the number of blocks in the block allocator for variable requirements
+#define CONFIG_VARIABLE_REQUIREMENT_ALLOCATOR_MAX_NUM_VARIABLE_REQUIREMENTS 10
+
 #endif
