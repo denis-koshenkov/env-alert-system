@@ -20,20 +20,20 @@ TEST(TemperatureValue, setCallsValueHolderUsingInstanceReturnedByCreate)
     mock().expectOneCall("value_holder_set").withParameter("vh", value_holder_instance_address).ignoreOtherParameters();
 
     temperature_value tv = temperature_value_create();
-    temperature t = 22;
+    Temperature t = 22;
     temperature_value_set(tv, t);
 }
 
 TEST(TemperatureValue, setPassesPointerToArgumentToValueHolderSet)
 {
     /* Pass value size to mock object, so that it can pass it to the `size` parameter of `withMemoryBufferParameter()`*/
-    mock().setData("value_holder_value_size", (unsigned int)sizeof(temperature));
+    mock().setData("value_holder_value_size", (unsigned int)sizeof(Temperature));
 
-    temperature t = 33;
+    Temperature t = 33;
     mock().expectOneCall("value_holder_create").withParameter("value_size", 2).andReturnValue((void *)NULL);
     mock()
         .expectOneCall("value_holder_set")
-        .withMemoryBufferParameter("value", (const uint8_t *)&t, sizeof(temperature))
+        .withMemoryBufferParameter("value", (const uint8_t *)&t, sizeof(Temperature))
         .ignoreOtherParameters();
 
     temperature_value tv = temperature_value_create();
@@ -42,15 +42,15 @@ TEST(TemperatureValue, setPassesPointerToArgumentToValueHolderSet)
 
 TEST(TemperatureValue, getReturnsValueReceivedFromValueHolderGet)
 {
-    temperature t = 65;
+    Temperature t = 65;
     mock().expectOneCall("value_holder_create").withParameter("value_size", 2).andReturnValue((void *)NULL);
     mock()
         .expectOneCall("value_holder_get")
-        .withOutputParameterReturning("value", &t, sizeof(temperature))
+        .withOutputParameterReturning("value", &t, sizeof(Temperature))
         .ignoreOtherParameters();
 
     temperature_value tv = temperature_value_create();
-    temperature received_temperature = temperature_value_get(tv);
+    Temperature received_temperature = temperature_value_get(tv);
     CHECK_EQUAL(t, received_temperature);
 }
 
@@ -61,7 +61,7 @@ TEST(TemperatureValue, getCallsValueHolderGetUsingInstanceReturnedByCreate)
     mock().expectOneCall("value_holder_get").withParameter("vh", value_holder_instance_address).ignoreOtherParameters();
 
     temperature_value tv = temperature_value_create();
-    temperature temperature = temperature_value_get(tv);
+    Temperature temperature = temperature_value_get(tv);
 }
 
 TEST(TemperatureValue, isValueChangedReturnsValueReceivedFromValueHolderValueFalse)

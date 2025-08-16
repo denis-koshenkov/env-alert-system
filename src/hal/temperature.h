@@ -8,7 +8,7 @@ extern "C"
 
 #include <stdint.h>
 
-typedef uint16_t temperature;
+typedef uint16_t Temperature;
 
 #ifdef __cplusplus
 }

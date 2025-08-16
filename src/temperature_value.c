@@ -11,7 +11,7 @@
 
 struct temperature_value_struct {
     value_holder value_holder;
-    temperature value_buf;
+    Temperature value_buf;
 };
 
 static struct temperature_value_struct instances[CONFIG_TEMPERATURE_VALUE_MAX_NUM_INSTANCES];
@@ -23,18 +23,18 @@ temperature_value temperature_value_create()
     struct temperature_value_struct *instance = &instances[instance_idx];
     instance_idx++;
 
-    instance->value_holder = value_holder_create((uint8_t *)&instance->value_buf, sizeof(temperature));
+    instance->value_holder = value_holder_create((uint8_t *)&instance->value_buf, sizeof(Temperature));
     return instance;
 }
 
-void temperature_value_set(temperature_value tv, temperature temperature)
+void temperature_value_set(temperature_value tv, Temperature temperature)
 {
     value_holder_set(tv->value_holder, &temperature);
 }
 
-temperature temperature_value_get(temperature_value tv)
+Temperature temperature_value_get(temperature_value tv)
 {
-    temperature temperature;
+    Temperature temperature;
     value_holder_get(tv->value_holder, &temperature);
     return temperature;
 }

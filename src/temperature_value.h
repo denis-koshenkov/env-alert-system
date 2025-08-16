@@ -28,7 +28,7 @@ temperature_value temperature_value_create();
  * @param tv Temperature value instance returned by @ref temperature_value_create.
  * @param temperature Temperature value to set.
  */
-void temperature_value_set(temperature_value tv, temperature temperature);
+void temperature_value_set(temperature_value tv, Temperature temperature);
 
 /**
  * @brief Get temperature value.
@@ -39,7 +39,7 @@ void temperature_value_set(temperature_value tv, temperature temperature);
  *
  * @return temperature Temperature value.
  */
-temperature temperature_value_get(temperature_value tv);
+Temperature temperature_value_get(temperature_value tv);
 
 /**
  * @brief Check whether the temperature value has changed.
