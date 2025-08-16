@@ -13,14 +13,14 @@ extern "C"
 /**
  * @brief Stores a temperature value and reports when it changes.
  */
-typedef struct temperature_value_struct *temperature_value;
+typedef struct TemperatureValueStruct *TemperatureValue;
 
 /**
  * @brief Create a temperature value instance.
  *
- * @return temperature_value Temperature value instance.
+ * @return TemperatureValue Temperature value instance.
  */
-temperature_value temperature_value_create();
+TemperatureValue temperature_value_create();
 
 /**
  * @brief Set temperature value.
@@ -28,7 +28,7 @@ temperature_value temperature_value_create();
  * @param tv Temperature value instance returned by @ref temperature_value_create.
  * @param temperature Temperature value to set.
  */
-void temperature_value_set(temperature_value tv, Temperature temperature);
+void temperature_value_set(TemperatureValue tv, Temperature temperature);
 
 /**
  * @brief Get temperature value.
@@ -39,7 +39,7 @@ void temperature_value_set(temperature_value tv, Temperature temperature);
  *
  * @return temperature Temperature value.
  */
-Temperature temperature_value_get(temperature_value tv);
+Temperature temperature_value_get(TemperatureValue tv);
 
 /**
  * @brief Check whether the temperature value has changed.
@@ -52,7 +52,7 @@ Temperature temperature_value_get(temperature_value tv);
  * temperature_value_set has been called only once so far.
  * @return false The last two calls to @ref temperature_value_set had differing values as arguments.
  */
-bool temperature_value_is_value_changed(temperature_value tv);
+bool temperature_value_is_value_changed(TemperatureValue tv);
 
 #ifdef __cplusplus
 }

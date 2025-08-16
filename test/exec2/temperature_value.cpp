@@ -10,7 +10,7 @@ TEST(TemperatureValue, createCallsValueHolderCreateWithSize2)
 {
     mock().expectOneCall("value_holder_create").withParameter("value_size", 2).andReturnValue((void *)NULL);
 
-    temperature_value tv = temperature_value_create();
+    TemperatureValue tv = temperature_value_create();
 }
 
 TEST(TemperatureValue, setCallsValueHolderUsingInstanceReturnedByCreate)
@@ -19,7 +19,7 @@ TEST(TemperatureValue, setCallsValueHolderUsingInstanceReturnedByCreate)
     mock().expectOneCall("value_holder_create").ignoreOtherParameters().andReturnValue(value_holder_instance_address);
     mock().expectOneCall("value_holder_set").withParameter("vh", value_holder_instance_address).ignoreOtherParameters();
 
-    temperature_value tv = temperature_value_create();
+    TemperatureValue tv = temperature_value_create();
     Temperature t = 22;
     temperature_value_set(tv, t);
 }
@@ -36,7 +36,7 @@ TEST(TemperatureValue, setPassesPointerToArgumentToValueHolderSet)
         .withMemoryBufferParameter("value", (const uint8_t *)&t, sizeof(Temperature))
         .ignoreOtherParameters();
 
-    temperature_value tv = temperature_value_create();
+    TemperatureValue tv = temperature_value_create();
     temperature_value_set(tv, t);
 }
 
@@ -49,7 +49,7 @@ TEST(TemperatureValue, getReturnsValueReceivedFromValueHolderGet)
         .withOutputParameterReturning("value", &t, sizeof(Temperature))
         .ignoreOtherParameters();
 
-    temperature_value tv = temperature_value_create();
+    TemperatureValue tv = temperature_value_create();
     Temperature received_temperature = temperature_value_get(tv);
     CHECK_EQUAL(t, received_temperature);
 }
@@ -60,7 +60,7 @@ TEST(TemperatureValue, getCallsValueHolderGetUsingInstanceReturnedByCreate)
     mock().expectOneCall("value_holder_create").ignoreOtherParameters().andReturnValue(value_holder_instance_address);
     mock().expectOneCall("value_holder_get").withParameter("vh", value_holder_instance_address).ignoreOtherParameters();
 
-    temperature_value tv = temperature_value_create();
+    TemperatureValue tv = temperature_value_create();
     Temperature temperature = temperature_value_get(tv);
 }
 
@@ -73,7 +73,7 @@ TEST(TemperatureValue, isValueChangedReturnsValueReceivedFromValueHolderValueFal
         .ignoreOtherParameters()
         .andReturnValue(is_value_changed_from_value_holder);
 
-    temperature_value tv = temperature_value_create();
+    TemperatureValue tv = temperature_value_create();
     bool is_value_changed_from_temperature_value = temperature_value_is_value_changed(tv);
     CHECK_EQUAL(is_value_changed_from_value_holder, is_value_changed_from_temperature_value);
 }
@@ -87,7 +87,7 @@ TEST(TemperatureValue, isValueChangedReturnsValueReceivedFromValueHolderValueTru
         .ignoreOtherParameters()
         .andReturnValue(is_value_changed_from_value_holder);
 
-    temperature_value tv = temperature_value_create();
+    TemperatureValue tv = temperature_value_create();
     bool is_value_changed_from_temperature_value = temperature_value_is_value_changed(tv);
     CHECK_EQUAL(is_value_changed_from_value_holder, is_value_changed_from_temperature_value);
 }
@@ -102,6 +102,6 @@ TEST(TemperatureValue, isValueChangedCallsValueHolderUsingInstanceReturnedByCrea
         .ignoreOtherParameters()
         .andReturnValue(true);
 
-    temperature_value tv = temperature_value_create();
+    TemperatureValue tv = temperature_value_create();
     bool is_value_changed = temperature_value_is_value_changed(tv);
 }
