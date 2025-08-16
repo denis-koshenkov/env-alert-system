@@ -8,7 +8,7 @@ extern "C"
 
 #include <stdint.h>
 
-typedef uint16_t pressure;
+typedef uint16_t Pressure;
 
 #ifdef __cplusplus
 }

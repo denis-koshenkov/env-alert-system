@@ -13,14 +13,14 @@ extern "C"
 /**
  * @brief Stores a pressure value and reports when it changes.
  */
-typedef struct pressure_value_struct *pressure_value;
+typedef struct PressureValueStruct *PressureValue;
 
 /**
  * @brief Create a pressure value instance.
  *
- * @return pressure_value Pressure value instance.
+ * @return PressureValue Pressure value instance.
  */
-pressure_value pressure_value_create();
+PressureValue pressure_value_create();
 
 /**
  * @brief Set pressure value.
@@ -28,7 +28,7 @@ pressure_value pressure_value_create();
  * @param pv Pressure value instance returned by @ref pressure_value_create.
  * @param pressure Pressure value to set.
  */
-void pressure_value_set(pressure_value pv, pressure pressure);
+void pressure_value_set(PressureValue pv, Pressure pressure);
 
 /**
  * @brief Get pressure value.
@@ -39,7 +39,7 @@ void pressure_value_set(pressure_value pv, pressure pressure);
  *
  * @return pressure Pressure value.
  */
-pressure pressure_value_get(pressure_value pv);
+Pressure pressure_value_get(PressureValue pv);
 
 /**
  * @brief Check whether the pressure value has changed.
@@ -52,7 +52,7 @@ pressure pressure_value_get(pressure_value pv);
  * pressure_value_set has been called only once so far.
  * @return false The last two calls to @ref pressure_value_set had differing values as arguments.
  */
-bool pressure_value_is_value_changed(pressure_value pv);
+bool pressure_value_is_value_changed(PressureValue pv);
 
 #ifdef __cplusplus
 }

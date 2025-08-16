@@ -9,37 +9,37 @@
 #define CONFIG_PRESSURE_VALUE_MAX_NUM_INSTANCES 1
 #endif
 
-struct pressure_value_struct {
+struct PressureValueStruct {
     value_holder value_holder;
-    pressure value_buf;
+    Pressure value_buf;
 };
 
-static struct pressure_value_struct instances[CONFIG_PRESSURE_VALUE_MAX_NUM_INSTANCES];
+static struct PressureValueStruct instances[CONFIG_PRESSURE_VALUE_MAX_NUM_INSTANCES];
 static size_t instance_idx = 0;
 
-pressure_value pressure_value_create()
+PressureValue pressure_value_create()
 {
     EAS_ASSERT(instance_idx < CONFIG_PRESSURE_VALUE_MAX_NUM_INSTANCES);
-    struct pressure_value_struct *instance = &instances[instance_idx];
+    struct PressureValueStruct *instance = &instances[instance_idx];
     instance_idx++;
 
-    instance->value_holder = value_holder_create((uint8_t *)&instance->value_buf, sizeof(pressure));
+    instance->value_holder = value_holder_create((uint8_t *)&instance->value_buf, sizeof(Pressure));
     return instance;
 }
 
-void pressure_value_set(pressure_value pv, pressure pressure)
+void pressure_value_set(PressureValue pv, Pressure pressure)
 {
     value_holder_set(pv->value_holder, &pressure);
 }
 
-pressure pressure_value_get(pressure_value pv)
+Pressure pressure_value_get(PressureValue pv)
 {
-    pressure pressure;
+    Pressure pressure;
     value_holder_get(pv->value_holder, &pressure);
     return pressure;
 }
 
-bool pressure_value_is_value_changed(pressure_value pv)
+bool pressure_value_is_value_changed(PressureValue pv)
 {
     return value_holder_is_value_changed(pv->value_holder);
 }
