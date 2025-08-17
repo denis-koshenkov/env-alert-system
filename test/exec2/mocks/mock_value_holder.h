@@ -1,5 +1,5 @@
-#ifndef VALUE_HOLDER_H
-#define VALUE_HOLDER_H
+#ifndef MOCK_VALUE_HOLDER_H
+#define MOCK_VALUE_HOLDER_H
 
 #ifdef __cplusplus
 extern "C"
