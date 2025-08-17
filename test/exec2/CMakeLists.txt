@@ -6,8 +6,16 @@ target_sources(test_exec2 PRIVATE
     pressure_value.cpp
     humidity_value.cpp
     light_intensity_value.cpp
+    temperature_requirement.cpp
+    temperature_requirement.c
+    variable_requirement.cpp
 
     mocks/mock_value_holder.cpp
+    mocks/mock_variable_requirement_allocator.cpp
+    mocks/mock_current_temperature.cpp
+
+    mocks/variable_requirements/vtable_null_requirement.cpp
+    mocks/variable_requirements/evaluate_null_requirement.cpp
 )
 
 target_link_libraries(test_exec2 PRIVATE test_common)
