@@ -11,5 +11,5 @@ target_sources(eas INTERFACE
 )
 
 target_include_directories(eas INTERFACE
-    .
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )

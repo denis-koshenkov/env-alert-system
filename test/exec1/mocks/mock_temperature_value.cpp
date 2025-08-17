@@ -1,5 +1,4 @@
 #include <stdbool.h>
-#include <string.h>
 
 #include "CppUTestExt/MockSupport.h"
 #include "mock_temperature_value.h"
