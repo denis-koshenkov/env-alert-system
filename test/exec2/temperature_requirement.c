@@ -4,41 +4,34 @@
 /* We are using the C CppUTest interface instead of C++, because this header would not compile under C++. */
 #include "temperature_requirement.h"
 
-TEST_C(TemperatureRequirement, evaluateReturnsTrueOperatorGEQValueGreater)
+static void test_evaluate(Temperature current_temperature, VariableRequirementOperator operator,
+                          Temperature requirement_value, bool expected_result)
 {
-    Temperature current_temperature_value = 30;
-    mock_c()->expectOneCall("current_temperature_get")->andReturnUnsignedIntValue(current_temperature_value);
+    mock_c()->expectOneCall("current_temperature_get")->andReturnUnsignedIntValue(current_temperature);
 
-    VariableRequirement temperature_requirement =
-        temperature_requirement_create(0, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 22);
+    VariableRequirement temperature_requirement = temperature_requirement_create(0, operator, requirement_value);
     bool result = variable_requirement_evaluate(temperature_requirement);
-    CHECK_C(result);
+    CHECK_EQUAL_C_BOOL(expected_result, result);
 
     temperature_requirement_destroy(temperature_requirement);
+}
+
+TEST_C(TemperatureRequirement, evaluateReturnsTrueOperatorGEQValueGreater)
+{
+    test_evaluate(30, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 22, true);
 }
 
 TEST_C(TemperatureRequirement, evaluateReturnsFalseOperatorGEQValueLess)
 {
-    Temperature current_temperature_value = 20;
-    mock_c()->expectOneCall("current_temperature_get")->andReturnUnsignedIntValue(current_temperature_value);
-
-    VariableRequirement temperature_requirement =
-        temperature_requirement_create(0, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 25);
-    bool result = variable_requirement_evaluate(temperature_requirement);
-    CHECK_C(!result);
-
-    temperature_requirement_destroy(temperature_requirement);
+    test_evaluate(20, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 25, false);
 }
 
 TEST_C(TemperatureRequirement, evaluateReturnsTrueOperatorGEQValueEqual)
 {
-    Temperature current_temperature_value = 100;
-    mock_c()->expectOneCall("current_temperature_get")->andReturnUnsignedIntValue(current_temperature_value);
+    test_evaluate(100, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 100, true);
+}
 
-    VariableRequirement temperature_requirement =
-        temperature_requirement_create(0, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 100);
-    bool result = variable_requirement_evaluate(temperature_requirement);
-    CHECK_C(result);
-
-    temperature_requirement_destroy(temperature_requirement);
+TEST_C(TemperatureRequirement, evaluateReturnsTrueOperatorLEQValueLess)
+{
+    test_evaluate(87, VARIABLE_REQUIREMENT_OPERATOR_LEQ, 88, true);
 }

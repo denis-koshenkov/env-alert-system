@@ -17,6 +17,7 @@ typedef struct VariableRequirementInterfaceStruct {
 
 typedef struct VariableRequirementStruct {
     VariableRequirementInterfaceStruct *vtable;
+    VariableRequirementOperator operator;
 } VariableRequirementStruct;
 
 #ifdef __cplusplus

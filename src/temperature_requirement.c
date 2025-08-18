@@ -30,7 +30,20 @@ static bool evaluate(VariableRequirement base)
 {
     TemperatureRequirement self = (TemperatureRequirement)base;
     Temperature current_temperature = current_temperature_get();
-    return (current_temperature >= self->value);
+
+    bool result;
+    switch (self->base.operator) {
+    case VARIABLE_REQUIREMENT_OPERATOR_GEQ:
+        result = (current_temperature >= self->value);
+        break;
+    case VARIABLE_REQUIREMENT_OPERATOR_LEQ:
+        result = true;
+        break;
+    default:
+        break;
+    }
+
+    return result;
 }
 
 VariableRequirement temperature_requirement_create(uint8_t alert_id, VariableRequirementOperator operator,
@@ -38,6 +51,7 @@ VariableRequirement temperature_requirement_create(uint8_t alert_id, VariableReq
 {
     TemperatureRequirement self = variable_requirement_allocator_alloc();
     self->base.vtable = &interface;
+    self->base.operator= operator;
     self->value = value;
     return (VariableRequirement)self;
 }

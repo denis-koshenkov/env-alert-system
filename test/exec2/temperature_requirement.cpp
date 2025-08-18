@@ -6,3 +6,4 @@ TEST_GROUP_C_WRAPPER(TemperatureRequirement){};
 TEST_C_WRAPPER(TemperatureRequirement, evaluateReturnsTrueOperatorGEQValueGreater);
 TEST_C_WRAPPER(TemperatureRequirement, evaluateReturnsFalseOperatorGEQValueLess);
 TEST_C_WRAPPER(TemperatureRequirement, evaluateReturnsTrueOperatorGEQValueEqual);
+TEST_C_WRAPPER(TemperatureRequirement, evaluateReturnsTrueOperatorLEQValueLess);
