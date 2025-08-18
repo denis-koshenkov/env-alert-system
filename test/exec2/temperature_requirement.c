@@ -4,15 +4,20 @@
 /* We are using the C CppUTest interface instead of C++, because this header would not compile under C++. */
 #include "temperature_requirement.h"
 
+static VariableRequirement temperature_requirement;
+
 static void test_evaluate(Temperature current_temperature, VariableRequirementOperator operator,
                           Temperature requirement_value, bool expected_result)
 {
     mock_c()->expectOneCall("current_temperature_get")->andReturnUnsignedIntValue(current_temperature);
 
-    VariableRequirement temperature_requirement = temperature_requirement_create(0, operator, requirement_value);
+    temperature_requirement = temperature_requirement_create(0, operator, requirement_value);
     bool result = variable_requirement_evaluate(temperature_requirement);
     CHECK_EQUAL_C_BOOL(expected_result, result);
+}
 
+TEST_GROUP_C_TEARDOWN(TemperatureRequirement)
+{
     temperature_requirement_destroy(temperature_requirement);
 }
 

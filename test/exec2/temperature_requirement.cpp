@@ -1,7 +1,10 @@
 #include "CppUTest/CommandLineTestRunner.h"
 #include "CppUTest/TestHarness_c.h"
 
-TEST_GROUP_C_WRAPPER(TemperatureRequirement){};
+TEST_GROUP_C_WRAPPER(TemperatureRequirement)
+{
+    TEST_GROUP_C_TEARDOWN_WRAPPER(TemperatureRequirement);
+};
 
 TEST_C_WRAPPER(TemperatureRequirement, evaluateReturnsTrueOperatorGEQValueGreater);
 TEST_C_WRAPPER(TemperatureRequirement, evaluateReturnsFalseOperatorGEQValueLess);
