@@ -40,3 +40,13 @@ TEST_C(TemperatureRequirement, evaluateReturnsTrueOperatorLEQValueLess)
 {
     test_evaluate(87, VARIABLE_REQUIREMENT_OPERATOR_LEQ, 88, true);
 }
+
+TEST_C(TemperatureRequirement, evaluateReturnsTrueOperatorLEQValueEqual)
+{
+    test_evaluate(220, VARIABLE_REQUIREMENT_OPERATOR_LEQ, 220, true);
+}
+
+TEST_C(TemperatureRequirement, evaluateReturnsFalseOperatorLEQValueGreater)
+{
+    test_evaluate(100, VARIABLE_REQUIREMENT_OPERATOR_LEQ, 50, false);
+}

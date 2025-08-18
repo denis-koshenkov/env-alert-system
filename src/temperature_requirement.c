@@ -37,7 +37,7 @@ static bool evaluate(VariableRequirement base)
         result = (current_temperature >= self->value);
         break;
     case VARIABLE_REQUIREMENT_OPERATOR_LEQ:
-        result = true;
+        result = (current_temperature <= self->value);
         break;
     default:
         break;
