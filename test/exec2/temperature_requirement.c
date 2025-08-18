@@ -50,3 +50,43 @@ TEST_C(TemperatureRequirement, evaluateReturnsFalseOperatorLEQValueGreater)
 {
     test_evaluate(100, VARIABLE_REQUIREMENT_OPERATOR_LEQ, 50, false);
 }
+
+TEST_C(TemperatureRequirement, evaluateReturnsTrueOperatorGEQBothValuesEqualZero)
+{
+    test_evaluate(0, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 0, true);
+}
+
+TEST_C(TemperatureRequirement, evaluateReturnsTrueOperatorLEQBothValuesEqualZero)
+{
+    test_evaluate(0, VARIABLE_REQUIREMENT_OPERATOR_LEQ, 0, true);
+}
+
+TEST_C(TemperatureRequirement, evaluateReturnsTrueOperatorGEQValueGreaterBothNegative)
+{
+    test_evaluate(-200, VARIABLE_REQUIREMENT_OPERATOR_GEQ, -300, true);
+}
+
+TEST_C(TemperatureRequirement, evaluateReturnsFalseOperatorGEQValueLessBothNegative)
+{
+    test_evaluate(-11, VARIABLE_REQUIREMENT_OPERATOR_GEQ, -1, false);
+}
+
+TEST_C(TemperatureRequirement, evaluateReturnsTrueOperatorGEQValueGreaterOneNegative)
+{
+    test_evaluate(10, VARIABLE_REQUIREMENT_OPERATOR_GEQ, -10, true);
+}
+
+TEST_C(TemperatureRequirement, evaluateReturnsFalseOperatorLEQValueGreaterBothNegative)
+{
+    test_evaluate(-200, VARIABLE_REQUIREMENT_OPERATOR_LEQ, -300, false);
+}
+
+TEST_C(TemperatureRequirement, evaluateReturnsTrueOperatorLEQValueLessBothNegative)
+{
+    test_evaluate(-101, VARIABLE_REQUIREMENT_OPERATOR_LEQ, -100, true);
+}
+
+TEST_C(TemperatureRequirement, evaluateReturnsFalseOperatorLEQValueGreaterOneNegative)
+{
+    test_evaluate(76, VARIABLE_REQUIREMENT_OPERATOR_LEQ, -2, false);
+}
