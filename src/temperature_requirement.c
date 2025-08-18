@@ -51,7 +51,7 @@ VariableRequirement temperature_requirement_create(uint8_t alert_id, VariableReq
 {
     TemperatureRequirement self = variable_requirement_allocator_alloc();
     self->base.vtable = &interface;
-    self->base.operator= operator;
+    self->base.operator = operator;
     self->value = value;
     return (VariableRequirement)self;
 }
