@@ -106,3 +106,26 @@ TEST(VariableRequirementMock, isResultChangedReturnsTrueAfterEvaluateIsCalledOnc
     CHECK(evaluate_result);
     CHECK(is_result_changed);
 }
+
+TEST(VariableRequirementMock, isResultChangedReturnsTrueAfterEvaluateIsCalledOnceReturnedFalse)
+{
+    mock_variable_requirement_set_evaluate_result(mock_variable_requirement, false);
+    bool evaluate_result = variable_requirement_evaluate(mock_variable_requirement);
+    bool is_result_changed = variable_requirement_is_result_changed(mock_variable_requirement);
+
+    /* Make sure variable_requirement_evaluate() actually returned false. */
+    CHECK(!evaluate_result);
+    CHECK(is_result_changed);
+}
+
+TEST(VariableRequirementMock, isResultChangedReturnsFalseAfterTwoCallsToEvaluateReturnTrue)
+{
+    mock_variable_requirement_set_evaluate_result(mock_variable_requirement, true);
+    bool evaluate_result_1 = variable_requirement_evaluate(mock_variable_requirement);
+    bool evaluate_result_2 = variable_requirement_evaluate(mock_variable_requirement);
+    bool is_result_changed = variable_requirement_is_result_changed(mock_variable_requirement);
+
+    CHECK(evaluate_result_1);
+    CHECK(evaluate_result_2);
+    CHECK(!is_result_changed);
+}

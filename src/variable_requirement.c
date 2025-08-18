@@ -6,6 +6,8 @@
 void variable_requirement_create(VariableRequirement self)
 {
     self->evaluate_has_been_called = false;
+    self->is_result_changed = true;
+    self->previous_evaluation_result = false;
 }
 
 bool variable_requirement_evaluate(VariableRequirement self)
@@ -14,12 +16,21 @@ bool variable_requirement_evaluate(VariableRequirement self)
     EAS_ASSERT(self->vtable);
     EAS_ASSERT(self->vtable->evaluate);
 
+    bool evaluation_result = self->vtable->evaluate(self);
+
+    if (self->evaluate_has_been_called) {
+        self->is_result_changed = (evaluation_result != self->previous_evaluation_result);
+    } else {
+        self->is_result_changed = true;
+    }
+
+    self->previous_evaluation_result = evaluation_result;
     self->evaluate_has_been_called = true;
-    return self->vtable->evaluate(self);
+    return evaluation_result;
 }
 
 bool variable_requirement_is_result_changed(VariableRequirement self)
 {
     EAS_ASSERT(self->evaluate_has_been_called);
-    return true;
+    return self->is_result_changed;
 }

@@ -19,6 +19,8 @@ typedef struct VariableRequirementStruct {
     VariableRequirementInterfaceStruct *vtable;
     VariableRequirementOperator operator;
     bool evaluate_has_been_called;
+    bool is_result_changed;
+    bool previous_evaluation_result;
 } VariableRequirementStruct;
 
 /**
