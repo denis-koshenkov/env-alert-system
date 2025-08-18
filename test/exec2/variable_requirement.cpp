@@ -129,3 +129,87 @@ TEST(VariableRequirementMock, isResultChangedReturnsFalseAfterTwoCallsToEvaluate
     CHECK(evaluate_result_2);
     CHECK(!is_result_changed);
 }
+
+TEST(VariableRequirementMock, isResultChangedReturnsFalseAfterTwoCallsToEvaluateReturnFalse)
+{
+    mock_variable_requirement_set_evaluate_result(mock_variable_requirement, false);
+    bool evaluate_result_1 = variable_requirement_evaluate(mock_variable_requirement);
+    bool evaluate_result_2 = variable_requirement_evaluate(mock_variable_requirement);
+    bool is_result_changed = variable_requirement_is_result_changed(mock_variable_requirement);
+
+    CHECK(!evaluate_result_1);
+    CHECK(!evaluate_result_2);
+    CHECK(!is_result_changed);
+}
+
+TEST(VariableRequirementMock, isResultChangedReturnsTrueFirstEvaluateTrueSecondEvaluateFalse)
+{
+    mock_variable_requirement_set_evaluate_result(mock_variable_requirement, true);
+    bool evaluate_result_1 = variable_requirement_evaluate(mock_variable_requirement);
+    mock_variable_requirement_set_evaluate_result(mock_variable_requirement, false);
+    bool evaluate_result_2 = variable_requirement_evaluate(mock_variable_requirement);
+    bool is_result_changed = variable_requirement_is_result_changed(mock_variable_requirement);
+
+    CHECK(evaluate_result_1);
+    CHECK(!evaluate_result_2);
+    CHECK(is_result_changed);
+}
+
+TEST(VariableRequirementMock, isResultChangedReturnsTrueFirstEvaluateFalseSecondEvaluateTrue)
+{
+    mock_variable_requirement_set_evaluate_result(mock_variable_requirement, false);
+    bool evaluate_result_1 = variable_requirement_evaluate(mock_variable_requirement);
+    mock_variable_requirement_set_evaluate_result(mock_variable_requirement, true);
+    bool evaluate_result_2 = variable_requirement_evaluate(mock_variable_requirement);
+    bool is_result_changed = variable_requirement_is_result_changed(mock_variable_requirement);
+
+    CHECK(!evaluate_result_1);
+    CHECK(evaluate_result_2);
+    CHECK(is_result_changed);
+}
+
+TEST(VariableRequirementMock, isResultChangedReturnsTrueManyEvaluationsLastTwoDifferent)
+{
+    bool dummy;
+    mock_variable_requirement_set_evaluate_result(mock_variable_requirement, false);
+    dummy = variable_requirement_evaluate(mock_variable_requirement);
+    mock_variable_requirement_set_evaluate_result(mock_variable_requirement, true);
+    dummy = variable_requirement_evaluate(mock_variable_requirement);
+    mock_variable_requirement_set_evaluate_result(mock_variable_requirement, true);
+    dummy = variable_requirement_evaluate(mock_variable_requirement);
+    mock_variable_requirement_set_evaluate_result(mock_variable_requirement, true);
+    dummy = variable_requirement_evaluate(mock_variable_requirement);
+    mock_variable_requirement_set_evaluate_result(mock_variable_requirement, true);
+    bool evaluate_result_1 = variable_requirement_evaluate(mock_variable_requirement);
+    mock_variable_requirement_set_evaluate_result(mock_variable_requirement, false);
+    bool evaluate_result_2 = variable_requirement_evaluate(mock_variable_requirement);
+
+    bool is_result_changed = variable_requirement_is_result_changed(mock_variable_requirement);
+
+    CHECK(evaluate_result_1);
+    CHECK(!evaluate_result_2);
+    CHECK(is_result_changed);
+}
+
+TEST(VariableRequirementMock, isResultChangedReturnsFalseManyEvaluationsLastTwoSame)
+{
+    bool dummy;
+    mock_variable_requirement_set_evaluate_result(mock_variable_requirement, true);
+    dummy = variable_requirement_evaluate(mock_variable_requirement);
+    mock_variable_requirement_set_evaluate_result(mock_variable_requirement, false);
+    dummy = variable_requirement_evaluate(mock_variable_requirement);
+    mock_variable_requirement_set_evaluate_result(mock_variable_requirement, true);
+    dummy = variable_requirement_evaluate(mock_variable_requirement);
+    mock_variable_requirement_set_evaluate_result(mock_variable_requirement, false);
+    dummy = variable_requirement_evaluate(mock_variable_requirement);
+    mock_variable_requirement_set_evaluate_result(mock_variable_requirement, true);
+    bool evaluate_result_1 = variable_requirement_evaluate(mock_variable_requirement);
+    mock_variable_requirement_set_evaluate_result(mock_variable_requirement, true);
+    bool evaluate_result_2 = variable_requirement_evaluate(mock_variable_requirement);
+
+    bool is_result_changed = variable_requirement_is_result_changed(mock_variable_requirement);
+
+    CHECK(evaluate_result_1);
+    CHECK(evaluate_result_2);
+    CHECK(!is_result_changed);
+}
