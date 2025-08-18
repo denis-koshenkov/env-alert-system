@@ -3,10 +3,23 @@
 #include "variable_requirement_private.h"
 #include "eas_assert.h"
 
-bool variable_requirement_evaluate(VariableRequirement variable_requirement)
+void variable_requirement_create(VariableRequirement self)
 {
-    EAS_ASSERT(variable_requirement);
-    EAS_ASSERT(variable_requirement->vtable);
-    EAS_ASSERT(variable_requirement->vtable->evaluate);
-    return variable_requirement->vtable->evaluate(variable_requirement);
+    self->evaluate_has_been_called = false;
+}
+
+bool variable_requirement_evaluate(VariableRequirement self)
+{
+    EAS_ASSERT(self);
+    EAS_ASSERT(self->vtable);
+    EAS_ASSERT(self->vtable->evaluate);
+
+    self->evaluate_has_been_called = true;
+    return self->vtable->evaluate(self);
+}
+
+bool variable_requirement_is_result_changed(VariableRequirement self)
+{
+    EAS_ASSERT(self->evaluate_has_been_called);
+    return true;
 }

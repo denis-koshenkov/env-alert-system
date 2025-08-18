@@ -16,6 +16,7 @@ target_sources(test_exec2 PRIVATE
 
     mocks/variable_requirements/vtable_null_requirement.c
     mocks/variable_requirements/evaluate_null_requirement.c
+    mocks/variable_requirements/mock_variable_requirement.c
 )
 
 target_link_libraries(test_exec2 PRIVATE test_common)

@@ -18,6 +18,8 @@ EAS_STATIC_ASSERT(sizeof(struct VtableNullRequirementStruct) <= CONFIG_VARIABLE_
 VariableRequirement vtable_null_requirement_create()
 {
     VtableNullRequirement self = (VtableNullRequirement)variable_requirement_allocator_alloc();
+    variable_requirement_create((VariableRequirement)self);
+
     self->base.vtable = NULL;
     return (VariableRequirement)self;
 }

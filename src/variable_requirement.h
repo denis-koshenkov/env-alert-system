@@ -17,7 +17,9 @@ typedef enum VariableRequirementOperator {
 
 typedef struct VariableRequirementStruct *VariableRequirement;
 
-bool variable_requirement_evaluate(VariableRequirement variable_requirement);
+bool variable_requirement_evaluate(VariableRequirement self);
+
+bool variable_requirement_is_result_changed(VariableRequirement self);
 
 #ifdef __cplusplus
 }

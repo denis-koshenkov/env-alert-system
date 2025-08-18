@@ -4,6 +4,7 @@
 #include "variable_requirement.h"
 #include "mocks/variable_requirements/vtable_null_requirement.h"
 #include "mocks/variable_requirements/evaluate_null_requirement.h"
+#include "mocks/variable_requirements/mock_variable_requirement.h"
 
 /* ------------------------------------------ VariableRequirement test group ------------------------------------ */
 
@@ -11,7 +12,7 @@ TEST_GROUP(VariableRequirement){};
 
 TEST(VariableRequirement, evaluateRaisesAssertIfCalledWithNullPointer)
 {
-    TestAssertPlugin::expectAssertion("variable_requirement");
+    TestAssertPlugin::expectAssertion("self");
     variable_requirement_evaluate(NULL);
 }
 
@@ -39,7 +40,7 @@ TEST_GROUP(VariableRequirementVtableNull)
 
 TEST(VariableRequirementVtableNull, evaluateRaisesAssertIfVtableIsNull)
 {
-    TestAssertPlugin::expectAssertion("variable_requirement->vtable");
+    TestAssertPlugin::expectAssertion("self->vtable");
     variable_requirement_evaluate(vtable_null_requirement);
 }
 
@@ -66,6 +67,42 @@ TEST_GROUP(VariableRequirementEvaluateNull)
 
 TEST(VariableRequirementEvaluateNull, evaluateRaisesAssertIfEvaluateIsNull)
 {
-    TestAssertPlugin::expectAssertion("variable_requirement->vtable->evaluate");
+    TestAssertPlugin::expectAssertion("self->vtable->evaluate");
     variable_requirement_evaluate(evaluate_null_requirement);
+}
+
+/* ------------------------------------------ VariableRequirementMock test group -------------------------- */
+
+static VariableRequirement mock_variable_requirement;
+
+// clang-format off
+TEST_GROUP(VariableRequirementMock)
+{
+    void setup()
+    {
+        mock_variable_requirement = mock_variable_requirement_create();
+    }
+
+    void teardown()
+    {
+        mock_variable_requirement_destroy(mock_variable_requirement);
+    }
+};
+// clang-format on
+
+TEST(VariableRequirementMock, isResultChangedRaisesAssertIfCalledBeforeEvaluate)
+{
+    TestAssertPlugin::expectAssertion("self->evaluate_has_been_called");
+    bool is_result_changed = variable_requirement_is_result_changed(mock_variable_requirement);
+}
+
+TEST(VariableRequirementMock, isResultChangedReturnsTrueAfterEvaluateIsCalledOnceReturnedTrue)
+{
+    mock_variable_requirement_set_evaluate_result(mock_variable_requirement, true);
+    bool evaluate_result = variable_requirement_evaluate(mock_variable_requirement);
+    bool is_result_changed = variable_requirement_is_result_changed(mock_variable_requirement);
+
+    /* Make sure variable_requirement_evaluate() actually returned true. */
+    CHECK(evaluate_result);
+    CHECK(is_result_changed);
 }
