@@ -16,3 +16,29 @@ TEST_C(TemperatureRequirement, evaluateReturnsTrueOperatorGEQValueGreater)
 
     temperature_requirement_destroy(temperature_requirement);
 }
+
+TEST_C(TemperatureRequirement, evaluateReturnsFalseOperatorGEQValueLess)
+{
+    Temperature current_temperature_value = 20;
+    mock_c()->expectOneCall("current_temperature_get")->andReturnUnsignedIntValue(current_temperature_value);
+
+    VariableRequirement temperature_requirement =
+        temperature_requirement_create(0, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 25);
+    bool result = variable_requirement_evaluate(temperature_requirement);
+    CHECK_C(!result);
+
+    temperature_requirement_destroy(temperature_requirement);
+}
+
+TEST_C(TemperatureRequirement, evaluateReturnsTrueOperatorGEQValueEqual)
+{
+    Temperature current_temperature_value = 100;
+    mock_c()->expectOneCall("current_temperature_get")->andReturnUnsignedIntValue(current_temperature_value);
+
+    VariableRequirement temperature_requirement =
+        temperature_requirement_create(0, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 100);
+    bool result = variable_requirement_evaluate(temperature_requirement);
+    CHECK_C(result);
+
+    temperature_requirement_destroy(temperature_requirement);
+}

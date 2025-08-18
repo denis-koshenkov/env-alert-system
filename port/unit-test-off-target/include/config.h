@@ -19,6 +19,6 @@
  * For the off-target unit test build, this config is used in mock variable requirement allocator to determine the size
  * of the buffer for one variable requirement.
  */
-#define CONFIG_VARIABLE_REQUIREMENT_MAX_SIZE 8
+#define CONFIG_VARIABLE_REQUIREMENT_MAX_SIZE 16
 
 #endif

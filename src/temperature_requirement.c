@@ -14,6 +14,7 @@ typedef struct TemperatureRequirementStruct *TemperatureRequirement;
 
 struct TemperatureRequirementStruct {
     VariableRequirementStruct base;
+    Temperature value;
 };
 
 EAS_STATIC_ASSERT(sizeof(struct TemperatureRequirementStruct) <= CONFIG_VARIABLE_REQUIREMENT_MAX_SIZE);
@@ -27,8 +28,9 @@ static VariableRequirementInterfaceStruct interface = {
 
 static bool evaluate(VariableRequirement base)
 {
+    TemperatureRequirement self = (TemperatureRequirement)base;
     Temperature current_temperature = current_temperature_get();
-    return true;
+    return (current_temperature >= self->value);
 }
 
 VariableRequirement temperature_requirement_create(uint8_t alert_id, VariableRequirementOperator operator,
@@ -36,6 +38,7 @@ VariableRequirement temperature_requirement_create(uint8_t alert_id, VariableReq
 {
     TemperatureRequirement self = variable_requirement_allocator_alloc();
     self->base.vtable = &interface;
+    self->value = value;
     return (VariableRequirement)self;
 }
 
