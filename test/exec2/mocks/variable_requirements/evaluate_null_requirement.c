@@ -22,9 +22,8 @@ static VariableRequirementInterfaceStruct interface = {
 VariableRequirement evaluate_null_requirement_create()
 {
     EvaluateNullRequirement self = (EvaluateNullRequirement)variable_requirement_allocator_alloc();
-    variable_requirement_create((VariableRequirement)self);
+    variable_requirement_create((VariableRequirement)self, &interface, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 0);
 
-    self->base.vtable = &interface;
     return (VariableRequirement)self;
 }
 

@@ -27,14 +27,20 @@ typedef struct VariableRequirementStruct {
 /**
  * @brief Create generic variable requirement.
  *
- * This function should be called as early as possible in the create() functions of the subclasses of
- * VariableRequirement, such as TemperatureVariableRequirement. The implementation of this function initializes all the
- * private members of VariableRequirementStruct that belong to the VariableRequirement class.
+ * This function must be called as early as possible in the create() functions of the subclasses of
+ * VariableRequirement, such as TemperatureVariableRequirement. The implementation of this function initializes all
+ * members of VariableRequirementStruct. The create() implementation of subclass is only responsible for initializing
+ * its own data - it can assume that all members of VariableRequirementStruct are initialized after a call to this
+ * function.
  *
  * @param self Variable requirement instance. This should already point to valid memory, memory allocation for variable
  * requirement instances is performed in the create() functions of the subclasses.
+ * @param vtable Interface implementation - initialized and provided by the subclass.
+ * @param operator Variable requirement operator to use when evaluating the requirement.
+ * @param alert_id Alert id - identifies alert that this variable requirement is a part of.
  */
-void variable_requirement_create(VariableRequirement self);
+void variable_requirement_create(VariableRequirement self, VariableRequirementInterfaceStruct *vtable,
+                                 VariableRequirementOperator operator, uint8_t alert_id);
 
 #ifdef __cplusplus
 }

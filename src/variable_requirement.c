@@ -3,8 +3,13 @@
 #include "variable_requirement_private.h"
 #include "eas_assert.h"
 
-void variable_requirement_create(VariableRequirement self)
+void variable_requirement_create(VariableRequirement self, VariableRequirementInterfaceStruct *vtable,
+                                 VariableRequirementOperator operator, uint8_t alert_id)
 {
+    self->vtable = vtable;
+    self->operator = operator;
+    self->alert_id = alert_id;
+
     self->evaluate_has_been_called = false;
     self->is_result_changed = true;
     self->previous_evaluation_result = false;
