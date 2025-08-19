@@ -9,8 +9,7 @@ extern "C"
 #include "hal/temperature.h"
 #include "variable_requirement.h"
 
-VariableRequirement temperature_requirement_create(uint8_t alert_id, VariableRequirementOperator operator,
-                                                   Temperature value);
+VariableRequirement temperature_requirement_create(uint8_t alert_id, uint8_t operator, Temperature value);
 
 void temperature_requirement_destroy(VariableRequirement temperature_requirement);
 

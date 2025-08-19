@@ -43,9 +43,8 @@ VariableRequirement mock_variable_requirement_create(bool pass_null_instance_to_
     if (pass_null_instance_to_var_req_create) {
         self = NULL;
     }
-    VariableRequirementOperator operator = pass_invalid_operator_to_var_req_create
-                                               ? VARIABLE_REQUIREMENT_OPERATOR_INVALID
-                                               : VARIABLE_REQUIREMENT_OPERATOR_GEQ;
+    uint8_t operator = pass_invalid_operator_to_var_req_create ? VARIABLE_REQUIREMENT_OPERATOR_INVALID
+                                                               : VARIABLE_REQUIREMENT_OPERATOR_GEQ;
 
     VariableRequirementInterfaceStruct *vtable = NULL;
     switch (vtable_parameter) {

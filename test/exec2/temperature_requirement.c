@@ -6,8 +6,8 @@
 
 static VariableRequirement temperature_requirement;
 
-static void test_evaluate(Temperature current_temperature, VariableRequirementOperator operator,
-                          Temperature requirement_value, bool expected_result)
+static void test_evaluate(Temperature current_temperature, uint8_t operator, Temperature requirement_value,
+                          bool expected_result)
 {
     mock_c()->expectOneCall("current_temperature_get")->andReturnUnsignedIntValue(current_temperature);
 

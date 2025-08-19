@@ -17,7 +17,7 @@ typedef struct VariableRequirementInterfaceStruct {
 
 typedef struct VariableRequirementStruct {
     VariableRequirementInterfaceStruct *vtable;
-    VariableRequirementOperator operator;
+    uint8_t operator; /**! Uses values from @ref VariableRequirementOperator, defined as uint8_t to save memory. */
     uint8_t alert_id;
     bool evaluate_has_been_called;
     bool is_result_changed;
@@ -39,11 +39,12 @@ typedef struct VariableRequirementStruct {
  * @param self Variable requirement instance. This should already point to valid memory, memory allocation for variable
  * requirement instances is performed in the create() functions of the subclasses.
  * @param vtable Interface implementation - initialized and provided by the subclass.
- * @param operator Variable requirement operator to use when evaluating the requirement.
+ * @param operator Use one of the values from @ref VariableRequirementOperator. Variable requirement operator to use
+ * when evaluating the requirement.
  * @param alert_id Alert id - identifies alert that this variable requirement is a part of.
  */
-void variable_requirement_create(VariableRequirement self, VariableRequirementInterfaceStruct *vtable,
-                                 VariableRequirementOperator operator, uint8_t alert_id);
+void variable_requirement_create(VariableRequirement self, VariableRequirementInterfaceStruct *vtable, uint8_t operator,
+                                 uint8_t alert_id);
 
 #ifdef __cplusplus
 }

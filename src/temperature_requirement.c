@@ -49,8 +49,7 @@ static bool evaluate(VariableRequirement base)
     return result;
 }
 
-VariableRequirement temperature_requirement_create(uint8_t alert_id, VariableRequirementOperator operator,
-                                                   Temperature value)
+VariableRequirement temperature_requirement_create(uint8_t alert_id, uint8_t operator, Temperature value)
 {
     TemperatureRequirement self = variable_requirement_allocator_alloc();
     variable_requirement_create((VariableRequirement)self, &interface, operator, alert_id);
