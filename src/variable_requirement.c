@@ -41,6 +41,9 @@ bool variable_requirement_evaluate(VariableRequirement self)
     if (self->evaluate_has_been_called) {
         self->is_result_changed = (evaluation_result != self->previous_evaluation_result);
     } else {
+        /* This is the first ever call to evaluate(). After evaluate() is called once, is_result_changed always returns
+         * true, regardless of the result. Before evaluate() was called, there was no result, and after it is called,
+         * there IS a result, so the result has changed. */
         self->is_result_changed = true;
     }
 
@@ -52,6 +55,8 @@ bool variable_requirement_evaluate(VariableRequirement self)
 bool variable_requirement_is_result_changed(VariableRequirement self)
 {
     EAS_ASSERT(self);
+    /* This function is only allowed to be called if evaluate() has been called at least once. If evaluate() has not
+     * been called yet, there is no result yet, so it does not make sense to report whether it has changed. */
     EAS_ASSERT(self->evaluate_has_been_called);
     return self->is_result_changed;
 }
