@@ -35,3 +35,8 @@ bool variable_requirement_is_result_changed(VariableRequirement self)
     EAS_ASSERT(self->evaluate_has_been_called);
     return self->is_result_changed;
 }
+
+uint8_t variable_requirement_get_alert_id(VariableRequirement self)
+{
+    return self->alert_id;
+}

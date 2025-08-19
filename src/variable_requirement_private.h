@@ -18,6 +18,7 @@ typedef struct VariableRequirementInterfaceStruct {
 typedef struct VariableRequirementStruct {
     VariableRequirementInterfaceStruct *vtable;
     VariableRequirementOperator operator;
+    uint8_t alert_id;
     bool evaluate_has_been_called;
     bool is_result_changed;
     bool previous_evaluation_result;

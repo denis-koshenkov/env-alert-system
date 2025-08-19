@@ -90,3 +90,23 @@ TEST_C(TemperatureRequirement, evaluateReturnsFalseOperatorLEQValueGreaterOneNeg
 {
     test_evaluate(76, VARIABLE_REQUIREMENT_OPERATOR_LEQ, -2, false);
 }
+
+/* The get_alert_id() tests below belong in testing temperature_requirement and not variable_requirement, because it
+ * is the responsibility of temperature_requirement_create() to propagate the alert_id to the base class. We are testing
+ * that link here. */
+TEST_C(TemperatureRequirement, getAlertIdReturnsAlertId1PassedToCreate)
+{
+    uint8_t expected_alert_id = 1;
+    temperature_requirement = temperature_requirement_create(expected_alert_id, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 200);
+    uint8_t actual_alert_id = variable_requirement_get_alert_id(temperature_requirement);
+    CHECK_EQUAL_C_UINT(expected_alert_id, actual_alert_id);
+}
+
+TEST_C(TemperatureRequirement, getAlertIdReturnsAlertId2PassedToCreate)
+{
+    uint8_t expected_alert_id = 2;
+    temperature_requirement =
+        temperature_requirement_create(expected_alert_id, VARIABLE_REQUIREMENT_OPERATOR_LEQ, -200);
+    uint8_t actual_alert_id = variable_requirement_get_alert_id(temperature_requirement);
+    CHECK_EQUAL_C_UINT(expected_alert_id, actual_alert_id);
+}

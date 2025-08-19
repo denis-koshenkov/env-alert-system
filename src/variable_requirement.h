@@ -21,6 +21,8 @@ bool variable_requirement_evaluate(VariableRequirement self);
 
 bool variable_requirement_is_result_changed(VariableRequirement self);
 
+uint8_t variable_requirement_get_alert_id(VariableRequirement self);
+
 #ifdef __cplusplus
 }
 #endif

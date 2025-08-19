@@ -54,6 +54,7 @@ VariableRequirement temperature_requirement_create(uint8_t alert_id, VariableReq
 
     self->base.vtable = &interface;
     self->base.operator = operator;
+    self->base.alert_id = alert_id;
     self->value = value;
     return (VariableRequirement)self;
 }
