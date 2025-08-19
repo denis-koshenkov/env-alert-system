@@ -2,7 +2,6 @@
 #include "CppUTestExt/TestAssertPlugin.h"
 
 #include "variable_requirement.h"
-#include "mocks/variable_requirements/vtable_null_requirement.h"
 #include "mocks/variable_requirements/evaluate_null_requirement.h"
 #include "mocks/variable_requirements/mock_variable_requirement.h"
 
@@ -28,38 +27,13 @@ TEST(VariableRequirement, getAlertIdRaisesAssertIfCalledWithNullPointer)
     uint8_t unused = variable_requirement_get_alert_id(NULL);
 }
 
-/* ------------------------------------------ VariableRequirementVtableNull test group -------------------------- */
-
-/* VariableRequirementVtableNull is a different test group, because we need to call vtable_null_requirement_destroy() in
- * teardown. If we put it in the test body, it will not be executed, because assert fires and the test ends prematurely.
- * But we should not call vtable_null_requirement_destroy() for the VariableRequirement test group tests. */
-static VariableRequirement vtable_null_requirement;
-
-// clang-format off
-TEST_GROUP(VariableRequirementVtableNull)
-{
-    void setup()
-    {
-        vtable_null_requirement = vtable_null_requirement_create();
-    }
-
-    void teardown()
-    {
-        vtable_null_requirement_destroy(vtable_null_requirement);
-    }
-};
-// clang-format on
-
-TEST(VariableRequirementVtableNull, evaluateRaisesAssertIfVtableIsNull)
-{
-    TestAssertPlugin::expectAssertion("self->vtable");
-    variable_requirement_evaluate(vtable_null_requirement);
-}
-
 /* ------------------------------------------ VariableRequirementEvaluateNull test group -------------------------- */
 
-/* Same logic applies to VariableRequirementEvaluateNull test group as to the VariableRequirementVtableNull test
- * group. */
+/* VariableRequirementEvaluateNull is a different test group, because we need to call
+ * evaluate_null_requirement_destroy() in teardown. If we put it in the test body, it will not be executed, because
+ * assert fires and the test ends prematurely. But we should not call evaluate_null_requirement_destroy() for the
+ * VariableRequirement test group tests.
+ */
 static VariableRequirement evaluate_null_requirement;
 
 // clang-format off
@@ -94,7 +68,8 @@ TEST_GROUP(VariableRequirementMock)
     {
         mock_variable_requirement = mock_variable_requirement_create(
             MOCK_VARIABLE_REQUIREMENT_PASS_VALID_INSTANCE_TO_VAR_REQ_CREATE,
-            MOCK_VARIABLE_REQUIREMENT_PASS_GEQ_OPERATOR_TO_VAR_REQ_CREATE
+            MOCK_VARIABLE_REQUIREMENT_PASS_GEQ_OPERATOR_TO_VAR_REQ_CREATE,
+            MOCK_VARIABLE_REQUIREMENT_PASS_VALID_VTABLE_TO_VAR_REQ_CREATE
         );
     }
 
@@ -253,7 +228,8 @@ TEST(VariableRequirementMockCreate, createRaisesAssertIfSelfIsNull)
     TestAssertPlugin::expectAssertion("self");
     mock_variable_requirement_create_test_group =
         mock_variable_requirement_create(MOCK_VARIABLE_REQUIREMENT_PASS_NULLPTR_INSTANCE_TO_VAR_REQ_CREATE,
-                                         MOCK_VARIABLE_REQUIREMENT_PASS_GEQ_OPERATOR_TO_VAR_REQ_CREATE);
+                                         MOCK_VARIABLE_REQUIREMENT_PASS_GEQ_OPERATOR_TO_VAR_REQ_CREATE,
+                                         MOCK_VARIABLE_REQUIREMENT_PASS_VALID_VTABLE_TO_VAR_REQ_CREATE);
 }
 
 TEST(VariableRequirementMockCreate, createRaisesAssertIfOperatorIsInvalid)
@@ -261,5 +237,15 @@ TEST(VariableRequirementMockCreate, createRaisesAssertIfOperatorIsInvalid)
     TestAssertPlugin::expectAssertion("is_valid_operator(operator)");
     mock_variable_requirement_create_test_group =
         mock_variable_requirement_create(MOCK_VARIABLE_REQUIREMENT_PASS_VALID_INSTANCE_TO_VAR_REQ_CREATE,
-                                         MOCK_VARIABLE_REQUIREMENT_PASS_INVALID_OPERATOR_TO_VAR_REQ_CREATE);
+                                         MOCK_VARIABLE_REQUIREMENT_PASS_INVALID_OPERATOR_TO_VAR_REQ_CREATE,
+                                         MOCK_VARIABLE_REQUIREMENT_PASS_VALID_VTABLE_TO_VAR_REQ_CREATE);
+}
+
+TEST(VariableRequirementMockCreate, createRaisesAssertIfVtableIsNull)
+{
+    TestAssertPlugin::expectAssertion("vtable");
+    mock_variable_requirement_create_test_group =
+        mock_variable_requirement_create(MOCK_VARIABLE_REQUIREMENT_PASS_VALID_INSTANCE_TO_VAR_REQ_CREATE,
+                                         MOCK_VARIABLE_REQUIREMENT_PASS_GEQ_OPERATOR_TO_VAR_REQ_CREATE,
+                                         MOCK_VARIABLE_REQUIREMENT_PASS_NULL_VTABLE_TO_VAR_REQ_CREATE);
 }

@@ -20,7 +20,9 @@ void variable_requirement_create(VariableRequirement self, VariableRequirementIn
                                  VariableRequirementOperator operator, uint8_t alert_id)
 {
     EAS_ASSERT(self);
+    EAS_ASSERT(vtable);
     EAS_ASSERT(is_valid_operator(operator));
+
     self->vtable = vtable;
     self->operator = operator;
     self->alert_id = alert_id;
