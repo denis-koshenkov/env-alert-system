@@ -92,7 +92,10 @@ TEST_GROUP(VariableRequirementMock)
 {
     void setup()
     {
-        mock_variable_requirement = mock_variable_requirement_create();
+        mock_variable_requirement = mock_variable_requirement_create(
+            MOCK_VARIABLE_REQUIREMENT_PASS_VALID_INSTANCE_TO_VAR_REQ_CREATE,
+            MOCK_VARIABLE_REQUIREMENT_PASS_GEQ_OPERATOR_TO_VAR_REQ_CREATE
+        );
     }
 
     void teardown()
@@ -224,4 +227,39 @@ TEST(VariableRequirementMock, isResultChangedReturnsFalseManyEvaluationsLastTwoS
     CHECK(evaluate_result_1);
     CHECK(evaluate_result_2);
     CHECK(!is_result_changed);
+}
+
+/* ------------------------------------------ VariableRequirementMockCreate test group -------------------------- */
+
+/* This is its own test group, because we expect asserts during the calls to mock_variable_requirement_create(). But in
+ the other test group that uses mock_variable_requirement, mock_variable_requirement_create() is called in setup(), so
+ we cannot expect asserts there. In this test group, calls to mock_variable_requirement_create() are performed in the
+ test body, which allows us to expect asserts there. */
+
+static VariableRequirement mock_variable_requirement_create_test_group;
+
+// clang-format off
+TEST_GROUP(VariableRequirementMockCreate)
+{
+    void teardown()
+    {
+        mock_variable_requirement_destroy(mock_variable_requirement_create_test_group);
+    }
+};
+// clang-format on
+
+TEST(VariableRequirementMockCreate, createRaisesAssertIfSelfIsNull)
+{
+    TestAssertPlugin::expectAssertion("self");
+    mock_variable_requirement_create_test_group =
+        mock_variable_requirement_create(MOCK_VARIABLE_REQUIREMENT_PASS_NULLPTR_INSTANCE_TO_VAR_REQ_CREATE,
+                                         MOCK_VARIABLE_REQUIREMENT_PASS_GEQ_OPERATOR_TO_VAR_REQ_CREATE);
+}
+
+TEST(VariableRequirementMockCreate, createRaisesAssertIfOperatorIsInvalid)
+{
+    TestAssertPlugin::expectAssertion("is_valid_operator(operator)");
+    mock_variable_requirement_create_test_group =
+        mock_variable_requirement_create(MOCK_VARIABLE_REQUIREMENT_PASS_VALID_INSTANCE_TO_VAR_REQ_CREATE,
+                                         MOCK_VARIABLE_REQUIREMENT_PASS_INVALID_OPERATOR_TO_VAR_REQ_CREATE);
 }

@@ -13,6 +13,9 @@ typedef enum VariableRequirementOperator {
     VARIABLE_REQUIREMENT_OPERATOR_GEQ,
     /// Less than or equal to.
     VARIABLE_REQUIREMENT_OPERATOR_LEQ,
+
+    /// Invalid operator - do not use.
+    VARIABLE_REQUIREMENT_OPERATOR_INVALID,
 } VariableRequirementOperator;
 
 typedef struct VariableRequirementStruct *VariableRequirement;

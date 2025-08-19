@@ -3,9 +3,24 @@
 #include "variable_requirement_private.h"
 #include "eas_assert.h"
 
+/**
+ * @brief Check that variable requirement operator is valid.
+ *
+ * @param operator Variable requirement operator.
+ *
+ * @return true Operator is valid.
+ * @return false Operator is invalid.
+ */
+static bool is_valid_operator(VariableRequirementOperator operator)
+{
+    return (operator < VARIABLE_REQUIREMENT_OPERATOR_INVALID);
+}
+
 void variable_requirement_create(VariableRequirement self, VariableRequirementInterfaceStruct *vtable,
                                  VariableRequirementOperator operator, uint8_t alert_id)
 {
+    EAS_ASSERT(self);
+    EAS_ASSERT(is_valid_operator(operator));
     self->vtable = vtable;
     self->operator = operator;
     self->alert_id = alert_id;

@@ -29,10 +29,17 @@ static bool evaluate(VariableRequirement base)
     return self->evaluate_result;
 }
 
-VariableRequirement mock_variable_requirement_create()
+VariableRequirement mock_variable_requirement_create(bool pass_null_instance_to_var_req_create,
+                                                     bool pass_invalid_operator_to_var_req_create)
 {
     MockVariableRequirement self = (MockVariableRequirement)variable_requirement_allocator_alloc();
-    variable_requirement_create((VariableRequirement)self, &interface, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 0);
+    if (pass_null_instance_to_var_req_create) {
+        self = NULL;
+    }
+    VariableRequirementOperator operator = pass_invalid_operator_to_var_req_create
+                                               ? VARIABLE_REQUIREMENT_OPERATOR_INVALID
+                                               : VARIABLE_REQUIREMENT_OPERATOR_GEQ;
+    variable_requirement_create((VariableRequirement)self, &interface, operator, 0);
 
     return (VariableRequirement)self;
 }

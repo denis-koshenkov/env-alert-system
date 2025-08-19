@@ -33,6 +33,9 @@ typedef struct VariableRequirementStruct {
  * its own data - it can assume that all members of VariableRequirementStruct are initialized after a call to this
  * function.
  *
+ * @note This function must only be called from create() functions of subclasses of variable requirement. It should
+ * never be called from anywhere else.
+ *
  * @param self Variable requirement instance. This should already point to valid memory, memory allocation for variable
  * requirement instances is performed in the create() functions of the subclasses.
  * @param vtable Interface implementation - initialized and provided by the subclass.
