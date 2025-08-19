@@ -13,13 +13,19 @@ TEST_GROUP(VariableRequirement){};
 TEST(VariableRequirement, evaluateRaisesAssertIfCalledWithNullPointer)
 {
     TestAssertPlugin::expectAssertion("self");
-    variable_requirement_evaluate(NULL);
+    bool unused = variable_requirement_evaluate(NULL);
 }
 
 TEST(VariableRequirement, isResultChangedRaisesAssertIfCalledWithNullPointer)
 {
     TestAssertPlugin::expectAssertion("self");
     bool unused = variable_requirement_is_result_changed(NULL);
+}
+
+TEST(VariableRequirement, getAlertIdRaisesAssertIfCalledWithNullPointer)
+{
+    TestAssertPlugin::expectAssertion("self");
+    uint8_t unused = variable_requirement_get_alert_id(NULL);
 }
 
 /* ------------------------------------------ VariableRequirementVtableNull test group -------------------------- */
