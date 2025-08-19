@@ -5,6 +5,7 @@
 #include "temperature_requirement.h"
 #include "variable_requirement_allocator.h"
 
+#include "eas_assert.h"
 #include "config.h"
 #include "utils/util.h"
 #include "hal/temperature.h"
@@ -40,7 +41,9 @@ static bool evaluate(VariableRequirement base)
         result = (current_temperature <= self->value);
         break;
     default:
-        break;
+        /* Invalid operator */
+        EAS_ASSERT(false);
+        return false;
     }
 
     return result;
