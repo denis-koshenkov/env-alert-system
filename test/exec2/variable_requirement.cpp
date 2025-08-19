@@ -16,6 +16,12 @@ TEST(VariableRequirement, evaluateRaisesAssertIfCalledWithNullPointer)
     variable_requirement_evaluate(NULL);
 }
 
+TEST(VariableRequirement, isResultChangedRaisesAssertIfCalledWithNullPointer)
+{
+    TestAssertPlugin::expectAssertion("self");
+    bool unused = variable_requirement_is_result_changed(NULL);
+}
+
 /* ------------------------------------------ VariableRequirementVtableNull test group -------------------------- */
 
 /* VariableRequirementVtableNull is a different test group, because we need to call vtable_null_requirement_destroy() in

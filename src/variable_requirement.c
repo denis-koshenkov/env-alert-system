@@ -31,6 +31,7 @@ bool variable_requirement_evaluate(VariableRequirement self)
 
 bool variable_requirement_is_result_changed(VariableRequirement self)
 {
+    EAS_ASSERT(self);
     EAS_ASSERT(self->evaluate_has_been_called);
     return self->is_result_changed;
 }
