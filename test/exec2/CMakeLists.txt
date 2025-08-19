@@ -14,7 +14,6 @@ target_sources(test_exec2 PRIVATE
     mocks/mock_variable_requirement_allocator.cpp
     mocks/mock_current_temperature.cpp
 
-    mocks/variable_requirements/evaluate_null_requirement.c
     mocks/variable_requirements/mock_variable_requirement.c
 )
 

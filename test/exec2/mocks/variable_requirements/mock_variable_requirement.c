@@ -19,8 +19,12 @@ EAS_STATIC_ASSERT(sizeof(struct MockVariableRequirementStruct) <= CONFIG_VARIABL
 // Forward declarations of interface functions to define the interface.
 static bool evaluate(VariableRequirement base);
 
-static VariableRequirementInterfaceStruct interface = {
+static VariableRequirementInterfaceStruct valid_interface = {
     .evaluate = evaluate,
+};
+
+static VariableRequirementInterfaceStruct interface_with_evaluate_null = {
+    .evaluate = NULL,
 };
 
 static bool evaluate(VariableRequirement base)
@@ -31,7 +35,7 @@ static bool evaluate(VariableRequirement base)
 
 VariableRequirement mock_variable_requirement_create(bool pass_null_instance_to_var_req_create,
                                                      bool pass_invalid_operator_to_var_req_create,
-                                                     bool pass_null_vtable)
+                                                     uint8_t vtable_parameter)
 {
     /* Allocate memory regardless of whether we are passing NULL to self or not, because the test always expects us to
      * allocate - it calls free() in teardown. */
@@ -42,7 +46,21 @@ VariableRequirement mock_variable_requirement_create(bool pass_null_instance_to_
     VariableRequirementOperator operator = pass_invalid_operator_to_var_req_create
                                                ? VARIABLE_REQUIREMENT_OPERATOR_INVALID
                                                : VARIABLE_REQUIREMENT_OPERATOR_GEQ;
-    VariableRequirementInterfaceStruct *vtable = pass_null_vtable ? NULL : &interface;
+
+    VariableRequirementInterfaceStruct *vtable = NULL;
+    switch (vtable_parameter) {
+    case MOCK_VARIABLE_REQUIREMENT_PASS_NULL_VTABLE_TO_VAR_REQ_CREATE:
+        vtable = NULL;
+        break;
+    case MOCK_VARIABLE_REQUIREMENT_PASS_VALID_VTABLE_TO_VAR_REQ_CREATE:
+        vtable = &valid_interface;
+        break;
+    case MOCK_VARIABLE_REQUIREMENT_PASS_NULL_EVALUATE_TO_VAR_REQ_CREATE:
+        vtable = &interface_with_evaluate_null;
+        break;
+    default:
+        break;
+    }
 
     variable_requirement_create((VariableRequirement)self, vtable, operator, 0);
     return (VariableRequirement)self;

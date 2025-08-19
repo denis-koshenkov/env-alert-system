@@ -21,6 +21,7 @@ void variable_requirement_create(VariableRequirement self, VariableRequirementIn
 {
     EAS_ASSERT(self);
     EAS_ASSERT(vtable);
+    EAS_ASSERT(vtable->evaluate);
     EAS_ASSERT(is_valid_operator(operator));
 
     self->vtable = vtable;
