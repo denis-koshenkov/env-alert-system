@@ -65,24 +65,36 @@ typedef enum VariableRequirementOperator {
  *
  * // Get alert id
  * uint8_t alert_id = variable_requirement_get_alert_id(temperature_requirement);
+ *
+ * // Destroy variable requirement
+ * variable_requirement_destroy(temperature_requirement);
  * ```
  *
  * # How to create a subclass
  *
- * 1. Define a evaluate() function, and define an interface (vtable) that contains a pointer to that function. This
- * vtable will be passed as an argument to the variable_requirement_create() call which happens inside the create()
- * function of the subclass.
+ * 1. Define a evaluate() function, a destroy() function, and define an interface (vtable) that contains a pointer to
+ * these functions. This vtable will be passed as an argument to the variable_requirement_create() call which happens
+ * inside the create() function of the subclass.
  * ```
  * static bool evaluate(VariableRequirement base);
  * static VariableRequirementInterfaceStruct interface = {
  *     .evaluate = evaluate,
+ *     .destroy = destroy,
  * };
  *
  * static bool evaluate(VariableRequirement base)
  * {
  *     // evaluate() implementation of the subclass
  * }
+ *
+ * static void destroy(VariableRequirement base)
+ * {
+ *     // destroy() implementation of the subclass
+ * }
  * ```
+ *
+ * The destroy() function should free the memory that is allocated during a call to the create() function of the
+ * subclass. See step 4.1 below for more details.
  *
  * 2. Define the subclass struct. The purpose of this struct is to hold all of the private members defined in
  * VariableRequirementStruct, as well as the requirement value. Example struct definition:
@@ -101,7 +113,7 @@ typedef enum VariableRequirementOperator {
  * If the build fails because of this assert, increase CONFIG_VARIABLE_REQUIREMENT_MAX_SIZE until the build succeeds.
  *
  * 4. Define the subclass create() function. Inside this create function, the following needs to happen:
- *   1. Call variable_requirement_allocator_alloc() to allocate memory for the variable requirement.
+ *   1. Allocate memory that will fit MyRequirementStruct.
  *   2. Call variable_requirement_create() and pass the allocated memory as a parameter. Also pass the vtable, alert id,
  * and operator. vtable is the interface we defined in step 1. Alert id and operator are probably passed as arguments to
  * the create() functions of the subclass, but that is not mandatory.
@@ -162,6 +174,12 @@ bool variable_requirement_is_result_changed(VariableRequirement self);
  */
 uint8_t variable_requirement_get_alert_id(VariableRequirement self);
 
+/**
+ * @brief Destroy variable requirement.
+ *
+ * @param self Variable requirement instance returned by the create() function of one of the subclasses of
+ * VariableRequirement.
+ */
 void variable_requirement_destroy(VariableRequirement self);
 
 #ifdef __cplusplus
