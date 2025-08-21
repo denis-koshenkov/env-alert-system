@@ -50,7 +50,7 @@ TEST_GROUP(VariableRequirementMock)
 
     void teardown()
     {
-        mock_variable_requirement_destroy(mock_variable_requirement);
+        variable_requirement_destroy(mock_variable_requirement);
     }
 };
 // clang-format on
@@ -193,6 +193,11 @@ TEST_GROUP(VariableRequirementMockCreate)
 {
     void teardown()
     {
+        /* This cannot be variable_requirement_destroy(), because that will access the vtable. The tests in this test
+        group will not get past the asserts at the beginning of variable_requirement_create, so vtable will never be
+        populated. This means that at the end of the test, when we end up here in the teardown, the vtable field contains
+        an invalid pointer. But we still need to free the memory we allocated in mock_variable_requirement_create(), so
+        we call the destroy() here directly. */
         mock_variable_requirement_destroy(mock_variable_requirement_create_test_group);
     }
 };
@@ -232,4 +237,13 @@ TEST(VariableRequirementMockCreate, createRaisesAssertIfEvaluateIsNull)
         mock_variable_requirement_create(MOCK_VARIABLE_REQUIREMENT_PASS_VALID_INSTANCE_TO_VAR_REQ_CREATE,
                                          MOCK_VARIABLE_REQUIREMENT_PASS_GEQ_OPERATOR_TO_VAR_REQ_CREATE,
                                          MOCK_VARIABLE_REQUIREMENT_PASS_NULL_EVALUATE_TO_VAR_REQ_CREATE);
+}
+
+TEST(VariableRequirementMockCreate, createRaisesAssertIfDestroyIsNull)
+{
+    TestAssertPlugin::expectAssertion("vtable->destroy");
+    mock_variable_requirement_create_test_group =
+        mock_variable_requirement_create(MOCK_VARIABLE_REQUIREMENT_PASS_VALID_INSTANCE_TO_VAR_REQ_CREATE,
+                                         MOCK_VARIABLE_REQUIREMENT_PASS_GEQ_OPERATOR_TO_VAR_REQ_CREATE,
+                                         MOCK_VARIABLE_REQUIREMENT_PASS_NULL_DESTROY_TO_VAR_REQ_CREATE);
 }

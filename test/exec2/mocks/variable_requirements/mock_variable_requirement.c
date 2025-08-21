@@ -18,19 +18,32 @@ EAS_STATIC_ASSERT(sizeof(struct MockVariableRequirementStruct) <= CONFIG_VARIABL
 
 // Forward declarations of interface functions to define the interface.
 static bool evaluate(VariableRequirement base);
+static void destroy(VariableRequirement base);
 
 static VariableRequirementInterfaceStruct valid_interface = {
     .evaluate = evaluate,
+    .destroy = destroy,
 };
 
 static VariableRequirementInterfaceStruct interface_with_evaluate_null = {
     .evaluate = NULL,
+    .destroy = destroy,
+};
+
+static VariableRequirementInterfaceStruct interface_with_destroy_null = {
+    .evaluate = evaluate,
+    .destroy = NULL,
 };
 
 static bool evaluate(VariableRequirement base)
 {
     MockVariableRequirement self = (MockVariableRequirement)base;
     return self->evaluate_result;
+}
+
+static void destroy(VariableRequirement base)
+{
+    variable_requirement_allocator_free(base);
 }
 
 VariableRequirement mock_variable_requirement_create(bool pass_null_instance_to_var_req_create,
@@ -56,6 +69,9 @@ VariableRequirement mock_variable_requirement_create(bool pass_null_instance_to_
         break;
     case MOCK_VARIABLE_REQUIREMENT_PASS_NULL_EVALUATE_TO_VAR_REQ_CREATE:
         vtable = &interface_with_evaluate_null;
+        break;
+    case MOCK_VARIABLE_REQUIREMENT_PASS_NULL_DESTROY_TO_VAR_REQ_CREATE:
+        vtable = &interface_with_destroy_null;
         break;
     default:
         break;
