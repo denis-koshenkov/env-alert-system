@@ -74,5 +74,7 @@ uint8_t variable_requirement_get_alert_id(VariableRequirement self)
 void variable_requirement_destroy(VariableRequirement self)
 {
     EAS_ASSERT(self);
+    EAS_ASSERT(self->vtable);
+    EAS_ASSERT(self->vtable->destroy);
     self->vtable->destroy(self);
 }
