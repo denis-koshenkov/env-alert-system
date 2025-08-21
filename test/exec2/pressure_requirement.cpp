@@ -1,0 +1,16 @@
+#include "CppUTest/CommandLineTestRunner.h"
+#include "CppUTest/TestHarness_c.h"
+
+TEST_GROUP_C_WRAPPER(PressureRequirement)
+{
+    TEST_GROUP_C_TEARDOWN_WRAPPER(PressureRequirement);
+};
+
+TEST_C_WRAPPER(PressureRequirement, evaluateReturnsTrueOperatorGEQValueGreater);
+TEST_C_WRAPPER(PressureRequirement, evaluateReturnsFalseOperatorGEQValueLess);
+TEST_C_WRAPPER(PressureRequirement, evaluateReturnsTrueOperatorGEQValueEqual);
+TEST_C_WRAPPER(PressureRequirement, evaluateReturnsTrueOperatorLEQValueLess);
+TEST_C_WRAPPER(PressureRequirement, evaluateReturnsTrueOperatorLEQValueEqual);
+TEST_C_WRAPPER(PressureRequirement, evaluateReturnsFalseOperatorLEQValueGreater);
+TEST_C_WRAPPER(PressureRequirement, evaluateReturnsTrueOperatorGEQBothValuesEqualZero);
+TEST_C_WRAPPER(PressureRequirement, evaluateReturnsTrueOperatorLEQBothValuesEqualZero);

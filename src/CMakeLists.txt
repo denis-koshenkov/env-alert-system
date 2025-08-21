@@ -10,6 +10,7 @@ target_sources(eas INTERFACE
     current_temperature.c
     current_pressure.c
     temperature_requirement.c
+    pressure_requirement.c
     variable_requirement.c
     variable_requirement_allocator.c
 )

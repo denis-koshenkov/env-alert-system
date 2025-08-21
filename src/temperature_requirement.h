@@ -28,7 +28,7 @@ extern "C"
  * when evaluating the requirement.
  * @param value Temperature requirement value.
  *
- * @return VariableRequirement
+ * @return VariableRequirement Created instance of temperature requirement.
  */
 VariableRequirement temperature_requirement_create(uint8_t alert_id, uint8_t operator, Temperature value);
 
