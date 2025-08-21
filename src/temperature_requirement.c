@@ -29,6 +29,14 @@ static VariableRequirementInterfaceStruct interface = {
     .destroy = destroy,
 };
 
+/**
+ * @brief Evaluate temperature variable requirement.
+ *
+ * @param base Temperature requirement instance returned by @ref temperature_requirement_create.
+ *
+ * @return true Temperature requirement is currently satisfied.
+ * @return false Temperature requirement is currently not satisfied.
+ */
 static bool evaluate(VariableRequirement base)
 {
     TemperatureRequirement self = (TemperatureRequirement)base;
@@ -51,9 +59,14 @@ static bool evaluate(VariableRequirement base)
     return result;
 }
 
-static void destroy(VariableRequirement temperature_requirement)
+/**
+ * @brief Destroy a temperature variable requirement instance.
+ *
+ * @param base Temperature requirement instance returned by @ref temperature_requirement_create.
+ */
+static void destroy(VariableRequirement base)
 {
-    variable_requirement_allocator_free(temperature_requirement);
+    variable_requirement_allocator_free(base);
 }
 
 VariableRequirement temperature_requirement_create(uint8_t alert_id, uint8_t operator, Temperature value)
