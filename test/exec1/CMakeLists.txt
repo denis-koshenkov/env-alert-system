@@ -4,8 +4,10 @@ target_sources(test_exec1 PRIVATE
     main.cpp
     value_holder.cpp
     current_temperature.cpp
+    current_pressure.cpp
 
     mocks/mock_temperature_value.cpp
+    mocks/mock_pressure_value.cpp
 )
 
 target_link_libraries(test_exec1 PRIVATE test_common)

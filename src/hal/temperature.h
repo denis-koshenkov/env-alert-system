@@ -23,7 +23,7 @@ extern "C"
  *   - -1.0 degrees -> -10
  *   - -20.5 degrees -> -205
  *
- * Temperature values range allowed by representation: -3276.8 to 3276.7.
+ * Temperature values range allowed by representation (in Celsius): -3276.8 to 3276.7.
  */
 typedef int16_t Temperature;
 
