@@ -162,6 +162,8 @@ bool variable_requirement_is_result_changed(VariableRequirement self);
  */
 uint8_t variable_requirement_get_alert_id(VariableRequirement self);
 
+void variable_requirement_destroy(VariableRequirement self);
+
 #ifdef __cplusplus
 }
 #endif

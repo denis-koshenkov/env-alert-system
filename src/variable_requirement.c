@@ -69,3 +69,9 @@ uint8_t variable_requirement_get_alert_id(VariableRequirement self)
     EAS_ASSERT(self);
     return self->alert_id;
 }
+
+void variable_requirement_destroy(VariableRequirement self)
+{
+    EAS_ASSERT(self);
+    self->vtable->destroy(self);
+}

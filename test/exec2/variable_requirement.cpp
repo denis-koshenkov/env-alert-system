@@ -26,6 +26,12 @@ TEST(VariableRequirement, getAlertIdRaisesAssertIfCalledWithNullPointer)
     uint8_t unused = variable_requirement_get_alert_id(NULL);
 }
 
+TEST(VariableRequirement, destroyRaisesAssertIfCalledWithNullPointer)
+{
+    TestAssertPlugin::expectAssertion("self");
+    variable_requirement_destroy(NULL);
+}
+
 /* ------------------------------------------ VariableRequirementMock test group -------------------------- */
 
 static VariableRequirement mock_variable_requirement;

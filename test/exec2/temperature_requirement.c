@@ -18,7 +18,7 @@ static void test_evaluate(Temperature current_temperature, uint8_t operator, Tem
 
 TEST_GROUP_C_TEARDOWN(TemperatureRequirement)
 {
-    temperature_requirement_destroy(temperature_requirement);
+    variable_requirement_destroy(temperature_requirement);
 }
 
 TEST_C(TemperatureRequirement, evaluateReturnsTrueOperatorGEQValueGreater)

@@ -13,6 +13,7 @@ extern "C"
 
 typedef struct VariableRequirementInterfaceStruct {
     bool (*evaluate)(VariableRequirement);
+    void (*destroy)(VariableRequirement);
 } VariableRequirementInterfaceStruct;
 
 typedef struct VariableRequirementStruct {

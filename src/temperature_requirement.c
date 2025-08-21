@@ -22,9 +22,11 @@ EAS_STATIC_ASSERT(sizeof(struct TemperatureRequirementStruct) <= CONFIG_VARIABLE
 
 // Forward declarations of interface functions to define the interface.
 static bool evaluate(VariableRequirement base);
+static void destroy(VariableRequirement base);
 
 static VariableRequirementInterfaceStruct interface = {
     .evaluate = evaluate,
+    .destroy = destroy,
 };
 
 static bool evaluate(VariableRequirement base)
@@ -49,6 +51,11 @@ static bool evaluate(VariableRequirement base)
     return result;
 }
 
+static void destroy(VariableRequirement temperature_requirement)
+{
+    variable_requirement_allocator_free(temperature_requirement);
+}
+
 VariableRequirement temperature_requirement_create(uint8_t alert_id, uint8_t operator, Temperature value)
 {
     TemperatureRequirement self = variable_requirement_allocator_alloc();
@@ -56,9 +63,4 @@ VariableRequirement temperature_requirement_create(uint8_t alert_id, uint8_t ope
 
     self->value = value;
     return (VariableRequirement)self;
-}
-
-void temperature_requirement_destroy(VariableRequirement temperature_requirement)
-{
-    variable_requirement_allocator_free(temperature_requirement);
 }
