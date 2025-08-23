@@ -16,3 +16,4 @@ TEST_C_WRAPPER(PressureRequirement, evaluateReturnsTrueOperatorGEQBothValuesEqua
 TEST_C_WRAPPER(PressureRequirement, evaluateReturnsTrueOperatorLEQBothValuesEqualZero);
 TEST_C_WRAPPER(PressureRequirement, getAlertIdReturnsAlertId1PassedToCreate);
 TEST_C_WRAPPER(PressureRequirement, getAlertIdReturnsAlertId2PassedToCreate);
+TEST_C_WRAPPER(PressureRequirement, createRaisesAssertIfMemoryAllocationFailed);

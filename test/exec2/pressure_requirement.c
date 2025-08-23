@@ -1,5 +1,6 @@
 #include "CppUTest/TestHarness_c.h"
 #include "CppUTestExt/MockSupport_c.h"
+#include "CppUTestExt/TestAssertPlugin_c.h"
 
 /* We are using the C CppUTest interface instead of C++, because this header would not compile under C++. */
 #include "pressure_requirement.h"
@@ -77,4 +78,15 @@ TEST_C(PressureRequirement, getAlertIdReturnsAlertId2PassedToCreate)
     pressure_requirement = pressure_requirement_create(expected_alert_id, VARIABLE_REQUIREMENT_OPERATOR_LEQ, 10000);
     uint8_t actual_alert_id = variable_requirement_get_alert_id(pressure_requirement);
     CHECK_EQUAL_C_UINT(expected_alert_id, actual_alert_id);
+}
+
+TEST_C(PressureRequirement, createRaisesAssertIfMemoryAllocationFailed)
+{
+    pressure_requirement = pressure_requirement_create(0, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 0);
+    /* Since we already called pressure_requirement_create(), and mock variable requirement allocator can only
+     * allocate one variable requirement instance at a time, variable_requirement_allocator_alloc() will return NULL
+     * when it is called again as a part of pressure_requirement_create(). We expect the implementation of
+     * pressure_requirement_create() to detect this and raise an assert. */
+    TEST_ASSERT_PLUGIN_C_EXPECT_ASSERTION("self", "pressure_requirement_create");
+    pressure_requirement_create(0, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 0);
 }
