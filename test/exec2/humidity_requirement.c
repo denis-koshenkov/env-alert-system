@@ -74,7 +74,7 @@ TEST_C(HumidityRequirement, getAlertIdReturnsAlertId5PassedToCreate)
 TEST_C(HumidityRequirement, getAlertIdReturnsAlertId6PassedToCreate)
 {
     uint8_t expected_alert_id = 6;
-    humidity_requirement = humidity_requirement_create(expected_alert_id, VARIABLE_REQUIREMENT_OPERATOR_LEQ, -200);
+    humidity_requirement = humidity_requirement_create(expected_alert_id, VARIABLE_REQUIREMENT_OPERATOR_LEQ, 300);
     uint8_t actual_alert_id = variable_requirement_get_alert_id(humidity_requirement);
     CHECK_EQUAL_C_UINT(expected_alert_id, actual_alert_id);
 }
