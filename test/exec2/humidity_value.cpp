@@ -8,7 +8,7 @@ TEST_GROUP(HumidityValue){};
 
 TEST(HumidityValue, createCallsValueHolderCreateWithSize1)
 {
-    mock().expectOneCall("value_holder_create").withParameter("value_size", 1).andReturnValue((void *)NULL);
+    mock().expectOneCall("value_holder_create").withParameter("value_size", 2).andReturnValue((void *)NULL);
 
     HumidityValue hv = humidity_value_create();
 }
@@ -30,7 +30,7 @@ TEST(HumidityValue, setPassesPointerToArgumentToValueHolderSet)
     mock().setData("value_holder_value_size", (unsigned int)sizeof(Humidity));
 
     Humidity humidity = 1;
-    mock().expectOneCall("value_holder_create").withParameter("value_size", 1).andReturnValue((void *)NULL);
+    mock().expectOneCall("value_holder_create").withParameter("value_size", 2).andReturnValue((void *)NULL);
     mock()
         .expectOneCall("value_holder_set")
         .withMemoryBufferParameter("value", (const uint8_t *)&humidity, sizeof(Humidity))
@@ -43,7 +43,7 @@ TEST(HumidityValue, setPassesPointerToArgumentToValueHolderSet)
 TEST(HumidityValue, getReturnsValueReceivedFromValueHolderGet)
 {
     Humidity h = 65;
-    mock().expectOneCall("value_holder_create").withParameter("value_size", 1).andReturnValue((void *)NULL);
+    mock().expectOneCall("value_holder_create").withParameter("value_size", 2).andReturnValue((void *)NULL);
     mock()
         .expectOneCall("value_holder_get")
         .withOutputParameterReturning("value", &h, sizeof(Humidity))
@@ -67,7 +67,7 @@ TEST(HumidityValue, getCallsValueHolderGetUsingInstanceReturnedByCreate)
 TEST(HumidityValue, isValueChangedReturnsValueReceivedFromValueHolderValueFalse)
 {
     bool is_value_changed_from_value_holder = false;
-    mock().expectOneCall("value_holder_create").withParameter("value_size", 1).andReturnValue((void *)NULL);
+    mock().expectOneCall("value_holder_create").withParameter("value_size", 2).andReturnValue((void *)NULL);
     mock()
         .expectOneCall("value_holder_is_value_changed")
         .ignoreOtherParameters()
@@ -81,7 +81,7 @@ TEST(HumidityValue, isValueChangedReturnsValueReceivedFromValueHolderValueFalse)
 TEST(HumidityValue, isValueChangedReturnsValueReceivedFromValueHolderValueTrue)
 {
     bool is_value_changed_from_value_holder = true;
-    mock().expectOneCall("value_holder_create").withParameter("value_size", 1).andReturnValue((void *)NULL);
+    mock().expectOneCall("value_holder_create").withParameter("value_size", 2).andReturnValue((void *)NULL);
     mock()
         .expectOneCall("value_holder_is_value_changed")
         .ignoreOtherParameters()
