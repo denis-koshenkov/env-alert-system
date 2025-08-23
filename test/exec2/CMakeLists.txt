@@ -11,11 +11,14 @@ target_sources(test_exec2 PRIVATE
     temperature_requirement.c
     pressure_requirement.cpp
     pressure_requirement.c
+    humidity_requirement.cpp
+    humidity_requirement.c
 
     mocks/mock_value_holder.cpp
     mocks/mock_variable_requirement_allocator.cpp
     mocks/mock_current_temperature.cpp
     mocks/mock_current_pressure.cpp
+    mocks/mock_current_humidity.cpp
 
     mocks/variable_requirements/mock_variable_requirement.c
 )

@@ -1,0 +1,18 @@
+#include "CppUTest/CommandLineTestRunner.h"
+#include "CppUTest/TestHarness_c.h"
+
+TEST_GROUP_C_WRAPPER(HumidityRequirement)
+{
+    TEST_GROUP_C_TEARDOWN_WRAPPER(HumidityRequirement);
+};
+
+TEST_C_WRAPPER(HumidityRequirement, evaluateReturnsTrueOperatorGEQValueGreater);
+TEST_C_WRAPPER(HumidityRequirement, evaluateReturnsFalseOperatorGEQValueLess);
+TEST_C_WRAPPER(HumidityRequirement, evaluateReturnsTrueOperatorGEQValueEqual);
+TEST_C_WRAPPER(HumidityRequirement, evaluateReturnsTrueOperatorLEQValueLess);
+TEST_C_WRAPPER(HumidityRequirement, evaluateReturnsTrueOperatorLEQValueEqual);
+TEST_C_WRAPPER(HumidityRequirement, evaluateReturnsFalseOperatorLEQValueGreater);
+TEST_C_WRAPPER(HumidityRequirement, evaluateReturnsTrueOperatorGEQBothValuesEqualZero);
+TEST_C_WRAPPER(HumidityRequirement, evaluateReturnsTrueOperatorLEQBothValuesEqualZero);
+TEST_C_WRAPPER(HumidityRequirement, getAlertIdReturnsAlertId5PassedToCreate);
+TEST_C_WRAPPER(HumidityRequirement, getAlertIdReturnsAlertId6PassedToCreate);
