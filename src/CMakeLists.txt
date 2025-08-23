@@ -10,6 +10,7 @@ target_sources(eas INTERFACE
     current_temperature.c
     current_pressure.c
     current_humidity.c
+    current_light_intensity.c
     temperature_requirement.c
     pressure_requirement.c
     humidity_requirement.c
