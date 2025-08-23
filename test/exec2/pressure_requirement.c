@@ -74,7 +74,7 @@ TEST_C(PressureRequirement, getAlertIdReturnsAlertId1PassedToCreate)
 TEST_C(PressureRequirement, getAlertIdReturnsAlertId2PassedToCreate)
 {
     uint8_t expected_alert_id = 2;
-    pressure_requirement = pressure_requirement_create(expected_alert_id, VARIABLE_REQUIREMENT_OPERATOR_LEQ, -200);
+    pressure_requirement = pressure_requirement_create(expected_alert_id, VARIABLE_REQUIREMENT_OPERATOR_LEQ, 10000);
     uint8_t actual_alert_id = variable_requirement_get_alert_id(pressure_requirement);
     CHECK_EQUAL_C_UINT(expected_alert_id, actual_alert_id);
 }
