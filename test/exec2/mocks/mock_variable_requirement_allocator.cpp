@@ -12,7 +12,10 @@ static bool is_allocated = false;
 
 void *variable_requirement_allocator_alloc()
 {
-    EAS_ASSERT(!is_allocated);
+    if (is_allocated) {
+        /* There is only once instance and it is allocated - we are out of memory. */
+        return NULL;
+    }
     memset(variable_requirement_buffer, 0, CONFIG_VARIABLE_REQUIREMENT_MAX_SIZE);
     is_allocated = true;
     return variable_requirement_buffer;

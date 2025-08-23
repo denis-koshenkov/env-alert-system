@@ -1,5 +1,6 @@
 #include "CppUTest/TestHarness_c.h"
 #include "CppUTestExt/MockSupport_c.h"
+#include "CppUTestExt/TestAssertPlugin_c.h"
 
 /* We are using the C CppUTest interface instead of C++, because this header would not compile under C++. */
 #include "temperature_requirement.h"
@@ -109,4 +110,15 @@ TEST_C(TemperatureRequirement, getAlertIdReturnsAlertId2PassedToCreate)
         temperature_requirement_create(expected_alert_id, VARIABLE_REQUIREMENT_OPERATOR_LEQ, -200);
     uint8_t actual_alert_id = variable_requirement_get_alert_id(temperature_requirement);
     CHECK_EQUAL_C_UINT(expected_alert_id, actual_alert_id);
+}
+
+TEST_C(TemperatureRequirement, createRaisesAssertIfMemoryAllocationFailed)
+{
+    temperature_requirement = temperature_requirement_create(0, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 0);
+    /* Since we already called temperature_requirement_create(), and mock variable requirement allocator can only
+     * allocate one variable requirement instance at a time, variable_requirement_allocator_alloc() will return NULL
+     * when it is called again as a part of temperature_requirement_create(). We expect the implementation of
+     * temperature_requirement_create() to detect this and raise an assert. */
+    TEST_ASSERT_PLUGIN_C_EXPECT_ASSERTION("self", "temperature_requirement_create");
+    temperature_requirement_create(0, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 0);
 }
