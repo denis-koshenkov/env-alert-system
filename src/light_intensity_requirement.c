@@ -72,6 +72,7 @@ static void destroy(VariableRequirement base)
 VariableRequirement light_intensity_requirement_create(uint8_t alert_id, uint8_t operator, LightIntensity value)
 {
     LightIntensityRequirement self = variable_requirement_allocator_alloc();
+    EAS_ASSERT(self);
     variable_requirement_create((VariableRequirement)self, &interface, operator, alert_id);
 
     self->value = value;
