@@ -5,9 +5,11 @@ target_sources(test_exec1 PRIVATE
     value_holder.cpp
     current_temperature.cpp
     current_pressure.cpp
+    current_humidity.cpp
 
     mocks/mock_temperature_value.cpp
     mocks/mock_pressure_value.cpp
+    mocks/mock_humidity_value.cpp
 )
 
 target_link_libraries(test_exec1 PRIVATE test_common)
