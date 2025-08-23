@@ -14,3 +14,5 @@ TEST_C_WRAPPER(PressureRequirement, evaluateReturnsTrueOperatorLEQValueEqual);
 TEST_C_WRAPPER(PressureRequirement, evaluateReturnsFalseOperatorLEQValueGreater);
 TEST_C_WRAPPER(PressureRequirement, evaluateReturnsTrueOperatorGEQBothValuesEqualZero);
 TEST_C_WRAPPER(PressureRequirement, evaluateReturnsTrueOperatorLEQBothValuesEqualZero);
+TEST_C_WRAPPER(PressureRequirement, getAlertIdReturnsAlertId1PassedToCreate);
+TEST_C_WRAPPER(PressureRequirement, getAlertIdReturnsAlertId2PassedToCreate);
