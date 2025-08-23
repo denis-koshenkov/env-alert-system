@@ -1,0 +1,18 @@
+#include "CppUTest/CommandLineTestRunner.h"
+#include "CppUTest/TestHarness_c.h"
+
+TEST_GROUP_C_WRAPPER(LightIntensityRequirement)
+{
+    TEST_GROUP_C_TEARDOWN_WRAPPER(LightIntensityRequirement);
+};
+
+TEST_C_WRAPPER(LightIntensityRequirement, evaluateReturnsTrueOperatorGEQValueGreater);
+TEST_C_WRAPPER(LightIntensityRequirement, evaluateReturnsFalseOperatorGEQValueLess);
+TEST_C_WRAPPER(LightIntensityRequirement, evaluateReturnsTrueOperatorGEQValueEqual);
+TEST_C_WRAPPER(LightIntensityRequirement, evaluateReturnsTrueOperatorLEQValueLess);
+TEST_C_WRAPPER(LightIntensityRequirement, evaluateReturnsTrueOperatorLEQValueEqual);
+TEST_C_WRAPPER(LightIntensityRequirement, evaluateReturnsFalseOperatorLEQValueGreater);
+TEST_C_WRAPPER(LightIntensityRequirement, evaluateReturnsTrueOperatorGEQBothValuesEqualZero);
+TEST_C_WRAPPER(LightIntensityRequirement, evaluateReturnsTrueOperatorLEQBothValuesEqualZero);
+TEST_C_WRAPPER(LightIntensityRequirement, getAlertIdReturnsAlertId3PassedToCreate);
+TEST_C_WRAPPER(LightIntensityRequirement, getAlertIdReturnsAlertId8PassedToCreate);
