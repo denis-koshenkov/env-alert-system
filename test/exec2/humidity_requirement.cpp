@@ -16,3 +16,4 @@ TEST_C_WRAPPER(HumidityRequirement, evaluateReturnsTrueOperatorGEQBothValuesEqua
 TEST_C_WRAPPER(HumidityRequirement, evaluateReturnsTrueOperatorLEQBothValuesEqualZero);
 TEST_C_WRAPPER(HumidityRequirement, getAlertIdReturnsAlertId5PassedToCreate);
 TEST_C_WRAPPER(HumidityRequirement, getAlertIdReturnsAlertId6PassedToCreate);
+TEST_C_WRAPPER(HumidityRequirement, createRaisesAssertIfMemoryAllocationFailed);
