@@ -8,6 +8,18 @@ extern "C"
 
 #include <stdint.h>
 
+/**
+ * @brief Light intensity data type definition.
+ *
+ * Light intensity is represented in whole lux (lx). Decimal point precision is not necessary for our application. Since
+ * light intensity in lux cannot be negtaive, an unsigned integer data type is used. Some examples of how various light
+ * intensity values are represented:
+ *   - 0 lx → 0
+ *   - 100 lx → 100
+ *   - 12345 lx → 12345
+ *
+ * Light intensity values range allowed by representation (in lx): 0 to 65535.
+ */
 typedef uint16_t LightIntensity;
 
 #ifdef __cplusplus
