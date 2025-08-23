@@ -3,6 +3,6 @@
 
 #include "CppUTestExt/TestAssertPlugin_c.h"
 
-#define EAS_ASSERT(expr) ((expr) ? (void)(0) : TEST_ASSERT_PLUGIN_ASSERT(expr))
+#define EAS_ASSERT(expr) ((expr) ? (void)(0) : TEST_ASSERT_PLUGIN_C_ASSERT(expr, __func__))
 
 #endif

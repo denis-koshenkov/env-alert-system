@@ -10,25 +10,25 @@ TEST_GROUP(VariableRequirement){};
 
 TEST(VariableRequirement, evaluateRaisesAssertIfCalledWithNullPointer)
 {
-    TestAssertPlugin::expectAssertion("self");
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "variable_requirement_evaluate");
     bool unused = variable_requirement_evaluate(NULL);
 }
 
 TEST(VariableRequirement, isResultChangedRaisesAssertIfCalledWithNullPointer)
 {
-    TestAssertPlugin::expectAssertion("self");
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "variable_requirement_is_result_changed");
     bool unused = variable_requirement_is_result_changed(NULL);
 }
 
 TEST(VariableRequirement, getAlertIdRaisesAssertIfCalledWithNullPointer)
 {
-    TestAssertPlugin::expectAssertion("self");
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "variable_requirement_get_alert_id");
     uint8_t unused = variable_requirement_get_alert_id(NULL);
 }
 
 TEST(VariableRequirement, destroyRaisesAssertIfCalledWithNullPointer)
 {
-    TestAssertPlugin::expectAssertion("self");
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "variable_requirement_destroy");
     variable_requirement_destroy(NULL);
 }
 
@@ -57,7 +57,7 @@ TEST_GROUP(VariableRequirementMock)
 
 TEST(VariableRequirementMock, isResultChangedRaisesAssertIfCalledBeforeEvaluate)
 {
-    TestAssertPlugin::expectAssertion("self->evaluate_has_been_called");
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self->evaluate_has_been_called", "variable_requirement_is_result_changed");
     bool is_result_changed = variable_requirement_is_result_changed(mock_variable_requirement);
 }
 
@@ -205,7 +205,7 @@ TEST_GROUP(VariableRequirementMockCreate)
 
 TEST(VariableRequirementMockCreate, createRaisesAssertIfSelfIsNull)
 {
-    TestAssertPlugin::expectAssertion("self");
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "variable_requirement_create");
     mock_variable_requirement_create_test_group =
         mock_variable_requirement_create(MOCK_VARIABLE_REQUIREMENT_PASS_NULLPTR_INSTANCE_TO_VAR_REQ_CREATE,
                                          MOCK_VARIABLE_REQUIREMENT_PASS_GEQ_OPERATOR_TO_VAR_REQ_CREATE,
@@ -214,7 +214,7 @@ TEST(VariableRequirementMockCreate, createRaisesAssertIfSelfIsNull)
 
 TEST(VariableRequirementMockCreate, createRaisesAssertIfOperatorIsInvalid)
 {
-    TestAssertPlugin::expectAssertion("is_valid_operator(operator)");
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("is_valid_operator(operator)", "variable_requirement_create");
     mock_variable_requirement_create_test_group =
         mock_variable_requirement_create(MOCK_VARIABLE_REQUIREMENT_PASS_VALID_INSTANCE_TO_VAR_REQ_CREATE,
                                          MOCK_VARIABLE_REQUIREMENT_PASS_INVALID_OPERATOR_TO_VAR_REQ_CREATE,
@@ -223,7 +223,7 @@ TEST(VariableRequirementMockCreate, createRaisesAssertIfOperatorIsInvalid)
 
 TEST(VariableRequirementMockCreate, createRaisesAssertIfVtableIsNull)
 {
-    TestAssertPlugin::expectAssertion("vtable");
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("vtable", "variable_requirement_create");
     mock_variable_requirement_create_test_group =
         mock_variable_requirement_create(MOCK_VARIABLE_REQUIREMENT_PASS_VALID_INSTANCE_TO_VAR_REQ_CREATE,
                                          MOCK_VARIABLE_REQUIREMENT_PASS_GEQ_OPERATOR_TO_VAR_REQ_CREATE,
@@ -232,7 +232,7 @@ TEST(VariableRequirementMockCreate, createRaisesAssertIfVtableIsNull)
 
 TEST(VariableRequirementMockCreate, createRaisesAssertIfEvaluateIsNull)
 {
-    TestAssertPlugin::expectAssertion("vtable->evaluate");
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("vtable->evaluate", "variable_requirement_create");
     mock_variable_requirement_create_test_group =
         mock_variable_requirement_create(MOCK_VARIABLE_REQUIREMENT_PASS_VALID_INSTANCE_TO_VAR_REQ_CREATE,
                                          MOCK_VARIABLE_REQUIREMENT_PASS_GEQ_OPERATOR_TO_VAR_REQ_CREATE,
@@ -241,7 +241,7 @@ TEST(VariableRequirementMockCreate, createRaisesAssertIfEvaluateIsNull)
 
 TEST(VariableRequirementMockCreate, createRaisesAssertIfDestroyIsNull)
 {
-    TestAssertPlugin::expectAssertion("vtable->destroy");
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("vtable->destroy", "variable_requirement_create");
     mock_variable_requirement_create_test_group =
         mock_variable_requirement_create(MOCK_VARIABLE_REQUIREMENT_PASS_VALID_INSTANCE_TO_VAR_REQ_CREATE,
                                          MOCK_VARIABLE_REQUIREMENT_PASS_GEQ_OPERATOR_TO_VAR_REQ_CREATE,

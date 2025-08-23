@@ -43,7 +43,7 @@ TEST(ValueHolder, GetWhatWeSet8bytes)
 TEST(ValueHolder, SetRaisesAssertVhNullPointer)
 {
     uint8_t dummy_buf;
-    TestAssertPlugin::expectAssertion("vh");
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("vh", "value_holder_set");
     value_holder_set(NULL, &dummy_buf);
 }
 
@@ -51,14 +51,14 @@ TEST(ValueHolder, SetRaisesAssertValueNullPointer)
 {
     uint8_t value_buf;
     ValueHolder vh = value_holder_create(&value_buf, sizeof(uint8_t));
-    TestAssertPlugin::expectAssertion("value");
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("value", "value_holder_set");
     value_holder_set(vh, NULL);
 }
 
 TEST(ValueHolder, GetRaisesAssertVhNullPointer)
 {
     uint8_t dummy_buf;
-    TestAssertPlugin::expectAssertion("vh");
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("vh", "value_holder_get");
     value_holder_get(NULL, &dummy_buf);
 }
 
@@ -66,7 +66,7 @@ TEST(ValueHolder, GetRaisesAssertValueNullPointer)
 {
     uint8_t value_buf;
     ValueHolder vh = value_holder_create(&value_buf, sizeof(uint8_t));
-    TestAssertPlugin::expectAssertion("value");
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("value", "value_holder_get");
     value_holder_get(vh, NULL);
 }
 
@@ -75,7 +75,7 @@ TEST(ValueHolder, GetRaisesAssertIfCalledBeforeSet)
     uint8_t value_buf;
     ValueHolder vh = value_holder_create(&value_buf, sizeof(uint8_t));
     uint8_t value;
-    TestAssertPlugin::expectAssertion("vh->set_has_been_called");
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("vh->set_has_been_called", "value_holder_get");
     value_holder_get(vh, &value);
 }
 
@@ -126,7 +126,7 @@ TEST(ValueHolder, IsValueChangedRaisesAssertIfCalledBeforeSet)
 {
     uint32_t value_buf;
     ValueHolder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint32_t));
-    TestAssertPlugin::expectAssertion("vh->set_has_been_called");
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("vh->set_has_been_called", "value_holder_is_value_changed");
     value_holder_is_value_changed(vh);
 }
 
@@ -136,7 +136,7 @@ TEST(ValueHolder, IsValueChangedRaisesAssertVhNullPointerAfterSetCalled)
     ValueHolder vh = value_holder_create((uint8_t *)&value_buf, sizeof(uint8_t));
     uint8_t value = 0;
     value_holder_set(vh, &value);
-    TestAssertPlugin::expectAssertion("vh");
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("vh", "value_holder_is_value_changed");
     value_holder_is_value_changed(NULL);
 }
 
