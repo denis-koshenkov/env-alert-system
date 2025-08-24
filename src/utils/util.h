@@ -1,5 +1,5 @@
-#ifndef HUMIDITY_VALUE_H
-#define HUMIDITY_VALUE_H
+#ifndef UTILS_UTIL_H
+#define UTILS_UTIL_H
 
 #ifdef __cplusplus
 extern "C"
