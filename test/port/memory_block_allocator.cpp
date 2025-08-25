@@ -42,3 +42,15 @@ TEST(MemoryBlockAllocator, CreateAssertsFreeBlocksMapIsNull)
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("free_blocks_map", "memory_block_allocator_create");
     memory_block_allocator_create(num_blocks, block_size, blocks, NULL);
 }
+
+TEST(MemoryBlockAllocator, AllocMoreThanNumBlocksReturnsNull)
+{
+    size_t block_size = 1;
+    size_t num_blocks = 1;
+    MemoryBlockAllocator memory_block_allocator =
+        memory_block_allocator_create(num_blocks, block_size, blocks, free_blocks_map);
+    void *allocated_block1 = memory_block_allocator_alloc(memory_block_allocator);
+    CHECK_EQUAL(blocks, allocated_block1);
+    void *allocated_block2 = memory_block_allocator_alloc(memory_block_allocator);
+    CHECK_EQUAL(NULL, allocated_block2);
+}

@@ -7,13 +7,14 @@ extern "C"
 #endif
 
 #include <stddef.h>
-#include <stdint.h>
 #include <stdbool.h>
 
 typedef struct MemoryBlockAllocatorStruct *MemoryBlockAllocator;
 
-MemoryBlockAllocator memory_block_allocator_create(size_t num_blocks, size_t block_size, uint8_t *blocks,
+MemoryBlockAllocator memory_block_allocator_create(size_t num_blocks, size_t block_size, void *blocks,
                                                    bool *free_blocks_map);
+
+void *memory_block_allocator_alloc(MemoryBlockAllocator self);
 
 #ifdef __cplusplus
 }
