@@ -9,10 +9,12 @@
 #endif
 
 typedef struct LinkedListNode {
+    void *element;
+    struct LinkedListNode *next;
 } LinkedListNode;
 
 typedef struct LinkedListStruct {
-    void *element;
+    LinkedListNode *head;
 } LinkedListStruct;
 
 static struct LinkedListStruct instances[CONFIG_LINKED_LIST_MAX_NUM_INSTANCES];
@@ -24,18 +26,23 @@ LinkedList linked_list_create()
     struct LinkedListStruct *instance = &instances[instance_idx];
     instance_idx++;
 
-    instance->element = NULL;
+    instance->head = NULL;
     return instance;
 }
 
 void linked_list_add(LinkedList self, void *element)
 {
-    self->element = element;
+    LinkedListNode *new_node = linked_list_node_allocator_alloc();
+    new_node->element = element;
+
+    LinkedListNode *previous_head = self->head;
+    self->head = new_node;
+    new_node->next = self->head;
 }
 
 void linked_list_for_each(LinkedList self, for_each_cb cb, void *user_data)
 {
-    if (self->element) {
-        cb(self->element, NULL);
+    for (LinkedListNode *node = self->head; node != NULL; node = node->next) {
+        cb(node->element, NULL);
     }
 }
