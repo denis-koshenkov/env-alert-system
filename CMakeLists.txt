@@ -17,13 +17,15 @@ endif()
 cmake_policy(SET CMP0077 NEW)
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
-add_subdirectory(src)
-
 if(BUILD_TESTS)
+    set(PORT_DIR "unit-test-off-target")
     add_subdirectory(test)
 else()
     # Building production firmware
+    set(PORT_DIR "prod-fw")
     target_sources(app PRIVATE src/main.c)
-    target_include_directories(app PRIVATE ${CMAKE_SOURCE_DIR}/port/prod-fw/include)
-    target_link_libraries(app PRIVATE eas)
+    target_link_libraries(app PRIVATE eas port)
 endif()
+
+add_subdirectory(src)
+add_subdirectory("port/${PORT_DIR}")
