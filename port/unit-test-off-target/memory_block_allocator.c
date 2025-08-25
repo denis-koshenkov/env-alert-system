@@ -5,5 +5,9 @@ MemoryBlockAllocator memory_block_allocator_create(size_t num_blocks, size_t blo
                                                    bool *free_blocks_map)
 {
     EAS_ASSERT(num_blocks > 0);
+    EAS_ASSERT(block_size > 0);
+    EAS_ASSERT(blocks);
+    EAS_ASSERT(free_blocks_map);
+
     return NULL;
 }

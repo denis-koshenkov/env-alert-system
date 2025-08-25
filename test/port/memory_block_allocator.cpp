@@ -18,3 +18,27 @@ TEST(MemoryBlockAllocator, CreateAssertsNumBlocks0)
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("num_blocks > 0", "memory_block_allocator_create");
     memory_block_allocator_create(num_blocks, block_size, blocks, free_blocks_map);
 }
+
+TEST(MemoryBlockAllocator, CreateAssertsBlockSize0)
+{
+    size_t block_size = 0;
+    size_t num_blocks = 1;
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("block_size > 0", "memory_block_allocator_create");
+    memory_block_allocator_create(num_blocks, block_size, blocks, free_blocks_map);
+}
+
+TEST(MemoryBlockAllocator, CreateAssertsBlocksIsNull)
+{
+    size_t block_size = 1;
+    size_t num_blocks = 1;
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("blocks", "memory_block_allocator_create");
+    memory_block_allocator_create(num_blocks, block_size, NULL, free_blocks_map);
+}
+
+TEST(MemoryBlockAllocator, CreateAssertsFreeBlocksMapIsNull)
+{
+    size_t block_size = 1;
+    size_t num_blocks = 1;
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("free_blocks_map", "memory_block_allocator_create");
+    memory_block_allocator_create(num_blocks, block_size, blocks, NULL);
+}
