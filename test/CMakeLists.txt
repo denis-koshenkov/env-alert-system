@@ -16,7 +16,9 @@ target_link_libraries(test_common INTERFACE
 
 add_subdirectory(app/exec1)
 add_subdirectory(app/exec2)
+add_subdirectory(port)
 
 # Register all unit test executables with CTest
-add_test(NAME test_exec1 COMMAND test_exec1)
-add_test(NAME test_exec2 COMMAND test_exec2)
+add_test(NAME app_test_exec1 COMMAND app_test_exec1)
+add_test(NAME app_test_exec2 COMMAND app_test_exec2)
+add_test(NAME port_test_exec COMMAND port_test_exec)
