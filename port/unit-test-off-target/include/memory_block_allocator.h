@@ -16,6 +16,8 @@ MemoryBlockAllocator memory_block_allocator_create(size_t num_blocks, size_t blo
 
 void *memory_block_allocator_alloc(MemoryBlockAllocator self);
 
+void memory_block_allocator_free(MemoryBlockAllocator self, void *block);
+
 #ifdef __cplusplus
 }
 #endif

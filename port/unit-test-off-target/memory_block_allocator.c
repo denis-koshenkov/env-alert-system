@@ -65,3 +65,8 @@ void *memory_block_allocator_alloc(MemoryBlockAllocator self)
     /* There are no free blocks */
     return NULL;
 }
+
+void memory_block_allocator_free(MemoryBlockAllocator self, void *block)
+{
+    self->free_blocks_map[0] = true;
+}
