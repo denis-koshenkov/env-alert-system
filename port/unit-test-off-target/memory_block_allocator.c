@@ -30,6 +30,28 @@ static void *get_block_memory(MemoryBlockAllocator self, size_t block_id)
     return self->blocks + (block_id * self->block_size);
 }
 
+/**
+ * @brief Get block id of the block.
+ *
+ * @param self MemoryBlockAllocator instance returned by @ref memory_block_allocator_create.
+ * @param block Block memory.
+ *
+ * @return size_t Block id of the block.
+ *
+ * @note Raises an assert if @p block does not point to a valid block.
+ */
+static size_t get_block_id(MemoryBlockAllocator self, void *block)
+{
+    for (size_t block_id = 0; block_id < self->num_blocks; block_id++) {
+        if (block == get_block_memory(self, block_id)) {
+            return block_id;
+        }
+    }
+    /* Invalid block */
+    EAS_ASSERT(false);
+    return 0;
+}
+
 MemoryBlockAllocator memory_block_allocator_create(size_t num_blocks, size_t block_size, void *blocks,
                                                    bool *free_blocks_map)
 {
@@ -68,5 +90,6 @@ void *memory_block_allocator_alloc(MemoryBlockAllocator self)
 
 void memory_block_allocator_free(MemoryBlockAllocator self, void *block)
 {
-    self->free_blocks_map[0] = true;
+    size_t block_id = get_block_id(self, block);
+    self->free_blocks_map[block_id] = true;
 }

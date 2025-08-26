@@ -10,7 +10,7 @@
 #define CONFIG_LINKED_LIST_MAX_NUM_INSTANCES 3
 
 /* Port-specific configs */
-#define CONFIG_MEMORY_BLOCK_ALLOCATOR_MAX_NUM_INSTANCES 3
+#define CONFIG_MEMORY_BLOCK_ALLOCATOR_MAX_NUM_INSTANCES 5
 
 /** Maximal size of one variable requirement in bytes. We have different variable requirement types - e.g.
  * TemperatureVariableRequirement, PressureVariableRequirement, and so on. Each of these types might have a different

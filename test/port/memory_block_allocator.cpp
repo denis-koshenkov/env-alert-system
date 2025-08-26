@@ -4,7 +4,7 @@
 #include "memory_block_allocator.h"
 
 #define MEMORY_BLOCK_ALLOCATOR_TEST_MAX_NUM_BLOCKS 2
-#define MEMORY_BLOCK_ALLOCATOR_TEST_MAX_BLOCK_SIZE 3
+#define MEMORY_BLOCK_ALLOCATOR_TEST_MAX_BLOCK_SIZE 4
 #define MEMORY_BLOCK_ALLOCATOR_TEST_BLOCKS_BUFFER_SIZE                                                                 \
     (MEMORY_BLOCK_ALLOCATOR_TEST_MAX_NUM_BLOCKS * MEMORY_BLOCK_ALLOCATOR_TEST_MAX_BLOCK_SIZE)
 
@@ -102,6 +102,7 @@ TEST(MemoryBlockAllocator, FreeFreesBlockOneBlock)
     CHECK_TRUE(validate_block_size_num_blocks(block_size, num_blocks));
     MemoryBlockAllocator memory_block_allocator =
         memory_block_allocator_create(num_blocks, block_size, blocks, free_blocks_map);
+
     void *allocated_block1 = memory_block_allocator_alloc(memory_block_allocator);
     CHECK_EQUAL(blocks, allocated_block1);
     memory_block_allocator_free(memory_block_allocator, allocated_block1);
@@ -109,4 +110,42 @@ TEST(MemoryBlockAllocator, FreeFreesBlockOneBlock)
     CHECK_EQUAL(blocks, allocated_block2);
     void *allocated_block3 = memory_block_allocator_alloc(memory_block_allocator);
     CHECK_TRUE(allocated_block3 == NULL);
+}
+
+TEST(MemoryBlockAllocator, FreeFreesBlockTwoBlocks)
+{
+    size_t block_size = 4;
+    size_t num_blocks = 2;
+    CHECK_TRUE(validate_block_size_num_blocks(block_size, num_blocks));
+    MemoryBlockAllocator memory_block_allocator =
+        memory_block_allocator_create(num_blocks, block_size, blocks, free_blocks_map);
+
+    void *allocated_block1 = memory_block_allocator_alloc(memory_block_allocator);
+    CHECK_TRUE(allocated_block1 != NULL);
+    void *allocated_block2 = memory_block_allocator_alloc(memory_block_allocator);
+    CHECK_TRUE(allocated_block2 != NULL);
+    memory_block_allocator_free(memory_block_allocator, allocated_block1);
+    memory_block_allocator_free(memory_block_allocator, allocated_block2);
+
+    void *allocated_block3 = memory_block_allocator_alloc(memory_block_allocator);
+    CHECK_TRUE(allocated_block3 != NULL);
+    void *allocated_block4 = memory_block_allocator_alloc(memory_block_allocator);
+    CHECK_TRUE(allocated_block4 != NULL);
+    void *allocated_block5 = memory_block_allocator_alloc(memory_block_allocator);
+    CHECK_TRUE(allocated_block5 == NULL);
+}
+
+TEST(MemoryBlockAllocator, FreeRaisesAssertIfGivenInvalidBlock)
+{
+    size_t block_size = 3;
+    size_t num_blocks = 2;
+    CHECK_TRUE(validate_block_size_num_blocks(block_size, num_blocks));
+    MemoryBlockAllocator memory_block_allocator =
+        memory_block_allocator_create(num_blocks, block_size, blocks, free_blocks_map);
+
+    /* We have 2 blocks of size 3. This will point to the second byte of the first block. This is not a valid block, so
+     * we expect memory_block_allocator_free to raise an assert. */
+    void *invalid_block = blocks + 1;
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("0", "get_block_id");
+    memory_block_allocator_free(memory_block_allocator, invalid_block);
 }
