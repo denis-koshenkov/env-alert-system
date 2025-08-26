@@ -9,6 +9,9 @@
 #define CONFIG_LIGHT_INTENSITY_VALUE_MAX_NUM_INSTANCES 8
 #define CONFIG_LINKED_LIST_MAX_NUM_INSTANCES 3
 
+/* Port-specific configs */
+#define CONFIG_MEMORY_BLOCK_ALLOCATOR_MAX_NUM_INSTANCES 2
+
 /** Maximal size of one variable requirement in bytes. We have different variable requirement types - e.g.
  * TemperatureVariableRequirement, PressureVariableRequirement, and so on. Each of these types might have a different
  * size, because the sizes of data types such as Temperature and Pressure can be different. This config defines the size
