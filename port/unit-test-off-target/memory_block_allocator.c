@@ -78,6 +78,7 @@ MemoryBlockAllocator memory_block_allocator_create(size_t num_blocks, size_t blo
 
 void *memory_block_allocator_alloc(MemoryBlockAllocator self)
 {
+    EAS_ASSERT(self);
     for (size_t block_id = 0; block_id < self->num_blocks; block_id++) {
         if (is_block_free(self, block_id)) {
             self->free_blocks_map[block_id] = false;
@@ -90,6 +91,9 @@ void *memory_block_allocator_alloc(MemoryBlockAllocator self)
 
 void memory_block_allocator_free(MemoryBlockAllocator self, void *block)
 {
+    EAS_ASSERT(self);
+    EAS_ASSERT(block);
     size_t block_id = get_block_id(self, block);
+    EAS_ASSERT(!is_block_free(self, block_id));
     self->free_blocks_map[block_id] = true;
 }
