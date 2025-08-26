@@ -1,17 +1,14 @@
 #include <stddef.h>
 
 #include "utils/linked_list.h"
+#include "utils/linked_list_private.h"
+#include "linked_list_node_allocator.h"
 #include "config.h"
 #include "eas_assert.h"
 
 #ifndef CONFIG_LINKED_LIST_MAX_NUM_INSTANCES
 #define CONFIG_LINKED_LIST_MAX_NUM_INSTANCES 1
 #endif
-
-typedef struct LinkedListNode {
-    void *element;
-    struct LinkedListNode *next;
-} LinkedListNode;
 
 typedef struct LinkedListStruct {
     LinkedListNode *head;
@@ -37,7 +34,7 @@ void linked_list_add(LinkedList self, void *element)
 
     LinkedListNode *previous_head = self->head;
     self->head = new_node;
-    new_node->next = self->head;
+    new_node->next = previous_head;
 }
 
 void linked_list_for_each(LinkedList self, for_each_cb cb, void *user_data)
