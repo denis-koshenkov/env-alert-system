@@ -18,12 +18,33 @@ struct MemoryBlockAllocatorStruct {
 static struct MemoryBlockAllocatorStruct instances[CONFIG_MEMORY_BLOCK_ALLOCATOR_MAX_NUM_INSTANCES];
 static size_t instance_idx = 0;
 
+/**
+ * @brief Check if block is currently free.
+ *
+ * @param self MemoryBlockAllocator instance returned by @ref memory_block_allocator_create.
+ * @param block_id Block id.
+ *
+ * @return true Block is free.
+ * @return false Block is already allocated.
+ *
+ * @note Raises assert if @p block_id is invalid - i.e. when @p block_id >= num_blocks.
+ */
 static bool is_block_free(MemoryBlockAllocator self, size_t block_id)
 {
     EAS_ASSERT(block_id < self->num_blocks);
     return self->free_blocks_map[block_id];
 }
 
+/**
+ * @brief Get block memory.
+ *
+ * @param self MemoryBlockAllocator instance returned by @ref memory_block_allocator_create.
+ * @param block_id Block id.
+ *
+ * @return void* Pointer to block with id @p block_id.
+ *
+ * @note Raises assert if @p block_id is invalid - i.e. when @p block_id >= num_blocks.
+ */
 static void *get_block_memory(MemoryBlockAllocator self, size_t block_id)
 {
     EAS_ASSERT(block_id < self->num_blocks);
