@@ -15,9 +15,9 @@ target_link_libraries(test_common INTERFACE
     CppUTestExt
 )
 
-add_subdirectory(app/exec1)
-add_subdirectory(app/exec2)
-add_subdirectory(port)
+add_subdirectory(execs/app/exec1)
+add_subdirectory(execs/app/exec2)
+add_subdirectory(execs/port)
 
 # Register all unit test executables with CTest
 add_test(NAME app_test_exec1 COMMAND app_test_exec1)
