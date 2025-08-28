@@ -24,7 +24,47 @@ static void for_each_cb_increment_count(void *element, void *user_data)
     iter_element->count++;
 }
 
-TEST_GROUP(LinkedList){};
+#define LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS 10
+static bool actual_elements_in_list[LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS];
+static bool expected_elements_in_list[LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS];
+
+static void expect_id_element_in_list(uint8_t id)
+{
+    expected_elements_in_list[id] = true;
+}
+
+static void actual_id_element_detected_in_list(uint8_t id)
+{
+    actual_elements_in_list[id] = true;
+}
+
+static void reset_expected_actual_id_elements()
+{
+    memset(expected_elements_in_list, 0, LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(bool));
+    memset(actual_elements_in_list, 0, LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(bool));
+}
+
+static bool expected_id_elements_match_actual()
+{
+    return (memcmp(expected_elements_in_list, actual_elements_in_list,
+                   LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(bool)) == 0);
+}
+
+static void for_each_cb_id_elements(void *element, void *user_data)
+{
+    LinkedListIdElement *id_element = (LinkedListIdElement *)element;
+    actual_id_element_detected_in_list(id_element->id);
+}
+
+// clang-format off
+TEST_GROUP(LinkedList)
+{
+    void setup()
+    {
+        reset_expected_actual_id_elements();
+    }
+};
+// clang-format on
 
 TEST(LinkedList, ListEmptyAfterCreate)
 {
@@ -54,16 +94,6 @@ TEST(LinkedList, ElementIsTheOnlyInListAfterAdding)
     fake_linked_list_node_allocator_free(test_element_node);
 }
 
-#define LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS 10
-static bool actual_elements_in_list[LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS];
-static bool expected_elements_in_list[LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS];
-
-static void for_each_cb_id_elements(void *element, void *user_data)
-{
-    LinkedListIdElement *id_element = (LinkedListIdElement *)element;
-    actual_elements_in_list[id_element->id] = true;
-}
-
 TEST(LinkedList, TwoElementsInListAfterAddingTwoElements)
 {
     LinkedList linked_list = linked_list_create();
@@ -76,18 +106,14 @@ TEST(LinkedList, TwoElementsInListAfterAddingTwoElements)
     LinkedListIdElement id_element_0 = {.id = 0};
     LinkedListIdElement id_element_2 = {.id = 2};
 
+    expect_id_element_in_list(0);
+    expect_id_element_in_list(2);
+
     linked_list_add(linked_list, &id_element_0);
     linked_list_add(linked_list, &id_element_2);
-
-    memset(expected_elements_in_list, 0, LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(bool));
-    expected_elements_in_list[0] = true;
-    expected_elements_in_list[2] = true;
-
-    memset(actual_elements_in_list, 0, LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(bool));
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
 
-    CHECK_TRUE(memcmp(expected_elements_in_list, actual_elements_in_list,
-                      LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(bool)) == 0);
+    CHECK_TRUE(expected_id_elements_match_actual());
 
     /* Clean up */
     fake_linked_list_node_allocator_free(id_element_0_node);
@@ -97,12 +123,12 @@ TEST(LinkedList, TwoElementsInListAfterAddingTwoElements)
 TEST(LinkedList, AddFiresAssertIfFailedToAllocateNode)
 {
     LinkedList linked_list = linked_list_create();
+    LinkedListIdElement element = {.id = 0};
 
     /* linked_list_node_allocator_alloc returns NULL if it fails to allocate the node. We expect linked_list_add to
      * detect this and fire an assert. */
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue((LinkedListNode *)NULL);
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("new_node", "linked_list_add");
 
-    LinkedListIdElement element = {.id = 0};
     linked_list_add(linked_list, &element);
 }
