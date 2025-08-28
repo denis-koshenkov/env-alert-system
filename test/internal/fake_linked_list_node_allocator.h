@@ -1,5 +1,5 @@
-#ifndef PORT_UNIT_TEST_OFF_TARGET_LINKED_LIST_NODE_ALLOCATOR_H
-#define PORT_UNIT_TEST_OFF_TARGET_LINKED_LIST_NODE_ALLOCATOR_H
+#ifndef TEST_INTERNAL_FAKE_LINKED_LIST_NODE_ALLOCATOR_H
+#define TEST_INTERNAL_FAKE_LINKED_LIST_NODE_ALLOCATOR_H
 
 #ifdef __cplusplus
 extern "C"
@@ -9,10 +9,13 @@ extern "C"
 #include "utils/linked_list_private.h"
 
 /**
- * @brief Allows to dynamically allocate memory for linked list nodes.
+ * @brief Allows to dynamically allocate memory for linked list nodes during tests.
  *
- * CONFIG_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES defines the maximal nodes that can be allocated at the same time. If not
- * defined in config.h, defaults to 1.
+ * CONFIG_FAKE_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES defines the maximal nodes that can be allocated at the same time. If
+ * not defined in config.h, defaults to 1.
+ *
+ * Under the hood, uses the memory_block_allocator module. It is very much a real node allocator - it is only called
+ * fake because it is called from the test program and not by production code directly.
  */
 
 /**
@@ -21,7 +24,7 @@ extern "C"
  * @return LinkedListNode* Pointer to the allocated memory for the linked list node if successful. If allocation fails,
  * returns NULL.
  */
-LinkedListNode *linked_list_node_allocator_alloc();
+LinkedListNode *fake_linked_list_node_allocator_alloc();
 
 /**
  * @brief Free a previously allocated linked list node.
@@ -31,7 +34,7 @@ LinkedListNode *linked_list_node_allocator_alloc();
  * @note Raises assert if @p block linked_list_node not point to a previously allocated node.
  * @note Raises assert if @p block linked_list_node to a previously allocated node that has already been freed.
  */
-void linked_list_node_allocator_free(LinkedListNode *linked_list_node);
+void fake_linked_list_node_allocator_free(LinkedListNode *linked_list_node);
 
 #ifdef __cplusplus
 }

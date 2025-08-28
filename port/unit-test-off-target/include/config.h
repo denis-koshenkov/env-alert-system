@@ -8,8 +8,6 @@
 #define CONFIG_HUMIDITY_VALUE_MAX_NUM_INSTANCES 8
 #define CONFIG_LIGHT_INTENSITY_VALUE_MAX_NUM_INSTANCES 8
 #define CONFIG_LINKED_LIST_MAX_NUM_INSTANCES 3
-/* Configs for port-specific modules */
-#define CONFIG_MEMORY_BLOCK_ALLOCATOR_MAX_NUM_INSTANCES 8
 
 /** Maximal size of one variable requirement in bytes. We have different variable requirement types - e.g.
  * TemperatureVariableRequirement, PressureVariableRequirement, and so on. Each of these types might have a different
@@ -24,7 +22,12 @@
  */
 #define CONFIG_VARIABLE_REQUIREMENT_MAX_SIZE 24
 
-/** The maximal number of nodes that the mock linked list node allocator module can allocate at the same time. */
-#define CONFIG_MOCK_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES 1
+/* Configs for port-specific modules */
+
+/** Should correspond to the number of times <module_name>_create() will be called in the unit test program. */
+#define CONFIG_MEMORY_BLOCK_ALLOCATOR_MAX_NUM_INSTANCES 8
+
+/** The maximal number of nodes that the fake linked list node allocator module can allocate at the same time. */
+#define CONFIG_FAKE_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES 1
 
 #endif

@@ -17,6 +17,7 @@ target_sources(eas INTERFACE
     light_intensity_requirement.c
     variable_requirement.c
     variable_requirement_allocator.c
+    linked_list_node_allocator.c
 )
 
 target_include_directories(eas INTERFACE
