@@ -63,6 +63,13 @@ TEST(LinkedList, AddRaisesAssertIfListIsNull)
     linked_list_add(NULL, &id_element_0);
 }
 
+TEST(LinkedList, ForEachRaisesAssertIfListIsNull)
+{
+    LinkedList linked_list = linked_list_create();
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "linked_list_for_each");
+    linked_list_for_each(NULL, for_each_cb_id_elements, NULL);
+}
+
 TEST(LinkedList, ListEmptyAfterCreate)
 {
     LinkedList linked_list = linked_list_create();
