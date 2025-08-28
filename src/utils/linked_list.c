@@ -40,10 +40,14 @@ void linked_list_add(LinkedList self, void *element)
     new_node->next = previous_head;
 }
 
-void linked_list_for_each(LinkedList self, for_each_cb cb, void *user_data)
+void linked_list_for_each(LinkedList self, LinkedListForEachCb cb, void *user_data)
 {
     EAS_ASSERT(self);
     for (LinkedListNode *node = self->head; node != NULL; node = node->next) {
         cb(node->element, user_data);
     }
+}
+
+void linked_list_remove_on_condition(LinkedList self, LinkedListConditionCb cb)
+{
 }

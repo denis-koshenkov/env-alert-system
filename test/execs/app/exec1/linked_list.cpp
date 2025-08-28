@@ -157,3 +157,15 @@ TEST(LinkedList, ForEachPassesUserDataToCallback)
     /* Clean up */
     fake_linked_list_node_allocator_free(id_element_0_node);
 }
+
+static bool condition_true_cb(void *element)
+{
+    return true;
+}
+
+TEST(LinkedList, RemoveOnConditionEmptyListStillEmpty)
+{
+    LinkedList linked_list = linked_list_create();
+    linked_list_remove_on_condition(linked_list, condition_true_cb);
+    CHECK_TRUE(expected_id_elements_match_actual());
+}

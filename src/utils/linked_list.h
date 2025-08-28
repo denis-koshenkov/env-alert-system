@@ -6,15 +6,20 @@ extern "C"
 {
 #endif
 
+#include <stdbool.h>
+
 typedef struct LinkedListStruct *LinkedList;
 
-typedef void (*for_each_cb)(void *element, void *user_data);
+typedef void (*LinkedListForEachCb)(void *element, void *user_data);
+typedef bool (*LinkedListConditionCb)(void *element);
 
 LinkedList linked_list_create();
 
 void linked_list_add(LinkedList self, void *element);
 
-void linked_list_for_each(LinkedList self, for_each_cb cb, void *user_data);
+void linked_list_for_each(LinkedList self, LinkedListForEachCb cb, void *user_data);
+
+void linked_list_remove_on_condition(LinkedList self, LinkedListConditionCb cb);
 
 #ifdef __cplusplus
 }
