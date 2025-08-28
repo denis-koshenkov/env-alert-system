@@ -69,11 +69,8 @@ TEST_GROUP(LinkedList)
 TEST(LinkedList, ListEmptyAfterCreate)
 {
     LinkedList linked_list = linked_list_create();
-
-    test_element.count = 0;
-    linked_list_for_each(linked_list, for_each_cb_increment_count, NULL);
-
-    CHECK_EQUAL(0, test_element.count);
+    linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
+    CHECK_TRUE(expected_id_elements_match_actual());
 }
 
 TEST(LinkedList, ElementIsTheOnlyInListAfterAdding)
