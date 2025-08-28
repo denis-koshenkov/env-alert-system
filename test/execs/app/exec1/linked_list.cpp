@@ -163,9 +163,35 @@ static bool condition_true_cb(void *element)
     return true;
 }
 
+static bool condition_false_cb(void *element)
+{
+    return false;
+}
+
 TEST(LinkedList, RemoveOnConditionEmptyListStillEmpty)
 {
     LinkedList linked_list = linked_list_create();
     linked_list_remove_on_condition(linked_list, condition_true_cb);
     CHECK_TRUE(expected_id_elements_match_actual());
+}
+
+TEST(LinkedList, RemoveOnConditionDoesNotRemoveElementConditionFalse)
+{
+    LinkedListIdElement id_element_0 = {.id = 0};
+    LinkedListNode *id_element_0_node = fake_linked_list_node_allocator_alloc();
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    /* Since condition evaluates to false, we expect remove_on_condition to keep it in the list. */
+    expect_id_element_in_list(0);
+
+    /* Exercise */
+    LinkedList linked_list = linked_list_create();
+    linked_list_add(linked_list, &id_element_0);
+    linked_list_remove_on_condition(linked_list, condition_false_cb);
+
+    /* Verify */
+    linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
+    CHECK_TRUE(expected_id_elements_match_actual());
+
+    /* Clean up */
+    fake_linked_list_node_allocator_free(id_element_0_node);
 }
