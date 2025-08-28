@@ -64,23 +64,45 @@ static void for_each_cb_id_elements(void *element, void *user_data)
     actual_elements_in_list[id_element->id] = true;
 }
 
-// TEST(LinkedList, TwoElementsInListAfterAddingTwoElements)
-// {
-//     LinkedList linked_list = linked_list_create();
+TEST(LinkedList, TwoElementsInListAfterAddingTwoElements)
+{
+    LinkedList linked_list = linked_list_create();
 
-//     LinkedListIdElement id_element_0 = {.id = 0};
-//     LinkedListIdElement id_element_2 = {.id = 2};
+    LinkedListNode *id_element_0_node = fake_linked_list_node_allocator_alloc();
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    LinkedListNode *id_element_2_node = fake_linked_list_node_allocator_alloc();
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_2_node);
 
-//     linked_list_add(linked_list, &id_element_0);
-//     linked_list_add(linked_list, &id_element_2);
+    LinkedListIdElement id_element_0 = {.id = 0};
+    LinkedListIdElement id_element_2 = {.id = 2};
 
-//     memset(expected_elements_in_list, 0, LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(bool));
-//     expected_elements_in_list[0] = true;
-//     expected_elements_in_list[2] = true;
+    linked_list_add(linked_list, &id_element_0);
+    linked_list_add(linked_list, &id_element_2);
 
-//     memset(actual_elements_in_list, 0, LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(bool));
-//     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
+    memset(expected_elements_in_list, 0, LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(bool));
+    expected_elements_in_list[0] = true;
+    expected_elements_in_list[2] = true;
 
-//     CHECK_TRUE(memcmp(expected_elements_in_list, actual_elements_in_list,
-//                       LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(bool)) == 0);
-// }
+    memset(actual_elements_in_list, 0, LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(bool));
+    linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
+
+    CHECK_TRUE(memcmp(expected_elements_in_list, actual_elements_in_list,
+                      LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(bool)) == 0);
+
+    /* Clean up */
+    fake_linked_list_node_allocator_free(id_element_0_node);
+    fake_linked_list_node_allocator_free(id_element_2_node);
+}
+
+TEST(LinkedList, AddFiresAssertIfFailedToAllocateNode)
+{
+    LinkedList linked_list = linked_list_create();
+
+    /* linked_list_node_allocator_alloc returns NULL if it fails to allocate the node. We expect linked_list_add to
+     * detect this and fire an assert. */
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue((LinkedListNode *)NULL);
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("new_node", "linked_list_add");
+
+    LinkedListIdElement element = {.id = 0};
+    linked_list_add(linked_list, &element);
+}

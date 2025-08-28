@@ -30,6 +30,7 @@ LinkedList linked_list_create()
 void linked_list_add(LinkedList self, void *element)
 {
     LinkedListNode *new_node = linked_list_node_allocator_alloc();
+    EAS_ASSERT(new_node);
     new_node->element = element;
 
     LinkedListNode *previous_head = self->head;
