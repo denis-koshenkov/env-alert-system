@@ -23,8 +23,3 @@ add_subdirectory(execs/app/exec2)
 
 # Test executables of internal test helper modules
 add_subdirectory(execs/internal)
-
-# Register all unit test executables with CTest
-add_test(NAME app_test_exec1 COMMAND app_test_exec1)
-add_test(NAME app_test_exec2 COMMAND app_test_exec2)
-add_test(NAME internal_test_exec COMMAND internal_test_exec)

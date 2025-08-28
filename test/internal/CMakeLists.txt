@@ -8,3 +8,6 @@ target_sources(test_internal INTERFACE
 target_include_directories(test_internal INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+# Register executable with test runner
+add_test(NAME internal_test_exec COMMAND internal_test_exec)
