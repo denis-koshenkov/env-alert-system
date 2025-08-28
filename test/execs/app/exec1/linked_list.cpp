@@ -54,6 +54,15 @@ TEST_GROUP(LinkedList)
 };
 // clang-format on
 
+TEST(LinkedList, AddRaisesAssertIfListIsNull)
+{
+    LinkedListIdElement id_element_0 = {.id = 0};
+
+    LinkedList linked_list = linked_list_create();
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "linked_list_add");
+    linked_list_add(NULL, &id_element_0);
+}
+
 TEST(LinkedList, ListEmptyAfterCreate)
 {
     LinkedList linked_list = linked_list_create();
