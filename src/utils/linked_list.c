@@ -50,4 +50,8 @@ void linked_list_for_each(LinkedList self, LinkedListForEachCb cb, void *user_da
 
 void linked_list_remove_on_condition(LinkedList self, LinkedListConditionCb cb)
 {
+    if ((self->head != NULL) && (cb(self->head->element))) {
+        linked_list_node_allocator_free(self->head);
+        self->head = NULL;
+    }
 }
