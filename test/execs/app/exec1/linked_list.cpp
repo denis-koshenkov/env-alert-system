@@ -12,18 +12,6 @@ typedef struct LinkedListIdElement {
     uint8_t id;
 } LinkedListIdElement;
 
-typedef struct LinkedListTestElement {
-    uint8_t count;
-} LinkedListTestElement;
-
-static LinkedListTestElement test_element;
-
-static void for_each_cb_increment_count(void *element, void *user_data)
-{
-    LinkedListTestElement *iter_element = (LinkedListTestElement *)element;
-    iter_element->count++;
-}
-
 #define LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS 10
 static bool actual_elements_in_list[LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS];
 static bool expected_elements_in_list[LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS];
@@ -75,20 +63,19 @@ TEST(LinkedList, ListEmptyAfterCreate)
 
 TEST(LinkedList, ElementIsTheOnlyInListAfterAdding)
 {
+    LinkedListIdElement id_element_3 = {.id = 3};
+    LinkedListNode *id_element_3_node = fake_linked_list_node_allocator_alloc();
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_3_node);
+    expect_id_element_in_list(3);
+
     LinkedList linked_list = linked_list_create();
+    linked_list_add(linked_list, &id_element_3);
+    linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
 
-    LinkedListNode *test_element_node = fake_linked_list_node_allocator_alloc();
-    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(test_element_node);
-
-    linked_list_add(linked_list, &test_element);
-
-    test_element.count = 0;
-    linked_list_for_each(linked_list, for_each_cb_increment_count, NULL);
-
-    CHECK_EQUAL(1, test_element.count);
+    CHECK_TRUE(expected_id_elements_match_actual());
 
     /* Clean up */
-    fake_linked_list_node_allocator_free(test_element_node);
+    fake_linked_list_node_allocator_free(id_element_3_node);
 }
 
 TEST(LinkedList, TwoElementsInListAfterAddingTwoElements)
