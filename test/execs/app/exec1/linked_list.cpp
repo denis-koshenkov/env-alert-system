@@ -70,6 +70,19 @@ TEST(LinkedList, ForEachRaisesAssertIfListIsNull)
     linked_list_for_each(NULL, for_each_cb_id_elements, NULL);
 }
 
+TEST(LinkedList, AddFiresAssertIfFailedToAllocateNode)
+{
+    LinkedList linked_list = linked_list_create();
+    LinkedListIdElement element = {.id = 0};
+
+    /* linked_list_node_allocator_alloc returns NULL if it fails to allocate the node. We expect linked_list_add to
+     * detect this and fire an assert. */
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue((LinkedListNode *)NULL);
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("new_node", "linked_list_add");
+
+    linked_list_add(linked_list, &element);
+}
+
 TEST(LinkedList, ListEmptyAfterCreate)
 {
     LinkedList linked_list = linked_list_create();
@@ -120,15 +133,27 @@ TEST(LinkedList, TwoElementsInListAfterAddingTwoElements)
     fake_linked_list_node_allocator_free(id_element_2_node);
 }
 
-TEST(LinkedList, AddFiresAssertIfFailedToAllocateNode)
+static void *actual_user_data = 0;
+
+static void save_actual_user_data_cb(void *element, void *user_data)
 {
+    actual_user_data = user_data;
+}
+
+TEST(LinkedList, ForEachPassesUserDataToCallback)
+{
+    LinkedListIdElement id_element_0 = {.id = 0};
+    LinkedListNode *id_element_0_node = fake_linked_list_node_allocator_alloc();
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+
     LinkedList linked_list = linked_list_create();
-    LinkedListIdElement element = {.id = 0};
 
-    /* linked_list_node_allocator_alloc returns NULL if it fails to allocate the node. We expect linked_list_add to
-     * detect this and fire an assert. */
-    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue((LinkedListNode *)NULL);
-    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("new_node", "linked_list_add");
+    uint8_t expected_user_data = 42;
+    linked_list_add(linked_list, &id_element_0);
+    linked_list_for_each(linked_list, save_actual_user_data_cb, &expected_user_data);
 
-    linked_list_add(linked_list, &element);
+    CHECK_EQUAL(&expected_user_data, actual_user_data);
+
+    /* Clean up */
+    fake_linked_list_node_allocator_free(id_element_0_node);
 }
