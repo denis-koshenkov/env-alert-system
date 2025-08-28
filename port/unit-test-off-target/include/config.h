@@ -24,7 +24,7 @@
  */
 #define CONFIG_VARIABLE_REQUIREMENT_MAX_SIZE 24
 
-/** The maximal number of nodes that the linked list node allocator module can allocate at the same time. */
-#define CONFIG_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES 3
+/** The maximal number of nodes that the mock linked list node allocator module can allocate at the same time. */
+#define CONFIG_MOCK_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES 1
 
 #endif

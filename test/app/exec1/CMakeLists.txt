@@ -13,6 +13,7 @@ target_sources(app_test_exec1 PRIVATE
     mocks/mock_pressure_value.cpp
     mocks/mock_humidity_value.cpp
     mocks/mock_light_intensity_value.cpp
+    mocks/mock_linked_list_node_allocator.cpp
 )
 
 target_link_libraries(app_test_exec1 PRIVATE test_common)
