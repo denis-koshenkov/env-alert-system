@@ -293,3 +293,83 @@ TEST(LinkedList, RemoveOnConditionRemovesElementsWithConditionTrueKeepsElementsW
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
     CHECK_TRUE(expected_id_elements_match_actual());
 }
+
+TEST(LinkedList, RemoveOnConditionRemovesOnlyFirstElement)
+{
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = true};
+    LinkedListIdElement id_element_1 = {.id = 1, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_2 = {.id = 2, .condition_evaluation_result = false};
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_2_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_0_node);
+    expect_id_element_in_list(1);
+    expect_id_element_in_list(2);
+
+    /* Exercise */
+    LinkedList linked_list = linked_list_create();
+    linked_list_add(linked_list, &id_element_0);
+    linked_list_add(linked_list, &id_element_1);
+    linked_list_add(linked_list, &id_element_2);
+    linked_list_remove_on_condition(linked_list, condition_id_element_cb);
+
+    /* Verify */
+    linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
+    CHECK_TRUE(expected_id_elements_match_actual());
+}
+
+TEST(LinkedList, RemoveOnConditionRemovesOnlyLastElement)
+{
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_1 = {.id = 1, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_2 = {.id = 2, .condition_evaluation_result = true};
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_2_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_2_node);
+    expect_id_element_in_list(0);
+    expect_id_element_in_list(1);
+
+    /* Exercise */
+    LinkedList linked_list = linked_list_create();
+    linked_list_add(linked_list, &id_element_0);
+    linked_list_add(linked_list, &id_element_1);
+    linked_list_add(linked_list, &id_element_2);
+    linked_list_remove_on_condition(linked_list, condition_id_element_cb);
+
+    /* Verify */
+    linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
+    CHECK_TRUE(expected_id_elements_match_actual());
+}
+
+TEST(LinkedList, RemoveOnConditionRemovesOnlyMiddleElement)
+{
+    LinkedListIdElement id_element_2 = {.id = 2, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_4 = {.id = 4, .condition_evaluation_result = true};
+    LinkedListIdElement id_element_1 = {.id = 1, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_3 = {.id = 3, .condition_evaluation_result = false};
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_2_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_4_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_3_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_4_node);
+    expect_id_element_in_list(2);
+    expect_id_element_in_list(0);
+    expect_id_element_in_list(1);
+    expect_id_element_in_list(3);
+
+    /* Exercise */
+    LinkedList linked_list = linked_list_create();
+    linked_list_add(linked_list, &id_element_2);
+    linked_list_add(linked_list, &id_element_0);
+    linked_list_add(linked_list, &id_element_4);
+    linked_list_add(linked_list, &id_element_1);
+    linked_list_add(linked_list, &id_element_3);
+    linked_list_remove_on_condition(linked_list, condition_id_element_cb);
+
+    /* Verify */
+    linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
+    CHECK_TRUE(expected_id_elements_match_actual());
+}
