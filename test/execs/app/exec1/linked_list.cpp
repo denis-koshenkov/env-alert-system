@@ -163,16 +163,6 @@ TEST(LinkedList, ForEachPassesUserDataToCallback)
     CHECK_EQUAL(&expected_user_data, actual_user_data);
 }
 
-static bool condition_true_cb(void *element)
-{
-    return true;
-}
-
-static bool condition_false_cb(void *element)
-{
-    return false;
-}
-
 static bool condition_id_element_cb(void *element)
 {
     LinkedListIdElement *id_element = (LinkedListIdElement *)element;
@@ -182,13 +172,13 @@ static bool condition_id_element_cb(void *element)
 TEST(LinkedList, RemoveOnConditionEmptyListStillEmpty)
 {
     LinkedList linked_list = linked_list_create();
-    linked_list_remove_on_condition(linked_list, condition_true_cb);
+    linked_list_remove_on_condition(linked_list, condition_id_element_cb);
     CHECK_TRUE(expected_id_elements_match_actual());
 }
 
 TEST(LinkedList, RemoveOnConditionDoesNotRemoveElementConditionFalse)
 {
-    LinkedListIdElement id_element_0 = {.id = 0};
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = false};
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
     /* Since condition evaluates to false, we expect remove_on_condition to keep it in the list. */
     expect_id_element_in_list(0);
@@ -196,7 +186,7 @@ TEST(LinkedList, RemoveOnConditionDoesNotRemoveElementConditionFalse)
     /* Exercise */
     LinkedList linked_list = linked_list_create();
     linked_list_add(linked_list, &id_element_0);
-    linked_list_remove_on_condition(linked_list, condition_false_cb);
+    linked_list_remove_on_condition(linked_list, condition_id_element_cb);
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
@@ -205,7 +195,7 @@ TEST(LinkedList, RemoveOnConditionDoesNotRemoveElementConditionFalse)
 
 TEST(LinkedList, RemoveOnConditionRemovesElementConditionTrue)
 {
-    LinkedListIdElement id_element_0 = {.id = 0};
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = true};
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
     mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_0_node);
     /* We expect the list to be empty, so we are not calling expect_id_element_in_list here. */
@@ -213,7 +203,7 @@ TEST(LinkedList, RemoveOnConditionRemovesElementConditionTrue)
     /* Exercise */
     LinkedList linked_list = linked_list_create();
     linked_list_add(linked_list, &id_element_0);
-    linked_list_remove_on_condition(linked_list, condition_true_cb);
+    linked_list_remove_on_condition(linked_list, condition_id_element_cb);
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
@@ -222,9 +212,9 @@ TEST(LinkedList, RemoveOnConditionRemovesElementConditionTrue)
 
 TEST(LinkedList, RemoveOnConditionRemovesAllElementsConditionTrue)
 {
-    LinkedListIdElement id_element_0 = {.id = 0};
-    LinkedListIdElement id_element_1 = {.id = 1};
-    LinkedListIdElement id_element_2 = {.id = 2};
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = true};
+    LinkedListIdElement id_element_1 = {.id = 1, .condition_evaluation_result = true};
+    LinkedListIdElement id_element_2 = {.id = 2, .condition_evaluation_result = true};
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_2_node);
@@ -238,7 +228,7 @@ TEST(LinkedList, RemoveOnConditionRemovesAllElementsConditionTrue)
     linked_list_add(linked_list, &id_element_0);
     linked_list_add(linked_list, &id_element_1);
     linked_list_add(linked_list, &id_element_2);
-    linked_list_remove_on_condition(linked_list, condition_true_cb);
+    linked_list_remove_on_condition(linked_list, condition_id_element_cb);
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
@@ -247,9 +237,9 @@ TEST(LinkedList, RemoveOnConditionRemovesAllElementsConditionTrue)
 
 TEST(LinkedList, RemoveOnConditionKeepsAllElementsConditionFalse)
 {
-    LinkedListIdElement id_element_0 = {.id = 0};
-    LinkedListIdElement id_element_1 = {.id = 1};
-    LinkedListIdElement id_element_2 = {.id = 2};
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_1 = {.id = 1, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_2 = {.id = 2, .condition_evaluation_result = false};
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_2_node);
@@ -263,7 +253,7 @@ TEST(LinkedList, RemoveOnConditionKeepsAllElementsConditionFalse)
     linked_list_add(linked_list, &id_element_0);
     linked_list_add(linked_list, &id_element_1);
     linked_list_add(linked_list, &id_element_2);
-    linked_list_remove_on_condition(linked_list, condition_false_cb);
+    linked_list_remove_on_condition(linked_list, condition_id_element_cb);
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
