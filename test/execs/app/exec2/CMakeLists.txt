@@ -15,6 +15,7 @@ target_sources(app_test_exec2 PRIVATE
     humidity_requirement.c
     light_intensity_requirement.cpp
     light_intensity_requirement.c
+    variable_requirement_list.cpp
 
     mocks/mock_value_holder.cpp
     mocks/mock_variable_requirement_allocator.cpp

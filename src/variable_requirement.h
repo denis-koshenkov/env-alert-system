@@ -7,6 +7,7 @@ extern "C"
 #endif
 
 #include <stdbool.h>
+#include <stdint.h>
 
 /// Variable requirement operator.
 typedef enum VariableRequirementOperator {

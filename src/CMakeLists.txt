@@ -18,6 +18,7 @@ target_sources(eas INTERFACE
     variable_requirement.c
     variable_requirement_allocator.c
     linked_list_node_allocator.c
+    variable_requirement_list.c
 )
 
 target_include_directories(eas INTERFACE
