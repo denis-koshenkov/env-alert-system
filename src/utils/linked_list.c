@@ -51,6 +51,8 @@ void linked_list_for_each(LinkedList self, LinkedListForEachCb cb, void *user_da
 void linked_list_remove_on_condition(LinkedList self, LinkedListConditionCb cb)
 {
     EAS_ASSERT(self);
+    EAS_ASSERT(cb);
+
     LinkedListNode **prev_node_next = &(self->head);
     LinkedListNode *node = self->head;
     while (node != NULL) {

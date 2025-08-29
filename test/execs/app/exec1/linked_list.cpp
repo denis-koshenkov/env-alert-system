@@ -108,6 +108,17 @@ TEST(LinkedList, RemoveOnConditionRaisesAssertIfListIsNUll)
     linked_list_remove_on_condition(NULL, condition_id_element_cb);
 }
 
+TEST(LinkedList, RemoveOnConditionRaisesAssertIfCbIsNUll)
+{
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("cb", "linked_list_remove_on_condition");
+    LinkedListIdElement id_element_0 = {.id = 0};
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+
+    LinkedList linked_list = linked_list_create();
+    linked_list_add(linked_list, &id_element_0);
+    linked_list_remove_on_condition(linked_list, NULL);
+}
+
 TEST(LinkedList, AddFiresAssertIfFailedToAllocateNode)
 {
     LinkedList linked_list = linked_list_create();
