@@ -216,3 +216,36 @@ TEST(LinkedList, RemoveOnConditionRemovesElementConditionTrue)
     /* Clean up */
     fake_linked_list_node_allocator_free(id_element_0_node);
 }
+
+TEST(LinkedList, RemoveOnConditionRemovesAllElementsConditionTrue)
+{
+    LinkedListIdElement id_element_0 = {.id = 0};
+    LinkedListIdElement id_element_1 = {.id = 1};
+    LinkedListIdElement id_element_2 = {.id = 2};
+    LinkedListNode *id_element_0_node = fake_linked_list_node_allocator_alloc();
+    LinkedListNode *id_element_1_node = fake_linked_list_node_allocator_alloc();
+    LinkedListNode *id_element_2_node = fake_linked_list_node_allocator_alloc();
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_2_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_1_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_2_node);
+    /* We expect the list to be empty, so we are not calling expect_id_element_in_list here. */
+
+    /* Exercise */
+    LinkedList linked_list = linked_list_create();
+    linked_list_add(linked_list, &id_element_0);
+    linked_list_add(linked_list, &id_element_1);
+    linked_list_add(linked_list, &id_element_2);
+    linked_list_remove_on_condition(linked_list, condition_true_cb);
+
+    /* Verify */
+    linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
+    CHECK_TRUE(expected_id_elements_match_actual());
+
+    /* Clean up */
+    fake_linked_list_node_allocator_free(id_element_0_node);
+    fake_linked_list_node_allocator_free(id_element_1_node);
+    fake_linked_list_node_allocator_free(id_element_2_node);
+}
