@@ -45,6 +45,18 @@ static void for_each_cb_id_elements(void *element, void *user_data)
     actual_id_element_detected_in_list(id_element->id);
 }
 
+static bool condition_id_element_cb(void *element)
+{
+    LinkedListIdElement *id_element = (LinkedListIdElement *)element;
+    return id_element->condition_evaluation_result;
+}
+
+static void *actual_user_data = 0;
+static void save_actual_user_data_cb(void *element, void *user_data)
+{
+    actual_user_data = user_data;
+}
+
 static LinkedListNode *id_element_0_node;
 static LinkedListNode *id_element_1_node;
 static LinkedListNode *id_element_2_node;
@@ -80,16 +92,20 @@ TEST(LinkedList, AddRaisesAssertIfListIsNull)
 {
     LinkedListIdElement id_element_0 = {.id = 0};
 
-    LinkedList linked_list = linked_list_create();
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "linked_list_add");
     linked_list_add(NULL, &id_element_0);
 }
 
 TEST(LinkedList, ForEachRaisesAssertIfListIsNull)
 {
-    LinkedList linked_list = linked_list_create();
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "linked_list_for_each");
     linked_list_for_each(NULL, for_each_cb_id_elements, NULL);
+}
+
+TEST(LinkedList, RemoveOnConditionRaisesAssertIfListIsNUll)
+{
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "linked_list_remove_on_condition");
+    linked_list_remove_on_condition(NULL, condition_id_element_cb);
 }
 
 TEST(LinkedList, AddFiresAssertIfFailedToAllocateNode)
@@ -143,13 +159,6 @@ TEST(LinkedList, TwoElementsInListAfterAddingTwoElements)
     CHECK_TRUE(expected_id_elements_match_actual());
 }
 
-static void *actual_user_data = 0;
-
-static void save_actual_user_data_cb(void *element, void *user_data)
-{
-    actual_user_data = user_data;
-}
-
 TEST(LinkedList, ForEachPassesUserDataToCallback)
 {
     LinkedListIdElement id_element_0 = {.id = 0};
@@ -161,12 +170,6 @@ TEST(LinkedList, ForEachPassesUserDataToCallback)
     linked_list_for_each(linked_list, save_actual_user_data_cb, &expected_user_data);
 
     CHECK_EQUAL(&expected_user_data, actual_user_data);
-}
-
-static bool condition_id_element_cb(void *element)
-{
-    LinkedListIdElement *id_element = (LinkedListIdElement *)element;
-    return id_element->condition_evaluation_result;
 }
 
 TEST(LinkedList, RemoveOnConditionEmptyListStillEmpty)
