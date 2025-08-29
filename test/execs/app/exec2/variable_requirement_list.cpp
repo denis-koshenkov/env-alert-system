@@ -1,18 +1,11 @@
-#include "CppUTest/TestHarness.h"
+#include "CppUTest/CommandLineTestRunner.h"
+#include "CppUTest/TestHarness_c.h"
 
-#include "variable_requirement_list.h"
-
-static bool for_each_cb_called = false;
-static void for_each_cb(VariableRequirement variable_requirement)
+TEST_GROUP_C_WRAPPER(VariableRequirementList)
 {
-    for_each_cb_called = true;
-}
+    TEST_GROUP_C_SETUP_WRAPPER(VariableRequirementList);
+    TEST_GROUP_C_TEARDOWN_WRAPPER(VariableRequirementList);
+};
 
-TEST_GROUP(VariableRequirementList){};
-
-TEST(VariableRequirementList, ListIsEmptyAfterCreate)
-{
-    VariableRequirementList list = variable_requirement_list_create();
-    variable_requirement_list_for_each(list, for_each_cb);
-    CHECK_FALSE(for_each_cb_called);
-}
+TEST_C_WRAPPER(VariableRequirementList, ListIsEmptyAfterCreate);
+TEST_C_WRAPPER(VariableRequirementList, ListContainsOneVarWhenOneVarAdded);

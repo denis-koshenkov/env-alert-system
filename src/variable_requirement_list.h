@@ -14,6 +14,8 @@ typedef void (*VariableRequirementListForEachCb)(VariableRequirement variable_re
 
 VariableRequirementList variable_requirement_list_create();
 
+void variable_requirement_list_add(VariableRequirementList self, VariableRequirement variable_requirement);
+
 void variable_requirement_list_for_each(VariableRequirementList self, VariableRequirementListForEachCb cb);
 
 #ifdef __cplusplus

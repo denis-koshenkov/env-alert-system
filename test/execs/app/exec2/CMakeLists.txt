@@ -16,6 +16,7 @@ target_sources(app_test_exec2 PRIVATE
     light_intensity_requirement.cpp
     light_intensity_requirement.c
     variable_requirement_list.cpp
+    variable_requirement_list.c
 
     mocks/mock_value_holder.cpp
     mocks/mock_variable_requirement_allocator.cpp
