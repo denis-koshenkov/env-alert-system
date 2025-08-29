@@ -1,8 +1,12 @@
 #include "CppUTest/TestHarness.h"
 #include "CppUTestExt/TestAssertPlugin.h"
+#include "CppUTestExt/MockSupport.h"
 
 #include "variable_requirement.h"
 #include "mocks/variable_requirements/mock_variable_requirement.h"
+#include "fake_variable_requirement_allocator.h"
+
+static void *requirement_buffer;
 
 /* ------------------------------------------ VariableRequirement test group ------------------------------------ */
 
@@ -41,6 +45,8 @@ TEST_GROUP(VariableRequirementMock)
 {
     void setup()
     {
+        requirement_buffer = fake_variable_requirement_allocator_alloc();
+        mock().expectOneCall("variable_requirement_allocator_alloc").andReturnValue(requirement_buffer);
         mock_variable_requirement = mock_variable_requirement_create(
             MOCK_VARIABLE_REQUIREMENT_PASS_VALID_INSTANCE_TO_VAR_REQ_CREATE,
             MOCK_VARIABLE_REQUIREMENT_PASS_GEQ_OPERATOR_TO_VAR_REQ_CREATE,
@@ -50,7 +56,9 @@ TEST_GROUP(VariableRequirementMock)
 
     void teardown()
     {
+        mock().expectOneCall("variable_requirement_allocator_free").withParameter("buf", requirement_buffer);
         variable_requirement_destroy(mock_variable_requirement);
+        fake_variable_requirement_allocator_free(requirement_buffer);
     }
 };
 // clang-format on
@@ -191,21 +199,23 @@ static VariableRequirement mock_variable_requirement_create_test_group;
 // clang-format off
 TEST_GROUP(VariableRequirementMockCreate)
 {
+    void setup()
+    {
+        requirement_buffer = fake_variable_requirement_allocator_alloc();
+    }
+
     void teardown()
     {
-        /* This cannot be variable_requirement_destroy(), because that will access the vtable. The tests in this test
-        group will not get past the asserts at the beginning of variable_requirement_create, so vtable will never be
-        populated. This means that at the end of the test, when we end up here in the teardown, the vtable field contains
-        an invalid pointer. But we still need to free the memory we allocated in mock_variable_requirement_create(), so
-        we call the destroy() here directly. */
-        mock_variable_requirement_destroy(mock_variable_requirement_create_test_group);
+        fake_variable_requirement_allocator_free(requirement_buffer);
     }
 };
 // clang-format on
 
 TEST(VariableRequirementMockCreate, createRaisesAssertIfSelfIsNull)
 {
+    mock().expectOneCall("variable_requirement_allocator_alloc").andReturnValue(requirement_buffer);
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "variable_requirement_create");
+
     mock_variable_requirement_create_test_group =
         mock_variable_requirement_create(MOCK_VARIABLE_REQUIREMENT_PASS_NULLPTR_INSTANCE_TO_VAR_REQ_CREATE,
                                          MOCK_VARIABLE_REQUIREMENT_PASS_GEQ_OPERATOR_TO_VAR_REQ_CREATE,
@@ -214,7 +224,9 @@ TEST(VariableRequirementMockCreate, createRaisesAssertIfSelfIsNull)
 
 TEST(VariableRequirementMockCreate, createRaisesAssertIfOperatorIsInvalid)
 {
+    mock().expectOneCall("variable_requirement_allocator_alloc").andReturnValue(requirement_buffer);
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("is_valid_operator(operator)", "variable_requirement_create");
+
     mock_variable_requirement_create_test_group =
         mock_variable_requirement_create(MOCK_VARIABLE_REQUIREMENT_PASS_VALID_INSTANCE_TO_VAR_REQ_CREATE,
                                          MOCK_VARIABLE_REQUIREMENT_PASS_INVALID_OPERATOR_TO_VAR_REQ_CREATE,
@@ -223,7 +235,9 @@ TEST(VariableRequirementMockCreate, createRaisesAssertIfOperatorIsInvalid)
 
 TEST(VariableRequirementMockCreate, createRaisesAssertIfVtableIsNull)
 {
+    mock().expectOneCall("variable_requirement_allocator_alloc").andReturnValue(requirement_buffer);
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("vtable", "variable_requirement_create");
+
     mock_variable_requirement_create_test_group =
         mock_variable_requirement_create(MOCK_VARIABLE_REQUIREMENT_PASS_VALID_INSTANCE_TO_VAR_REQ_CREATE,
                                          MOCK_VARIABLE_REQUIREMENT_PASS_GEQ_OPERATOR_TO_VAR_REQ_CREATE,
@@ -232,7 +246,9 @@ TEST(VariableRequirementMockCreate, createRaisesAssertIfVtableIsNull)
 
 TEST(VariableRequirementMockCreate, createRaisesAssertIfEvaluateIsNull)
 {
+    mock().expectOneCall("variable_requirement_allocator_alloc").andReturnValue(requirement_buffer);
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("vtable->evaluate", "variable_requirement_create");
+
     mock_variable_requirement_create_test_group =
         mock_variable_requirement_create(MOCK_VARIABLE_REQUIREMENT_PASS_VALID_INSTANCE_TO_VAR_REQ_CREATE,
                                          MOCK_VARIABLE_REQUIREMENT_PASS_GEQ_OPERATOR_TO_VAR_REQ_CREATE,
@@ -241,7 +257,9 @@ TEST(VariableRequirementMockCreate, createRaisesAssertIfEvaluateIsNull)
 
 TEST(VariableRequirementMockCreate, createRaisesAssertIfDestroyIsNull)
 {
+    mock().expectOneCall("variable_requirement_allocator_alloc").andReturnValue(requirement_buffer);
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("vtable->destroy", "variable_requirement_create");
+
     mock_variable_requirement_create_test_group =
         mock_variable_requirement_create(MOCK_VARIABLE_REQUIREMENT_PASS_VALID_INSTANCE_TO_VAR_REQ_CREATE,
                                          MOCK_VARIABLE_REQUIREMENT_PASS_GEQ_OPERATOR_TO_VAR_REQ_CREATE,

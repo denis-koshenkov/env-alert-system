@@ -3,6 +3,7 @@
 
 TEST_GROUP_C_WRAPPER(PressureRequirement)
 {
+    TEST_GROUP_C_SETUP_WRAPPER(PressureRequirement);
     TEST_GROUP_C_TEARDOWN_WRAPPER(PressureRequirement);
 };
 

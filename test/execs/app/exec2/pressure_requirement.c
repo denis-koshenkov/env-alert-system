@@ -1,24 +1,36 @@
 #include "CppUTest/TestHarness_c.h"
 #include "CppUTestExt/MockSupport_c.h"
 #include "CppUTestExt/TestAssertPlugin_c.h"
+#include "fake_variable_requirement_allocator.h"
 
 /* We are using the C CppUTest interface instead of C++, because this header would not compile under C++. */
 #include "pressure_requirement.h"
 
 static VariableRequirement pressure_requirement;
+static void *requirement_buffer;
 
 static void test_evaluate(Pressure current_pressure, uint8_t operator, Pressure requirement_value, bool expected_result)
 {
+    mock_c()->expectOneCall("variable_requirement_allocator_alloc")->andReturnPointerValue(requirement_buffer);
     mock_c()->expectOneCall("current_pressure_get")->andReturnUnsignedIntValue(current_pressure);
+    mock_c()->expectOneCall("variable_requirement_allocator_free")->withPointerParameters("buf", requirement_buffer);
 
     pressure_requirement = pressure_requirement_create(0, operator, requirement_value);
     bool result = variable_requirement_evaluate(pressure_requirement);
     CHECK_EQUAL_C_BOOL(expected_result, result);
+
+    /* Clean up */
+    variable_requirement_destroy(pressure_requirement);
+}
+
+TEST_GROUP_C_SETUP(PressureRequirement)
+{
+    requirement_buffer = fake_variable_requirement_allocator_alloc();
 }
 
 TEST_GROUP_C_TEARDOWN(PressureRequirement)
 {
-    variable_requirement_destroy(pressure_requirement);
+    fake_variable_requirement_allocator_free(requirement_buffer);
 }
 
 TEST_C(PressureRequirement, evaluateReturnsTrueOperatorGEQValueGreater)
@@ -66,27 +78,38 @@ TEST_C(PressureRequirement, evaluateReturnsTrueOperatorLEQBothValuesEqualZero)
  * that link here. */
 TEST_C(PressureRequirement, getAlertIdReturnsAlertId1PassedToCreate)
 {
+    mock_c()->expectOneCall("variable_requirement_allocator_alloc")->andReturnPointerValue(requirement_buffer);
+    mock_c()->expectOneCall("variable_requirement_allocator_free")->withPointerParameters("buf", requirement_buffer);
     uint8_t expected_alert_id = 1;
+
     pressure_requirement = pressure_requirement_create(expected_alert_id, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 200);
     uint8_t actual_alert_id = variable_requirement_get_alert_id(pressure_requirement);
+
     CHECK_EQUAL_C_UINT(expected_alert_id, actual_alert_id);
+
+    /* Clean up */
+    variable_requirement_destroy(pressure_requirement);
 }
 
 TEST_C(PressureRequirement, getAlertIdReturnsAlertId2PassedToCreate)
 {
+    mock_c()->expectOneCall("variable_requirement_allocator_alloc")->andReturnPointerValue(requirement_buffer);
+    mock_c()->expectOneCall("variable_requirement_allocator_free")->withPointerParameters("buf", requirement_buffer);
     uint8_t expected_alert_id = 2;
+
     pressure_requirement = pressure_requirement_create(expected_alert_id, VARIABLE_REQUIREMENT_OPERATOR_LEQ, 10000);
     uint8_t actual_alert_id = variable_requirement_get_alert_id(pressure_requirement);
+
     CHECK_EQUAL_C_UINT(expected_alert_id, actual_alert_id);
+
+    /* Clean up */
+    variable_requirement_destroy(pressure_requirement);
 }
 
 TEST_C(PressureRequirement, createRaisesAssertIfMemoryAllocationFailed)
 {
-    pressure_requirement = pressure_requirement_create(0, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 0);
-    /* Since we already called pressure_requirement_create(), and mock variable requirement allocator can only
-     * allocate one variable requirement instance at a time, variable_requirement_allocator_alloc() will return NULL
-     * when it is called again as a part of pressure_requirement_create(). We expect the implementation of
-     * pressure_requirement_create() to detect this and raise an assert. */
+    mock_c()->expectOneCall("variable_requirement_allocator_alloc")->andReturnPointerValue((void *)NULL);
     TEST_ASSERT_PLUGIN_C_EXPECT_ASSERTION("self", "pressure_requirement_create");
+
     pressure_requirement_create(0, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 0);
 }

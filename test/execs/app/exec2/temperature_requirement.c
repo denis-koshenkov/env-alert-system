@@ -1,25 +1,37 @@
 #include "CppUTest/TestHarness_c.h"
 #include "CppUTestExt/MockSupport_c.h"
 #include "CppUTestExt/TestAssertPlugin_c.h"
+#include "fake_variable_requirement_allocator.h"
 
 /* We are using the C CppUTest interface instead of C++, because this header would not compile under C++. */
 #include "temperature_requirement.h"
 
 static VariableRequirement temperature_requirement;
+static void *requirement_buffer;
 
 static void test_evaluate(Temperature current_temperature, uint8_t operator, Temperature requirement_value,
                           bool expected_result)
 {
+    mock_c()->expectOneCall("variable_requirement_allocator_alloc")->andReturnPointerValue(requirement_buffer);
     mock_c()->expectOneCall("current_temperature_get")->andReturnUnsignedIntValue(current_temperature);
+    mock_c()->expectOneCall("variable_requirement_allocator_free")->withPointerParameters("buf", requirement_buffer);
 
     temperature_requirement = temperature_requirement_create(0, operator, requirement_value);
     bool result = variable_requirement_evaluate(temperature_requirement);
     CHECK_EQUAL_C_BOOL(expected_result, result);
+
+    /* Clean up */
+    variable_requirement_destroy(temperature_requirement);
+}
+
+TEST_GROUP_C_SETUP(TemperatureRequirement)
+{
+    requirement_buffer = fake_variable_requirement_allocator_alloc();
 }
 
 TEST_GROUP_C_TEARDOWN(TemperatureRequirement)
 {
-    variable_requirement_destroy(temperature_requirement);
+    fake_variable_requirement_allocator_free(requirement_buffer);
 }
 
 TEST_C(TemperatureRequirement, evaluateReturnsTrueOperatorGEQValueGreater)
@@ -97,28 +109,39 @@ TEST_C(TemperatureRequirement, evaluateReturnsFalseOperatorLEQValueGreaterOneNeg
  * that link here. */
 TEST_C(TemperatureRequirement, getAlertIdReturnsAlertId1PassedToCreate)
 {
+    mock_c()->expectOneCall("variable_requirement_allocator_alloc")->andReturnPointerValue(requirement_buffer);
+    mock_c()->expectOneCall("variable_requirement_allocator_free")->withPointerParameters("buf", requirement_buffer);
     uint8_t expected_alert_id = 1;
+
     temperature_requirement = temperature_requirement_create(expected_alert_id, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 200);
     uint8_t actual_alert_id = variable_requirement_get_alert_id(temperature_requirement);
+
     CHECK_EQUAL_C_UINT(expected_alert_id, actual_alert_id);
+
+    /* Clean up */
+    variable_requirement_destroy(temperature_requirement);
 }
 
 TEST_C(TemperatureRequirement, getAlertIdReturnsAlertId2PassedToCreate)
 {
+    mock_c()->expectOneCall("variable_requirement_allocator_alloc")->andReturnPointerValue(requirement_buffer);
+    mock_c()->expectOneCall("variable_requirement_allocator_free")->withPointerParameters("buf", requirement_buffer);
     uint8_t expected_alert_id = 2;
+
     temperature_requirement =
         temperature_requirement_create(expected_alert_id, VARIABLE_REQUIREMENT_OPERATOR_LEQ, -200);
     uint8_t actual_alert_id = variable_requirement_get_alert_id(temperature_requirement);
+
     CHECK_EQUAL_C_UINT(expected_alert_id, actual_alert_id);
+
+    /* Clean up */
+    variable_requirement_destroy(temperature_requirement);
 }
 
 TEST_C(TemperatureRequirement, createRaisesAssertIfMemoryAllocationFailed)
 {
-    temperature_requirement = temperature_requirement_create(0, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 0);
-    /* Since we already called temperature_requirement_create(), and mock variable requirement allocator can only
-     * allocate one variable requirement instance at a time, variable_requirement_allocator_alloc() will return NULL
-     * when it is called again as a part of temperature_requirement_create(). We expect the implementation of
-     * temperature_requirement_create() to detect this and raise an assert. */
+    mock_c()->expectOneCall("variable_requirement_allocator_alloc")->andReturnPointerValue((void *)NULL);
     TEST_ASSERT_PLUGIN_C_EXPECT_ASSERTION("self", "temperature_requirement_create");
+
     temperature_requirement_create(0, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 0);
 }

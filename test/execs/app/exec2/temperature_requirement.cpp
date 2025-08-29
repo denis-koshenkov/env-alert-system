@@ -3,6 +3,7 @@
 
 TEST_GROUP_C_WRAPPER(TemperatureRequirement)
 {
+    TEST_GROUP_C_SETUP_WRAPPER(TemperatureRequirement);
     TEST_GROUP_C_TEARDOWN_WRAPPER(TemperatureRequirement);
 };
 

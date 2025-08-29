@@ -3,6 +3,7 @@
 
 TEST_GROUP_C_WRAPPER(HumidityRequirement)
 {
+    TEST_GROUP_C_SETUP_WRAPPER(HumidityRequirement);
     TEST_GROUP_C_TEARDOWN_WRAPPER(HumidityRequirement);
 };
 
