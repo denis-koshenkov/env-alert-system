@@ -7,7 +7,7 @@
 #define CONFIG_PRESSURE_VALUE_MAX_NUM_INSTANCES 8
 #define CONFIG_HUMIDITY_VALUE_MAX_NUM_INSTANCES 8
 #define CONFIG_LIGHT_INTENSITY_VALUE_MAX_NUM_INSTANCES 8
-#define CONFIG_LINKED_LIST_MAX_NUM_INSTANCES 12
+#define CONFIG_LINKED_LIST_MAX_NUM_INSTANCES 13
 
 /** Maximal size of one variable requirement in bytes. We have different variable requirement types - e.g.
  * TemperatureVariableRequirement, PressureVariableRequirement, and so on. Each of these types might have a different
@@ -28,6 +28,6 @@
 #define CONFIG_MEMORY_BLOCK_ALLOCATOR_MAX_NUM_INSTANCES 8
 
 /** The maximal number of nodes that the fake linked list node allocator module can allocate at the same time. */
-#define CONFIG_FAKE_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES 4
+#define CONFIG_FAKE_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES 5
 
 #endif

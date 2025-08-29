@@ -10,6 +10,7 @@
 
 typedef struct LinkedListIdElement {
     uint8_t id;
+    bool condition_evaluation_result;
 } LinkedListIdElement;
 
 #define LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS 10
@@ -48,6 +49,7 @@ static LinkedListNode *id_element_0_node;
 static LinkedListNode *id_element_1_node;
 static LinkedListNode *id_element_2_node;
 static LinkedListNode *id_element_3_node;
+static LinkedListNode *id_element_4_node;
 
 // clang-format off
 TEST_GROUP(LinkedList)
@@ -60,6 +62,7 @@ TEST_GROUP(LinkedList)
         id_element_1_node = fake_linked_list_node_allocator_alloc();
         id_element_2_node = fake_linked_list_node_allocator_alloc();
         id_element_3_node = fake_linked_list_node_allocator_alloc();
+        id_element_4_node = fake_linked_list_node_allocator_alloc();
     }
 
     void teardown()
@@ -68,6 +71,7 @@ TEST_GROUP(LinkedList)
         fake_linked_list_node_allocator_free(id_element_1_node);
         fake_linked_list_node_allocator_free(id_element_2_node);
         fake_linked_list_node_allocator_free(id_element_3_node);
+        fake_linked_list_node_allocator_free(id_element_4_node);
     }
 };
 // clang-format on
@@ -169,6 +173,12 @@ static bool condition_false_cb(void *element)
     return false;
 }
 
+static bool condition_id_element_cb(void *element)
+{
+    LinkedListIdElement *id_element = (LinkedListIdElement *)element;
+    return id_element->condition_evaluation_result;
+}
+
 TEST(LinkedList, RemoveOnConditionEmptyListStillEmpty)
 {
     LinkedList linked_list = linked_list_create();
@@ -254,6 +264,40 @@ TEST(LinkedList, RemoveOnConditionKeepsAllElementsConditionFalse)
     linked_list_add(linked_list, &id_element_1);
     linked_list_add(linked_list, &id_element_2);
     linked_list_remove_on_condition(linked_list, condition_false_cb);
+
+    /* Verify */
+    linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
+    CHECK_TRUE(expected_id_elements_match_actual());
+}
+
+TEST(LinkedList, RemoveOnConditionRemovesElementsWithConditionTrueKeepsElementsWithConditionFalse)
+{
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_1 = {.id = 1, .condition_evaluation_result = true};
+    LinkedListIdElement id_element_2 = {.id = 2, .condition_evaluation_result = true};
+    LinkedListIdElement id_element_3 = {.id = 3, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_4 = {.id = 4, .condition_evaluation_result = true};
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_2_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_3_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_4_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_1_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_2_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_4_node);
+    /* Condition is false for elements 0, 3 - they should be kept, condition true false for elements 1, 2, 4 - they
+     * should be removed. */
+    expect_id_element_in_list(0);
+    expect_id_element_in_list(3);
+
+    /* Exercise */
+    LinkedList linked_list = linked_list_create();
+    linked_list_add(linked_list, &id_element_0);
+    linked_list_add(linked_list, &id_element_1);
+    linked_list_add(linked_list, &id_element_2);
+    linked_list_add(linked_list, &id_element_3);
+    linked_list_add(linked_list, &id_element_4);
+    linked_list_remove_on_condition(linked_list, condition_id_element_cb);
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
