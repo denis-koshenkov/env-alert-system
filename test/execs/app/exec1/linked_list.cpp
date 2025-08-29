@@ -102,6 +102,17 @@ TEST(LinkedList, ForEachRaisesAssertIfListIsNull)
     linked_list_for_each(NULL, for_each_cb_id_elements, NULL);
 }
 
+TEST(LinkedList, ForEachRaisesAssertIfCbIsNUll)
+{
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("cb", "linked_list_for_each");
+    LinkedListIdElement id_element_0 = {.id = 0};
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+
+    LinkedList linked_list = linked_list_create();
+    linked_list_add(linked_list, &id_element_0);
+    linked_list_for_each(linked_list, NULL, NULL);
+}
+
 TEST(LinkedList, RemoveOnConditionRaisesAssertIfListIsNUll)
 {
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "linked_list_remove_on_condition");

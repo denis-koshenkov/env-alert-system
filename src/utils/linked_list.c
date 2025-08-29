@@ -43,6 +43,8 @@ void linked_list_add(LinkedList self, void *element)
 void linked_list_for_each(LinkedList self, LinkedListForEachCb cb, void *user_data)
 {
     EAS_ASSERT(self);
+    EAS_ASSERT(cb);
+
     for (LinkedListNode *node = self->head; node != NULL; node = node->next) {
         cb(node->element, user_data);
     }
