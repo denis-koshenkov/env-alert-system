@@ -28,6 +28,6 @@
 #define CONFIG_MEMORY_BLOCK_ALLOCATOR_MAX_NUM_INSTANCES 8
 
 /** The maximal number of nodes that the fake linked list node allocator module can allocate at the same time. */
-#define CONFIG_FAKE_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES 3
+#define CONFIG_FAKE_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES 4
 
 #endif
