@@ -249,3 +249,36 @@ TEST(LinkedList, RemoveOnConditionRemovesAllElementsConditionTrue)
     fake_linked_list_node_allocator_free(id_element_1_node);
     fake_linked_list_node_allocator_free(id_element_2_node);
 }
+
+TEST(LinkedList, RemoveOnConditionKeepsAllElementsConditionFalse)
+{
+    LinkedListIdElement id_element_0 = {.id = 0};
+    LinkedListIdElement id_element_1 = {.id = 1};
+    LinkedListIdElement id_element_2 = {.id = 2};
+    LinkedListNode *id_element_0_node = fake_linked_list_node_allocator_alloc();
+    LinkedListNode *id_element_1_node = fake_linked_list_node_allocator_alloc();
+    LinkedListNode *id_element_2_node = fake_linked_list_node_allocator_alloc();
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_2_node);
+    /* We expect all three elements to be in the list, since condition is false for all of them. */
+    expect_id_element_in_list(0);
+    expect_id_element_in_list(1);
+    expect_id_element_in_list(2);
+
+    /* Exercise */
+    LinkedList linked_list = linked_list_create();
+    linked_list_add(linked_list, &id_element_0);
+    linked_list_add(linked_list, &id_element_1);
+    linked_list_add(linked_list, &id_element_2);
+    linked_list_remove_on_condition(linked_list, condition_false_cb);
+
+    /* Verify */
+    linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
+    CHECK_TRUE(expected_id_elements_match_actual());
+
+    /* Clean up */
+    fake_linked_list_node_allocator_free(id_element_0_node);
+    fake_linked_list_node_allocator_free(id_element_1_node);
+    fake_linked_list_node_allocator_free(id_element_2_node);
+}
