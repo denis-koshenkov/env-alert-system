@@ -23,6 +23,7 @@ target_sources(eas INTERFACE
     pressure_requirement_list.c
     humidity_requirement_list.c
     light_intensity_requirement_list.c
+    alert_condition.c
 )
 
 target_include_directories(eas INTERFACE
