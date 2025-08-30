@@ -3,7 +3,7 @@
 #include "CppUTestExt/MockSupport.h"
 
 #include "variable_requirement.h"
-#include "mocks/variable_requirements/mock_variable_requirement.h"
+#include "mocks/mock_variable_requirement.h"
 #include "fake_variable_requirement_allocator.h"
 
 static void *requirement_buffer;
