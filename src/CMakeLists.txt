@@ -21,6 +21,7 @@ target_sources(eas INTERFACE
     variable_requirement_list.c
     temperature_requirement_list.c
     pressure_requirement_list.c
+    humidity_requirement_list.c
 )
 
 target_include_directories(eas INTERFACE
