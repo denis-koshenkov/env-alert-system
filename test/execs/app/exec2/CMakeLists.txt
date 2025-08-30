@@ -17,6 +17,7 @@ target_sources(app_test_exec2 PRIVATE
     light_intensity_requirement.c
     variable_requirement_list.cpp
     variable_requirement_list.c
+    linked_list.cpp
 
     mocks/mock_value_holder.cpp
     mocks/mock_variable_requirement_allocator.cpp
@@ -24,6 +25,7 @@ target_sources(app_test_exec2 PRIVATE
     mocks/mock_current_pressure.cpp
     mocks/mock_current_humidity.cpp
     mocks/mock_current_light_intensity.cpp
+    mocks/mock_linked_list_node_allocator.cpp
 
     mocks/variable_requirements/mock_variable_requirement.c
 )

@@ -7,8 +7,8 @@
 #define CONFIG_PRESSURE_VALUE_MAX_NUM_INSTANCES 8
 #define CONFIG_HUMIDITY_VALUE_MAX_NUM_INSTANCES 8
 #define CONFIG_LIGHT_INTENSITY_VALUE_MAX_NUM_INSTANCES 8
-#define CONFIG_LINKED_LIST_MAX_NUM_INSTANCES 16
-#define CONFIG_VARIABLE_REQUIREMENT_LIST_MAX_NUM_INSTANCES 2
+#define CONFIG_LINKED_LIST_MAX_NUM_INSTANCES 19
+#define CONFIG_VARIABLE_REQUIREMENT_LIST_MAX_NUM_INSTANCES 3
 
 /** Maximal size of one variable requirement in bytes. We have different variable requirement types - e.g.
  * TemperatureVariableRequirement, PressureVariableRequirement, and so on. Each of these types might have a different
@@ -33,6 +33,6 @@
 
 /** The maximal number of requirements that the fake variable requirement allocator module can allocate at the same
  * time. */
-#define CONFIG_FAKE_VARIABLE_REQUIREMENT_ALLOCATOR_NUM_REQUIREMENTS 1
+#define CONFIG_FAKE_VARIABLE_REQUIREMENT_ALLOCATOR_NUM_REQUIREMENTS 3
 
 #endif

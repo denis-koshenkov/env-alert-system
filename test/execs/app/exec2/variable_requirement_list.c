@@ -6,11 +6,13 @@
  * pressure requirements to add to the list. */
 #include "pressure_requirement.h"
 #include "fake_variable_requirement_allocator.h"
+#include "fake_linked_list_node_allocator.h"
 #include "eas_assert.h"
 
-#define TEST_VARIABLE_REQUIREMENT_LIST_MAX_NUM_EXPECTED_REQUIREMENTS 1
+#define TEST_VARIABLE_REQUIREMENT_LIST_MAX_NUM_EXPECTED_REQUIREMENTS 3
 
 typedef struct ExpectedVariableRequirement {
+    void *linked_list_node_buffer;
     void *requirement_buffer;
     VariableRequirement requirement;
     bool is_expected;
@@ -63,6 +65,7 @@ static void for_each_cb_expected_requirements(VariableRequirement variable_requi
 TEST_GROUP_C_SETUP(VariableRequirementList)
 {
     for (size_t i = 0; i < TEST_VARIABLE_REQUIREMENT_LIST_MAX_NUM_EXPECTED_REQUIREMENTS; i++) {
+        expected_requirements[i].linked_list_node_buffer = fake_linked_list_node_allocator_alloc();
         expected_requirements[i].requirement_buffer = fake_variable_requirement_allocator_alloc();
         mock_c()
             ->expectOneCall("variable_requirement_allocator_alloc")
@@ -80,6 +83,7 @@ TEST_GROUP_C_TEARDOWN(VariableRequirementList)
             ->withPointerParameters("buf", expected_requirements[i].requirement_buffer);
         variable_requirement_destroy(expected_requirements[i].requirement);
         fake_variable_requirement_allocator_free(expected_requirements[i].requirement_buffer);
+        fake_linked_list_node_allocator_free(expected_requirements[i].linked_list_node_buffer);
     }
 }
 
@@ -93,10 +97,38 @@ TEST_C(VariableRequirementList, ListIsEmptyAfterCreate)
 
 TEST_C(VariableRequirementList, ListContainsOneVarWhenOneVarAdded)
 {
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_alloc")
+        ->andReturnPointerValue(expected_requirements[0].linked_list_node_buffer);
     expect_requirement_in_list(0);
 
     VariableRequirementList list = variable_requirement_list_create();
     variable_requirement_list_add(list, expected_requirements[0].requirement);
+    variable_requirement_list_for_each(list, for_each_cb_expected_requirements);
+
+    CHECK_C(expected_requirements_match_actual());
+}
+
+TEST_C(VariableRequirementList, ListContainsThreeVarsWhenThreeVarsAdded)
+{
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_alloc")
+        ->andReturnPointerValue(expected_requirements[0].linked_list_node_buffer);
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_alloc")
+        ->andReturnPointerValue(expected_requirements[1].linked_list_node_buffer);
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_alloc")
+        ->andReturnPointerValue(expected_requirements[2].linked_list_node_buffer);
+    expect_requirement_in_list(0);
+    expect_requirement_in_list(1);
+    expect_requirement_in_list(2);
+
+    VariableRequirementList list = variable_requirement_list_create();
+    variable_requirement_list_add(list, expected_requirements[0].requirement);
+    variable_requirement_list_add(list, expected_requirements[1].requirement);
+    variable_requirement_list_add(list, expected_requirements[2].requirement);
+
     variable_requirement_list_for_each(list, for_each_cb_expected_requirements);
 
     CHECK_C(expected_requirements_match_actual());

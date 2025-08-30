@@ -1,6 +1,7 @@
 #include <stddef.h>
 
 #include "variable_requirement_list.h"
+#include "utils/linked_list.h"
 #include "config.h"
 #include "eas_assert.h"
 
@@ -9,11 +10,18 @@
 #endif
 
 typedef struct VariableRequirementListStruct {
-    VariableRequirement variable_requirement;
+    LinkedList linked_list;
 } VariableRequirementListStruct;
 
 static struct VariableRequirementListStruct instances[CONFIG_VARIABLE_REQUIREMENT_LIST_MAX_NUM_INSTANCES];
 static size_t instance_idx = 0;
+
+static void linked_list_for_each_cb(void *element, void *user_data)
+{
+    VariableRequirementListForEachCb cb = (VariableRequirementListForEachCb)user_data;
+    VariableRequirement variable_requirement = (VariableRequirement)element;
+    cb(variable_requirement);
+}
 
 VariableRequirementList variable_requirement_list_create()
 {
@@ -21,18 +29,16 @@ VariableRequirementList variable_requirement_list_create()
     struct VariableRequirementListStruct *instance = &instances[instance_idx];
     instance_idx++;
 
-    instance->variable_requirement = NULL;
+    instance->linked_list = linked_list_create();
     return instance;
 }
 
 void variable_requirement_list_add(VariableRequirementList self, VariableRequirement variable_requirement)
 {
-    self->variable_requirement = variable_requirement;
+    linked_list_add(self->linked_list, variable_requirement);
 }
 
 void variable_requirement_list_for_each(VariableRequirementList self, VariableRequirementListForEachCb cb)
 {
-    if (self->variable_requirement != NULL) {
-        cb(self->variable_requirement);
-    }
+    linked_list_for_each(self->linked_list, linked_list_for_each_cb, cb);
 }

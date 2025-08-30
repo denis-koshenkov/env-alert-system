@@ -9,3 +9,4 @@ TEST_GROUP_C_WRAPPER(VariableRequirementList)
 
 TEST_C_WRAPPER(VariableRequirementList, ListIsEmptyAfterCreate);
 TEST_C_WRAPPER(VariableRequirementList, ListContainsOneVarWhenOneVarAdded);
+TEST_C_WRAPPER(VariableRequirementList, ListContainsThreeVarsWhenThreeVarsAdded);
