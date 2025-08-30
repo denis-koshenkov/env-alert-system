@@ -31,4 +31,8 @@
 /** The maximal number of nodes that the fake linked list node allocator module can allocate at the same time. */
 #define CONFIG_FAKE_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES 5
 
+/** The maximal number of requirements that the fake variable requirement allocator module can allocate at the same
+ * time. */
+#define CONFIG_FAKE_VARIABLE_REQUIREMENT_ALLOCATOR_NUM_REQUIREMENTS 1
+
 #endif
