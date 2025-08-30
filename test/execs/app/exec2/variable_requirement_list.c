@@ -9,7 +9,7 @@
 #include "fake_linked_list_node_allocator.h"
 #include "eas_assert.h"
 
-#define TEST_VARIABLE_REQUIREMENT_LIST_MAX_NUM_EXPECTED_REQUIREMENTS 3
+#define TEST_VARIABLE_REQUIREMENT_LIST_MAX_NUM_EXPECTED_REQUIREMENTS 4
 
 typedef struct ExpectedVariableRequirement {
     void *linked_list_node_buffer;
@@ -19,7 +19,7 @@ typedef struct ExpectedVariableRequirement {
 } ExpectedVariableRequirement;
 
 static const uint8_t alert_ids_of_expected_requirements[TEST_VARIABLE_REQUIREMENT_LIST_MAX_NUM_EXPECTED_REQUIREMENTS] =
-    {2, 0, 0};
+    {2, 1, 1, 1};
 static ExpectedVariableRequirement expected_requirements[TEST_VARIABLE_REQUIREMENT_LIST_MAX_NUM_EXPECTED_REQUIREMENTS];
 
 static void expect_requirement_in_list(size_t index)
@@ -178,6 +178,42 @@ TEST_C(VariableRequirementList, RemoveAllVarsOfAlertKeepsTheOnlyRequirement)
 
     VariableRequirementList list = variable_requirement_list_create();
     variable_requirement_list_add(list, expected_requirements[0].requirement);
+    variable_requirement_list_remove_all_for_alert(list, alert_id);
+
+    variable_requirement_list_for_each(list, for_each_cb_expected_requirements);
+    CHECK_C(expected_requirements_match_actual());
+}
+
+TEST_C(VariableRequirementList, RemoveAllVarsOfAlertRemovesAllRequirements)
+{
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_alloc")
+        ->andReturnPointerValue(expected_requirements[1].linked_list_node_buffer);
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_alloc")
+        ->andReturnPointerValue(expected_requirements[2].linked_list_node_buffer);
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_alloc")
+        ->andReturnPointerValue(expected_requirements[3].linked_list_node_buffer);
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_free")
+        ->withPointerParameters("linked_list_node", expected_requirements[1].linked_list_node_buffer);
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_free")
+        ->withPointerParameters("linked_list_node", expected_requirements[2].linked_list_node_buffer);
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_free")
+        ->withPointerParameters("linked_list_node", expected_requirements[3].linked_list_node_buffer);
+
+    uint8_t alert_id = 1;
+    /* Not expecting any requirements to be in the list, because variable_requirement_list_remove_all_for_alert should
+     * remove all requirements that we add. */
+
+    VariableRequirementList list = variable_requirement_list_create();
+    variable_requirement_list_add(list, expected_requirements[1].requirement);
+    variable_requirement_list_add(list, expected_requirements[2].requirement);
+    variable_requirement_list_add(list, expected_requirements[3].requirement);
+
     variable_requirement_list_remove_all_for_alert(list, alert_id);
 
     variable_requirement_list_for_each(list, for_each_cb_expected_requirements);
