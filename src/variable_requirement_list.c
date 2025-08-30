@@ -16,17 +16,40 @@ typedef struct VariableRequirementListStruct {
 static struct VariableRequirementListStruct instances[CONFIG_VARIABLE_REQUIREMENT_LIST_MAX_NUM_INSTANCES];
 static size_t instance_idx = 0;
 
+/**
+ * @brief Callback to be passed to linked_list_for_each.
+ *
+ * Executes a callback for each variable requirement.
+ *
+ * @param element linked_list_remove_on_condition passes the current list element to this parameter. In our case, it is
+ * the VariableRequirement instance.
+ * @param user_data Function pointer to a callback to execute for each variable requirement.
+ */
 static void linked_list_for_each_cb(void *element, void *user_data)
 {
     VariableRequirementListForEachCb cb = (VariableRequirementListForEachCb)user_data;
     VariableRequirement variable_requirement = (VariableRequirement)element;
+    EAS_ASSERT(cb);
+
     cb(variable_requirement);
 }
 
+/**
+ * @brief Callback to be passed to linked_list_remove_on_condition.
+ *
+ * @param element linked_list_remove_on_condition passes the current list element to this parameter. In our case, it is
+ * the VariableRequirement instance.
+ * @param user_data Pointer to alert id - for all variable requirements with this alert id, this function needs to
+ * return true.
+ *
+ * @return true @p element has alert id equal to alert id passed as @p user_data.
+ * @return false @p element has alert id that is NOT equal to alert id passed as @p user_data.
+ */
 static bool requirement_has_alert_id(void *element, void *user_data)
 {
     VariableRequirement variable_requirement = (VariableRequirement)element;
     uint8_t *alert_id = (uint8_t *)user_data;
+    EAS_ASSERT(alert_id);
 
     return (variable_requirement_get_alert_id(variable_requirement) == (*alert_id));
 }
