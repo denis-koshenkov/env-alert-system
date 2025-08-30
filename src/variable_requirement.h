@@ -9,6 +9,8 @@ extern "C"
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "variable_requirement_defs.h"
+
 /// Variable requirement operator.
 typedef enum VariableRequirementOperator {
     /// Greater or equal to.
@@ -137,7 +139,6 @@ typedef enum VariableRequirementOperator {
  * }
  * ```
  */
-typedef struct VariableRequirementStruct *VariableRequirement;
 
 /**
  * @brief Evaluate variable requirement.

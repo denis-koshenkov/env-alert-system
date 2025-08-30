@@ -7,11 +7,13 @@ target_sources(app_test_exec1 PRIVATE
     current_pressure.cpp
     current_humidity.cpp
     current_light_intensity.cpp
+    temperature_requirement_list.cpp
 
     mocks/mock_temperature_value.cpp
     mocks/mock_pressure_value.cpp
     mocks/mock_humidity_value.cpp
     mocks/mock_light_intensity_value.cpp
+    mocks/mock_variable_requirement_list.cpp
 )
 
 target_link_libraries(app_test_exec1 PRIVATE test_common)

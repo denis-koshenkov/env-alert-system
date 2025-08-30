@@ -1,6 +1,7 @@
 #include <stddef.h>
 
 #include "variable_requirement_list.h"
+#include "variable_requirement.h"
 #include "utils/linked_list.h"
 #include "config.h"
 #include "eas_assert.h"

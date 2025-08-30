@@ -6,21 +6,15 @@ extern "C"
 {
 #endif
 
-#include "variable_requirement.h"
+#include <stdint.h>
+
+#include "variable_requirement_list_defs.h"
+#include "variable_requirement_defs.h"
 
 /**
  * @brief Variable requirement list.
  */
 typedef struct VariableRequirementListStruct *VariableRequirementList;
-
-/**
- * @brief Defines callback type to execute for each element as a part of @ref variable_requirement_list_for_each.
- *
- * @ref variable_requirement_list_for_each executes this callback for each variable requirement present in the list.
- *
- * @param variable_requirement Variable requirement instance for which the callback is being executed.
- */
-typedef void (*VariableRequirementListForEachCb)(VariableRequirement variable_requirement);
 
 /**
  * @brief Create a variable requirement list instance.
