@@ -18,6 +18,8 @@ void variable_requirement_list_add(VariableRequirementList self, VariableRequire
 
 void variable_requirement_list_for_each(VariableRequirementList self, VariableRequirementListForEachCb cb);
 
+void variable_requirement_list_remove_all_for_alert(VariableRequirementList self, uint8_t alert_id);
+
 #ifdef __cplusplus
 }
 #endif

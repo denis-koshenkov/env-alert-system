@@ -42,3 +42,7 @@ void variable_requirement_list_for_each(VariableRequirementList self, VariableRe
 {
     linked_list_for_each(self->linked_list, linked_list_for_each_cb, cb);
 }
+
+void variable_requirement_list_remove_all_for_alert(VariableRequirementList self, uint8_t alert_id)
+{
+}

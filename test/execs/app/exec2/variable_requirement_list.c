@@ -133,3 +133,12 @@ TEST_C(VariableRequirementList, ListContainsThreeVarsWhenThreeVarsAdded)
 
     CHECK_C(expected_requirements_match_actual());
 }
+
+TEST_C(VariableRequirementList, RemoveAllVarsOfAlertEmptyList)
+{
+    VariableRequirementList list = variable_requirement_list_create();
+    uint8_t alert_id = 0;
+    variable_requirement_list_remove_all_for_alert(list, alert_id);
+
+    CHECK_C(expected_requirements_match_actual());
+}
