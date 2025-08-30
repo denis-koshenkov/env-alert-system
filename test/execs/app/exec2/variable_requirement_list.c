@@ -1,5 +1,6 @@
 #include "CppUTest/TestHarness_c.h"
 #include "CppUTestExt/MockSupport_c.h"
+#include "CppUTestExt/TestAssertPlugin_c.h"
 
 #include "variable_requirement_list.h"
 /* We test with adding actual variable requirements to the list, so this header is needed because we need to create
@@ -321,4 +322,34 @@ TEST_C(VariableRequirementList, RemoveAllVarsOfAlertRemovesOnlyReqsWithMatchingA
     /* Verify */
     variable_requirement_list_for_each(list, for_each_cb_expected_requirements);
     CHECK_C(expected_requirements_match_actual());
+}
+
+TEST_C(VariableRequirementList, AddFiresAssertIfListIsNull)
+{
+    TEST_ASSERT_PLUGIN_C_EXPECT_ASSERTION("self", "variable_requirement_list_add");
+    variable_requirement_list_add(NULL, expected_requirements[0].requirement);
+}
+
+TEST_C(VariableRequirementList, ForEachFiresAssertIfListIsNull)
+{
+    TEST_ASSERT_PLUGIN_C_EXPECT_ASSERTION("self", "variable_requirement_list_for_each");
+    variable_requirement_list_for_each(NULL, for_each_cb_expected_requirements);
+}
+
+TEST_C(VariableRequirementList, ForEachFiresAssertIfCbIsNull)
+{
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_alloc")
+        ->andReturnPointerValue(expected_requirements[0].linked_list_node_buffer);
+    TEST_ASSERT_PLUGIN_C_EXPECT_ASSERTION("cb", "variable_requirement_list_for_each");
+
+    VariableRequirementList list = variable_requirement_list_create();
+    variable_requirement_list_add(list, expected_requirements[0].requirement);
+    variable_requirement_list_for_each(list, NULL);
+}
+
+TEST_C(VariableRequirementList, RemoveAllForAlertFiresAssertIfListIsNull)
+{
+    TEST_ASSERT_PLUGIN_C_EXPECT_ASSERTION("self", "variable_requirement_list_remove_all_for_alert");
+    variable_requirement_list_remove_all_for_alert(NULL, 0);
 }

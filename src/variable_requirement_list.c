@@ -43,15 +43,19 @@ VariableRequirementList variable_requirement_list_create()
 
 void variable_requirement_list_add(VariableRequirementList self, VariableRequirement variable_requirement)
 {
+    EAS_ASSERT(self);
     linked_list_add(self->linked_list, variable_requirement);
 }
 
 void variable_requirement_list_for_each(VariableRequirementList self, VariableRequirementListForEachCb cb)
 {
+    EAS_ASSERT(self);
+    EAS_ASSERT(cb);
     linked_list_for_each(self->linked_list, linked_list_for_each_cb, cb);
 }
 
 void variable_requirement_list_remove_all_for_alert(VariableRequirementList self, uint8_t alert_id)
 {
+    EAS_ASSERT(self);
     linked_list_remove_on_condition(self->linked_list, requirement_has_alert_id, &alert_id);
 }
