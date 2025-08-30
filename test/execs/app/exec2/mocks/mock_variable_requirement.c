@@ -78,6 +78,8 @@ VariableRequirement mock_variable_requirement_create(bool pass_null_instance_to_
     }
 
     variable_requirement_create((VariableRequirement)self, vtable, operator, 0);
+
+    self->evaluate_result = false;
     return (VariableRequirement)self;
 }
 
