@@ -12,6 +12,7 @@
 struct AlertConditionStruct {
     VariableRequirement variable_requirement_0;
     VariableRequirement variable_requirement_1;
+    bool is_operator_and;
 };
 
 static struct AlertConditionStruct instances[CONFIG_ALERT_CONDITION_MAX_NUM_INSTANCES];
@@ -25,6 +26,7 @@ AlertCondition alert_condition_create()
 
     instance->variable_requirement_0 = NULL;
     instance->variable_requirement_1 = NULL;
+    instance->is_operator_and = false;
     return instance;
 }
 
@@ -35,6 +37,11 @@ void alert_condition_add_variable_requirement(AlertCondition self, VariableRequi
     } else {
         self->variable_requirement_1 = variable_requirement;
     }
+}
+
+void alert_condition_start_new_ored_requirement(AlertCondition self)
+{
+    self->is_operator_and = true;
 }
 
 bool alert_condition_evaluate(AlertCondition self)
@@ -48,6 +55,10 @@ bool alert_condition_evaluate(AlertCondition self)
         /* Two requirements */
         bool result_0 = variable_requirement_evaluator_evaluate(self->variable_requirement_0);
         bool result_1 = variable_requirement_evaluator_evaluate(self->variable_requirement_1);
-        return (result_0 || result_1);
+        if (self->is_operator_and) {
+            return (result_0 && result_1);
+        } else {
+            return (result_0 || result_1);
+        }
     }
 }

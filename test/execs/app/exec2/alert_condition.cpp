@@ -112,3 +112,59 @@ TEST(AlertCondition, EvaluateReturnsTrue2ReqsTrueOrTrue)
 
     CHECK_EQUAL(true, actual_evaluate_result);
 }
+
+TEST(AlertCondition, EvaluateReturnsFalse2ReqsFalseAndFalse)
+{
+    fake_variable_requirement_set_evaluate_result(variable_requirements[0], false);
+    fake_variable_requirement_set_evaluate_result(variable_requirements[1], false);
+
+    AlertCondition alert_condition = alert_condition_create();
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
+    alert_condition_start_new_ored_requirement(alert_condition);
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[1]);
+    bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
+
+    CHECK_EQUAL(false, actual_evaluate_result);
+}
+
+TEST(AlertCondition, EvaluateReturnsFalse2ReqsFalseAndTrue)
+{
+    fake_variable_requirement_set_evaluate_result(variable_requirements[0], false);
+    fake_variable_requirement_set_evaluate_result(variable_requirements[1], true);
+
+    AlertCondition alert_condition = alert_condition_create();
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
+    alert_condition_start_new_ored_requirement(alert_condition);
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[1]);
+    bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
+
+    CHECK_EQUAL(false, actual_evaluate_result);
+}
+
+TEST(AlertCondition, EvaluateReturnsFalse2ReqsTrueAndFalse)
+{
+    fake_variable_requirement_set_evaluate_result(variable_requirements[0], true);
+    fake_variable_requirement_set_evaluate_result(variable_requirements[1], false);
+
+    AlertCondition alert_condition = alert_condition_create();
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
+    alert_condition_start_new_ored_requirement(alert_condition);
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[1]);
+    bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
+
+    CHECK_EQUAL(false, actual_evaluate_result);
+}
+
+TEST(AlertCondition, EvaluateReturnsTrue2ReqsTrueAndTrue)
+{
+    fake_variable_requirement_set_evaluate_result(variable_requirements[0], true);
+    fake_variable_requirement_set_evaluate_result(variable_requirements[1], true);
+
+    AlertCondition alert_condition = alert_condition_create();
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
+    alert_condition_start_new_ored_requirement(alert_condition);
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[1]);
+    bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
+
+    CHECK_EQUAL(true, actual_evaluate_result);
+}
