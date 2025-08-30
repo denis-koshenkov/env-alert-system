@@ -9,7 +9,7 @@
 #include "fake_linked_list_node_allocator.h"
 #include "eas_assert.h"
 
-#define TEST_VARIABLE_REQUIREMENT_LIST_MAX_NUM_EXPECTED_REQUIREMENTS 4
+#define TEST_VARIABLE_REQUIREMENT_LIST_MAX_NUM_EXPECTED_REQUIREMENTS 7
 
 typedef struct ExpectedVariableRequirement {
     void *linked_list_node_buffer;
@@ -19,7 +19,7 @@ typedef struct ExpectedVariableRequirement {
 } ExpectedVariableRequirement;
 
 static const uint8_t alert_ids_of_expected_requirements[TEST_VARIABLE_REQUIREMENT_LIST_MAX_NUM_EXPECTED_REQUIREMENTS] =
-    {2, 1, 1, 1};
+    {2, 1, 1, 1, 0, 3, 4};
 static ExpectedVariableRequirement expected_requirements[TEST_VARIABLE_REQUIREMENT_LIST_MAX_NUM_EXPECTED_REQUIREMENTS];
 
 static void expect_requirement_in_list(size_t index)
@@ -155,6 +155,7 @@ TEST_C(VariableRequirementList, RemoveAllVarsOfAlertRemovesTheOnlyRequirement)
         ->expectOneCall("linked_list_node_allocator_free")
         ->withPointerParameters("linked_list_node", expected_requirements[0].linked_list_node_buffer);
     uint8_t alert_id = 2;
+    EAS_ASSERT((alert_id == alert_ids_of_expected_requirements[0]));
     /* Not expecting any requirements to be in the list, because variable_requirement_list_remove_all_for_alert should
      * remove the only requirement we add. */
 
@@ -175,6 +176,7 @@ TEST_C(VariableRequirementList, RemoveAllVarsOfAlertKeepsTheOnlyRequirement)
      * variable_requirement_list_remove_all_for_alert for alert id 1 */
     expect_requirement_in_list(0);
     uint8_t alert_id = 1;
+    EAS_ASSERT((alert_id != alert_ids_of_expected_requirements[0]));
 
     VariableRequirementList list = variable_requirement_list_create();
     variable_requirement_list_add(list, expected_requirements[0].requirement);
@@ -206,6 +208,9 @@ TEST_C(VariableRequirementList, RemoveAllVarsOfAlertRemovesAllRequirements)
         ->withPointerParameters("linked_list_node", expected_requirements[3].linked_list_node_buffer);
 
     uint8_t alert_id = 1;
+    EAS_ASSERT((alert_id == alert_ids_of_expected_requirements[1]));
+    EAS_ASSERT((alert_id == alert_ids_of_expected_requirements[2]));
+    EAS_ASSERT((alert_id == alert_ids_of_expected_requirements[3]));
     /* Not expecting any requirements to be in the list, because variable_requirement_list_remove_all_for_alert should
      * remove all requirements that we add. */
 
@@ -213,6 +218,43 @@ TEST_C(VariableRequirementList, RemoveAllVarsOfAlertRemovesAllRequirements)
     variable_requirement_list_add(list, expected_requirements[1].requirement);
     variable_requirement_list_add(list, expected_requirements[2].requirement);
     variable_requirement_list_add(list, expected_requirements[3].requirement);
+
+    variable_requirement_list_remove_all_for_alert(list, alert_id);
+
+    variable_requirement_list_for_each(list, for_each_cb_expected_requirements);
+    CHECK_C(expected_requirements_match_actual());
+}
+
+TEST_C(VariableRequirementList, RemoveAllVarsOfAlertKeepsAllRequirements)
+{
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_alloc")
+        ->andReturnPointerValue(expected_requirements[0].linked_list_node_buffer);
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_alloc")
+        ->andReturnPointerValue(expected_requirements[4].linked_list_node_buffer);
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_alloc")
+        ->andReturnPointerValue(expected_requirements[5].linked_list_node_buffer);
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_alloc")
+        ->andReturnPointerValue(expected_requirements[6].linked_list_node_buffer);
+    uint8_t alert_id = 1;
+    EAS_ASSERT((alert_id != alert_ids_of_expected_requirements[0]));
+    EAS_ASSERT((alert_id != alert_ids_of_expected_requirements[4]));
+    EAS_ASSERT((alert_id != alert_ids_of_expected_requirements[5]));
+    EAS_ASSERT((alert_id != alert_ids_of_expected_requirements[6]));
+
+    expect_requirement_in_list(0);
+    expect_requirement_in_list(4);
+    expect_requirement_in_list(5);
+    expect_requirement_in_list(6);
+
+    VariableRequirementList list = variable_requirement_list_create();
+    variable_requirement_list_add(list, expected_requirements[0].requirement);
+    variable_requirement_list_add(list, expected_requirements[4].requirement);
+    variable_requirement_list_add(list, expected_requirements[5].requirement);
+    variable_requirement_list_add(list, expected_requirements[6].requirement);
 
     variable_requirement_list_remove_all_for_alert(list, alert_id);
 

@@ -14,3 +14,4 @@ TEST_C_WRAPPER(VariableRequirementList, RemoveAllVarsOfAlertEmptyList);
 TEST_C_WRAPPER(VariableRequirementList, RemoveAllVarsOfAlertRemovesTheOnlyRequirement);
 TEST_C_WRAPPER(VariableRequirementList, RemoveAllVarsOfAlertKeepsTheOnlyRequirement);
 TEST_C_WRAPPER(VariableRequirementList, RemoveAllVarsOfAlertRemovesAllRequirements);
+TEST_C_WRAPPER(VariableRequirementList, RemoveAllVarsOfAlertKeepsAllRequirements);
