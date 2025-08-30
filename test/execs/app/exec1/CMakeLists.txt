@@ -10,6 +10,7 @@ target_sources(app_test_exec1 PRIVATE
     temperature_requirement_list.cpp
     pressure_requirement_list.cpp
     humidity_requirement_list.cpp
+    light_intensity_requirement_list.cpp
 
     mocks/mock_temperature_value.cpp
     mocks/mock_pressure_value.cpp
