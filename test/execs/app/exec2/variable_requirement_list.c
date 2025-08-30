@@ -19,7 +19,7 @@ typedef struct ExpectedVariableRequirement {
 } ExpectedVariableRequirement;
 
 static const uint8_t alert_ids_of_expected_requirements[TEST_VARIABLE_REQUIREMENT_LIST_MAX_NUM_EXPECTED_REQUIREMENTS] =
-    {2, 1, 1, 1, 0, 3, 4};
+    {2, 1, 1, 1, 0, 3, 3};
 static ExpectedVariableRequirement expected_requirements[TEST_VARIABLE_REQUIREMENT_LIST_MAX_NUM_EXPECTED_REQUIREMENTS];
 
 static void expect_requirement_in_list(size_t index)
@@ -258,6 +258,67 @@ TEST_C(VariableRequirementList, RemoveAllVarsOfAlertKeepsAllRequirements)
 
     variable_requirement_list_remove_all_for_alert(list, alert_id);
 
+    variable_requirement_list_for_each(list, for_each_cb_expected_requirements);
+    CHECK_C(expected_requirements_match_actual());
+}
+
+TEST_C(VariableRequirementList, RemoveAllVarsOfAlertRemovesOnlyReqsWithMatchingAlertId)
+{
+    /* Setup */
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_alloc")
+        ->andReturnPointerValue(expected_requirements[0].linked_list_node_buffer);
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_alloc")
+        ->andReturnPointerValue(expected_requirements[5].linked_list_node_buffer);
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_alloc")
+        ->andReturnPointerValue(expected_requirements[1].linked_list_node_buffer);
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_alloc")
+        ->andReturnPointerValue(expected_requirements[2].linked_list_node_buffer);
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_alloc")
+        ->andReturnPointerValue(expected_requirements[3].linked_list_node_buffer);
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_alloc")
+        ->andReturnPointerValue(expected_requirements[4].linked_list_node_buffer);
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_alloc")
+        ->andReturnPointerValue(expected_requirements[6].linked_list_node_buffer);
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_free")
+        ->withPointerParameters("linked_list_node", expected_requirements[5].linked_list_node_buffer);
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_free")
+        ->withPointerParameters("linked_list_node", expected_requirements[6].linked_list_node_buffer);
+    uint8_t alert_id = 3;
+    EAS_ASSERT((alert_id != alert_ids_of_expected_requirements[0]));
+    EAS_ASSERT((alert_id != alert_ids_of_expected_requirements[1]));
+    EAS_ASSERT((alert_id != alert_ids_of_expected_requirements[2]));
+    EAS_ASSERT((alert_id != alert_ids_of_expected_requirements[3]));
+    EAS_ASSERT((alert_id != alert_ids_of_expected_requirements[4]));
+    /* Will remove reqs with indices 5 and 6, because their alert ids are equal to alert_id */
+    EAS_ASSERT((alert_id == alert_ids_of_expected_requirements[5]));
+    EAS_ASSERT((alert_id == alert_ids_of_expected_requirements[6]));
+    expect_requirement_in_list(0);
+    expect_requirement_in_list(1);
+    expect_requirement_in_list(2);
+    expect_requirement_in_list(3);
+    expect_requirement_in_list(4);
+
+    /* Exercise */
+    VariableRequirementList list = variable_requirement_list_create();
+    variable_requirement_list_add(list, expected_requirements[0].requirement);
+    variable_requirement_list_add(list, expected_requirements[5].requirement);
+    variable_requirement_list_add(list, expected_requirements[1].requirement);
+    variable_requirement_list_add(list, expected_requirements[2].requirement);
+    variable_requirement_list_add(list, expected_requirements[3].requirement);
+    variable_requirement_list_add(list, expected_requirements[4].requirement);
+    variable_requirement_list_add(list, expected_requirements[6].requirement);
+    variable_requirement_list_remove_all_for_alert(list, alert_id);
+
+    /* Verify */
     variable_requirement_list_for_each(list, for_each_cb_expected_requirements);
     CHECK_C(expected_requirements_match_actual());
 }
