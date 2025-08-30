@@ -18,6 +18,8 @@ typedef struct ExpectedVariableRequirement {
     bool is_expected;
 } ExpectedVariableRequirement;
 
+static const uint8_t alert_ids_of_expected_requirements[TEST_VARIABLE_REQUIREMENT_LIST_MAX_NUM_EXPECTED_REQUIREMENTS] =
+    {2, 0, 0};
 static ExpectedVariableRequirement expected_requirements[TEST_VARIABLE_REQUIREMENT_LIST_MAX_NUM_EXPECTED_REQUIREMENTS];
 
 static void expect_requirement_in_list(size_t index)
@@ -70,7 +72,8 @@ TEST_GROUP_C_SETUP(VariableRequirementList)
         mock_c()
             ->expectOneCall("variable_requirement_allocator_alloc")
             ->andReturnPointerValue(expected_requirements[i].requirement_buffer);
-        expected_requirements[i].requirement = pressure_requirement_create(0, VARIABLE_REQUIREMENT_OPERATOR_GEQ, 0);
+        expected_requirements[i].requirement =
+            pressure_requirement_create(alert_ids_of_expected_requirements[i], VARIABLE_REQUIREMENT_OPERATOR_GEQ, 0);
         expected_requirements[i].is_expected = false;
     }
 }
@@ -90,8 +93,8 @@ TEST_GROUP_C_TEARDOWN(VariableRequirementList)
 TEST_C(VariableRequirementList, ListIsEmptyAfterCreate)
 {
     VariableRequirementList list = variable_requirement_list_create();
-    variable_requirement_list_for_each(list, for_each_cb_expected_requirements);
 
+    variable_requirement_list_for_each(list, for_each_cb_expected_requirements);
     CHECK_C(expected_requirements_match_actual());
 }
 
@@ -104,8 +107,8 @@ TEST_C(VariableRequirementList, ListContainsOneVarWhenOneVarAdded)
 
     VariableRequirementList list = variable_requirement_list_create();
     variable_requirement_list_add(list, expected_requirements[0].requirement);
-    variable_requirement_list_for_each(list, for_each_cb_expected_requirements);
 
+    variable_requirement_list_for_each(list, for_each_cb_expected_requirements);
     CHECK_C(expected_requirements_match_actual());
 }
 
@@ -130,7 +133,6 @@ TEST_C(VariableRequirementList, ListContainsThreeVarsWhenThreeVarsAdded)
     variable_requirement_list_add(list, expected_requirements[2].requirement);
 
     variable_requirement_list_for_each(list, for_each_cb_expected_requirements);
-
     CHECK_C(expected_requirements_match_actual());
 }
 
@@ -140,5 +142,26 @@ TEST_C(VariableRequirementList, RemoveAllVarsOfAlertEmptyList)
     uint8_t alert_id = 0;
     variable_requirement_list_remove_all_for_alert(list, alert_id);
 
+    variable_requirement_list_for_each(list, for_each_cb_expected_requirements);
+    CHECK_C(expected_requirements_match_actual());
+}
+
+TEST_C(VariableRequirementList, RemoveAllVarsOfAlertRemovesTheOnlyRequirement)
+{
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_alloc")
+        ->andReturnPointerValue(expected_requirements[0].linked_list_node_buffer);
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_free")
+        ->withPointerParameters("linked_list_node", expected_requirements[0].linked_list_node_buffer);
+    uint8_t alert_id = 2;
+    /* Not expecting any requirements to be in the list, because variable_requirement_list_remove_all_for_alert should
+     * remove the only requirement we add. */
+
+    VariableRequirementList list = variable_requirement_list_create();
+    variable_requirement_list_add(list, expected_requirements[0].requirement);
+    variable_requirement_list_remove_all_for_alert(list, alert_id);
+
+    variable_requirement_list_for_each(list, for_each_cb_expected_requirements);
     CHECK_C(expected_requirements_match_actual());
 }

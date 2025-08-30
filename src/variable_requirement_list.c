@@ -23,6 +23,11 @@ static void linked_list_for_each_cb(void *element, void *user_data)
     cb(variable_requirement);
 }
 
+static bool requirement_has_alert_id(void *element)
+{
+    return true;
+}
+
 VariableRequirementList variable_requirement_list_create()
 {
     EAS_ASSERT(instance_idx < CONFIG_VARIABLE_REQUIREMENT_LIST_MAX_NUM_INSTANCES);
@@ -45,4 +50,5 @@ void variable_requirement_list_for_each(VariableRequirementList self, VariableRe
 
 void variable_requirement_list_remove_all_for_alert(VariableRequirementList self, uint8_t alert_id)
 {
+    linked_list_remove_on_condition(self->linked_list, requirement_has_alert_id);
 }
