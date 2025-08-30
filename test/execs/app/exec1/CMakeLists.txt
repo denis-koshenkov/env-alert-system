@@ -8,6 +8,7 @@ target_sources(app_test_exec1 PRIVATE
     current_humidity.cpp
     current_light_intensity.cpp
     temperature_requirement_list.cpp
+    pressure_requirement_list.cpp
 
     mocks/mock_temperature_value.cpp
     mocks/mock_pressure_value.cpp

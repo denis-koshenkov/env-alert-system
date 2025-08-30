@@ -17,7 +17,7 @@ extern "C"
 /**
  * @brief Add a temperature requirement to the list.
  *
- * @param variable_requirement Temperature requirement to add to the list.
+ * @param temperature_requirement Temperature requirement to add to the list.
  */
 void temperature_requirement_list_add(VariableRequirement temperature_requirement);
 
@@ -34,7 +34,7 @@ void temperature_requirement_list_for_each(VariableRequirementListForEachCb cb);
 /**
  * @brief Remove all temperature requirements from the list that belong to a specific alert.
  *
- * @param alert_id All variable requirements that belong to the alert with this id are removed from the list.
+ * @param alert_id All temperature requirements that belong to the alert with this id are removed from the list.
  */
 void temperature_requirement_list_remove_all_for_alert(uint8_t alert_id);
 
