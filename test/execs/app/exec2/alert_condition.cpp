@@ -23,7 +23,7 @@ TEST_GROUP(AlertCondition)
 
 TEST(AlertCondition, EvaluateAssertsNoVariableRequirementsAdded)
 {
-    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("0", "alert_condition_evaluate");
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self->variable_requirement", "alert_condition_evaluate");
 
     AlertCondition alert_condition = alert_condition_create();
     bool unused = alert_condition_evaluate(alert_condition);
@@ -32,6 +32,18 @@ TEST(AlertCondition, EvaluateAssertsNoVariableRequirementsAdded)
 TEST(AlertCondition, EvaluateTrue1ReqTrue)
 {
     bool expected_evaluate_result = true;
+    fake_variable_requirement_set_evaluate_result(variable_requirement, expected_evaluate_result);
+
+    AlertCondition alert_condition = alert_condition_create();
+    alert_condition_add_variable_requirement(alert_condition, variable_requirement);
+    bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
+
+    CHECK_EQUAL(expected_evaluate_result, actual_evaluate_result);
+}
+
+TEST(AlertCondition, EvaluateFalse1ReqFalse)
+{
+    bool expected_evaluate_result = false;
     fake_variable_requirement_set_evaluate_result(variable_requirement, expected_evaluate_result);
 
     AlertCondition alert_condition = alert_condition_create();

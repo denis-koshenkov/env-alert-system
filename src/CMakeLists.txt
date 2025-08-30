@@ -24,6 +24,7 @@ target_sources(eas INTERFACE
     humidity_requirement_list.c
     light_intensity_requirement_list.c
     alert_condition.c
+    variable_requirement_evaluator.c
 )
 
 target_include_directories(eas INTERFACE
