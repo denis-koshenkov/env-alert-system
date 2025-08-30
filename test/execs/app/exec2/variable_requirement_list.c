@@ -165,3 +165,21 @@ TEST_C(VariableRequirementList, RemoveAllVarsOfAlertRemovesTheOnlyRequirement)
     variable_requirement_list_for_each(list, for_each_cb_expected_requirements);
     CHECK_C(expected_requirements_match_actual());
 }
+
+TEST_C(VariableRequirementList, RemoveAllVarsOfAlertKeepsTheOnlyRequirement)
+{
+    mock_c()
+        ->expectOneCall("linked_list_node_allocator_alloc")
+        ->andReturnPointerValue(expected_requirements[0].linked_list_node_buffer);
+    /* Expecting the requirement to still be in the list, because it has alert id 2, but we call
+     * variable_requirement_list_remove_all_for_alert for alert id 1 */
+    expect_requirement_in_list(0);
+    uint8_t alert_id = 1;
+
+    VariableRequirementList list = variable_requirement_list_create();
+    variable_requirement_list_add(list, expected_requirements[0].requirement);
+    variable_requirement_list_remove_all_for_alert(list, alert_id);
+
+    variable_requirement_list_for_each(list, for_each_cb_expected_requirements);
+    CHECK_C(expected_requirements_match_actual());
+}

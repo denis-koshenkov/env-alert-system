@@ -12,3 +12,4 @@ TEST_C_WRAPPER(VariableRequirementList, ListContainsOneVarWhenOneVarAdded);
 TEST_C_WRAPPER(VariableRequirementList, ListContainsThreeVarsWhenThreeVarsAdded);
 TEST_C_WRAPPER(VariableRequirementList, RemoveAllVarsOfAlertEmptyList);
 TEST_C_WRAPPER(VariableRequirementList, RemoveAllVarsOfAlertRemovesTheOnlyRequirement);
+TEST_C_WRAPPER(VariableRequirementList, RemoveAllVarsOfAlertKeepsTheOnlyRequirement);

@@ -45,7 +45,7 @@ static void for_each_cb_id_elements(void *element, void *user_data)
     actual_id_element_detected_in_list(id_element->id);
 }
 
-static bool condition_id_element_cb(void *element)
+static bool condition_id_element_cb(void *element, void *user_data)
 {
     LinkedListIdElement *id_element = (LinkedListIdElement *)element;
     return id_element->condition_evaluation_result;
@@ -55,6 +55,13 @@ static void *actual_user_data = 0;
 static void save_actual_user_data_cb(void *element, void *user_data)
 {
     actual_user_data = user_data;
+}
+
+static void *remove_on_condition_actual_user_data = 0;
+static bool remove_on_condition_save_use_data_cb(void *element, void *user_data)
+{
+    remove_on_condition_actual_user_data = user_data;
+    return false;
 }
 
 static LinkedListNode *id_element_0_node;
@@ -116,7 +123,7 @@ TEST(LinkedList, ForEachRaisesAssertIfCbIsNUll)
 TEST(LinkedList, RemoveOnConditionRaisesAssertIfListIsNUll)
 {
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "linked_list_remove_on_condition");
-    linked_list_remove_on_condition(NULL, condition_id_element_cb);
+    linked_list_remove_on_condition(NULL, condition_id_element_cb, NULL);
 }
 
 TEST(LinkedList, RemoveOnConditionRaisesAssertIfCbIsNUll)
@@ -127,7 +134,7 @@ TEST(LinkedList, RemoveOnConditionRaisesAssertIfCbIsNUll)
 
     LinkedList linked_list = linked_list_create();
     linked_list_add(linked_list, &id_element_0);
-    linked_list_remove_on_condition(linked_list, NULL);
+    linked_list_remove_on_condition(linked_list, NULL, NULL);
 }
 
 TEST(LinkedList, AddFiresAssertIfFailedToAllocateNode)
@@ -197,7 +204,7 @@ TEST(LinkedList, ForEachPassesUserDataToCallback)
 TEST(LinkedList, RemoveOnConditionEmptyListStillEmpty)
 {
     LinkedList linked_list = linked_list_create();
-    linked_list_remove_on_condition(linked_list, condition_id_element_cb);
+    linked_list_remove_on_condition(linked_list, condition_id_element_cb, NULL);
     CHECK_TRUE(expected_id_elements_match_actual());
 }
 
@@ -211,7 +218,7 @@ TEST(LinkedList, RemoveOnConditionDoesNotRemoveElementConditionFalse)
     /* Exercise */
     LinkedList linked_list = linked_list_create();
     linked_list_add(linked_list, &id_element_0);
-    linked_list_remove_on_condition(linked_list, condition_id_element_cb);
+    linked_list_remove_on_condition(linked_list, condition_id_element_cb, NULL);
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
@@ -228,7 +235,7 @@ TEST(LinkedList, RemoveOnConditionRemovesElementConditionTrue)
     /* Exercise */
     LinkedList linked_list = linked_list_create();
     linked_list_add(linked_list, &id_element_0);
-    linked_list_remove_on_condition(linked_list, condition_id_element_cb);
+    linked_list_remove_on_condition(linked_list, condition_id_element_cb, NULL);
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
@@ -253,7 +260,7 @@ TEST(LinkedList, RemoveOnConditionRemovesAllElementsConditionTrue)
     linked_list_add(linked_list, &id_element_0);
     linked_list_add(linked_list, &id_element_1);
     linked_list_add(linked_list, &id_element_2);
-    linked_list_remove_on_condition(linked_list, condition_id_element_cb);
+    linked_list_remove_on_condition(linked_list, condition_id_element_cb, NULL);
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
@@ -278,7 +285,7 @@ TEST(LinkedList, RemoveOnConditionKeepsAllElementsConditionFalse)
     linked_list_add(linked_list, &id_element_0);
     linked_list_add(linked_list, &id_element_1);
     linked_list_add(linked_list, &id_element_2);
-    linked_list_remove_on_condition(linked_list, condition_id_element_cb);
+    linked_list_remove_on_condition(linked_list, condition_id_element_cb, NULL);
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
@@ -312,7 +319,7 @@ TEST(LinkedList, RemoveOnConditionRemovesElementsWithConditionTrueKeepsElementsW
     linked_list_add(linked_list, &id_element_2);
     linked_list_add(linked_list, &id_element_3);
     linked_list_add(linked_list, &id_element_4);
-    linked_list_remove_on_condition(linked_list, condition_id_element_cb);
+    linked_list_remove_on_condition(linked_list, condition_id_element_cb, NULL);
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
@@ -336,7 +343,7 @@ TEST(LinkedList, RemoveOnConditionRemovesOnlyFirstElement)
     linked_list_add(linked_list, &id_element_0);
     linked_list_add(linked_list, &id_element_1);
     linked_list_add(linked_list, &id_element_2);
-    linked_list_remove_on_condition(linked_list, condition_id_element_cb);
+    linked_list_remove_on_condition(linked_list, condition_id_element_cb, NULL);
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
@@ -360,7 +367,7 @@ TEST(LinkedList, RemoveOnConditionRemovesOnlyLastElement)
     linked_list_add(linked_list, &id_element_0);
     linked_list_add(linked_list, &id_element_1);
     linked_list_add(linked_list, &id_element_2);
-    linked_list_remove_on_condition(linked_list, condition_id_element_cb);
+    linked_list_remove_on_condition(linked_list, condition_id_element_cb, NULL);
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
@@ -392,9 +399,22 @@ TEST(LinkedList, RemoveOnConditionRemovesOnlyMiddleElement)
     linked_list_add(linked_list, &id_element_4);
     linked_list_add(linked_list, &id_element_1);
     linked_list_add(linked_list, &id_element_3);
-    linked_list_remove_on_condition(linked_list, condition_id_element_cb);
+    linked_list_remove_on_condition(linked_list, condition_id_element_cb, NULL);
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
     CHECK_TRUE(expected_id_elements_match_actual());
+}
+
+TEST(LinkedList, RemoveOnConditionPassesUserDataToCallback)
+{
+    LinkedListIdElement id_element_0 = {.id = 0};
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+
+    LinkedList linked_list = linked_list_create();
+    uint8_t expected_user_data = 24;
+    linked_list_add(linked_list, &id_element_0);
+    linked_list_remove_on_condition(linked_list, remove_on_condition_save_use_data_cb, &expected_user_data);
+
+    CHECK_EQUAL(&expected_user_data, remove_on_condition_actual_user_data);
 }

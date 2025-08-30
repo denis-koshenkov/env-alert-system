@@ -50,7 +50,7 @@ void linked_list_for_each(LinkedList self, LinkedListForEachCb cb, void *user_da
     }
 }
 
-void linked_list_remove_on_condition(LinkedList self, LinkedListConditionCb cb)
+void linked_list_remove_on_condition(LinkedList self, LinkedListConditionCb cb, void *user_data)
 {
     EAS_ASSERT(self);
     EAS_ASSERT(cb);
@@ -58,7 +58,7 @@ void linked_list_remove_on_condition(LinkedList self, LinkedListConditionCb cb)
     LinkedListNode **prev_node_next = &(self->head);
     LinkedListNode *node = self->head;
     while (node != NULL) {
-        if (cb(node->element)) {
+        if (cb(node->element, user_data)) {
             *prev_node_next = node->next;
             LinkedListNode *node_to_free = node;
             node = node->next;

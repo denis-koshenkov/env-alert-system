@@ -32,11 +32,13 @@ typedef void (*LinkedListForEachCb)(void *element, void *user_data);
  *
  * @param element Element is passed to the callback as a parameter. This is useful when the condition depends on some
  * data that is stored as a part of the element.
+ * @param user_data User data that is passed as a parameter to @ref linked_list_remove_on_condition. This is how the
+ * caller of @ref linked_list_remove_on_condition can pass data to the callback implementation.
  *
  * @return true The element will be removed from the list.
  * @return false The element will be kept in the list.
  */
-typedef bool (*LinkedListConditionCb)(void *element);
+typedef bool (*LinkedListConditionCb)(void *element, void *user_data);
 
 /**
  * @brief Create a linked list instance.
@@ -74,11 +76,12 @@ void linked_list_for_each(LinkedList self, LinkedListForEachCb cb, void *user_da
  * @param self Linked list instance returned by @ref linked_list_create.
  * @param cb This callback is called for each element in the list. If the callback for the element returns true, then
  * the element is removed from the list. If the callback for the element returns false, the element is kept in the list.
+ * @param user_data User data to pass to the callback. Can be NULL.
  *
  * @note Fires an assert if @p cb is NULL. Calling this function with @p cb equal to NULL would be equivalent to not
  * calling this function at all.
  */
-void linked_list_remove_on_condition(LinkedList self, LinkedListConditionCb cb);
+void linked_list_remove_on_condition(LinkedList self, LinkedListConditionCb cb, void *user_data);
 
 #ifdef __cplusplus
 }

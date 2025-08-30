@@ -23,9 +23,12 @@ static void linked_list_for_each_cb(void *element, void *user_data)
     cb(variable_requirement);
 }
 
-static bool requirement_has_alert_id(void *element)
+static bool requirement_has_alert_id(void *element, void *user_data)
 {
-    return true;
+    VariableRequirement variable_requirement = (VariableRequirement)element;
+    uint8_t *alert_id = (uint8_t *)user_data;
+
+    return (variable_requirement_get_alert_id(variable_requirement) == (*alert_id));
 }
 
 VariableRequirementList variable_requirement_list_create()
@@ -50,5 +53,5 @@ void variable_requirement_list_for_each(VariableRequirementList self, VariableRe
 
 void variable_requirement_list_remove_all_for_alert(VariableRequirementList self, uint8_t alert_id)
 {
-    linked_list_remove_on_condition(self->linked_list, requirement_has_alert_id);
+    linked_list_remove_on_condition(self->linked_list, requirement_has_alert_id, &alert_id);
 }
