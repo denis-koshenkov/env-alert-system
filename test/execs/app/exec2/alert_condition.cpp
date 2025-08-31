@@ -639,3 +639,35 @@ TEST(AlertCondition, ForEachMaxNumOredReqs)
 
     for_each_verify(CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS);
 }
+
+TEST(AlertCondition, ForEachMaxNumAndedReqs)
+{
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >=
+               CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS);
+
+    for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
+        alert_condition_add_variable_requirement(alert_condition, variable_requirements[i]);
+        alert_condition_start_new_ored_requirement(alert_condition);
+    }
+    alert_condition_for_each(alert_condition, for_each_cb);
+
+    for_each_verify(CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS);
+}
+
+TEST(AlertCondition, ForEachMixAndOr)
+{
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >= 7);
+
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
+    alert_condition_start_new_ored_requirement(alert_condition);
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[1]);
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[2]);
+    alert_condition_start_new_ored_requirement(alert_condition);
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[3]);
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[4]);
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[5]);
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[6]);
+    alert_condition_for_each(alert_condition, for_each_cb);
+
+    for_each_verify(7);
+}
