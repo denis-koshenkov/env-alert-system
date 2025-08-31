@@ -12,6 +12,8 @@ extern "C"
 
 typedef struct AlertConditionStruct *AlertCondition;
 
+typedef void (*AlertConditionForEachCb)(VariableRequirement variable_requirement);
+
 AlertCondition alert_condition_create();
 
 void alert_condition_add_variable_requirement(AlertCondition self, VariableRequirement variable_requirement);
@@ -19,6 +21,8 @@ void alert_condition_add_variable_requirement(AlertCondition self, VariableRequi
 void alert_condition_start_new_ored_requirement(AlertCondition self);
 
 bool alert_condition_evaluate(AlertCondition self);
+
+void alert_condition_for_each(AlertCondition self, AlertConditionForEachCb cb);
 
 void alert_condition_reset(AlertCondition self);
 

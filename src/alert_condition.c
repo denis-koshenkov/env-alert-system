@@ -164,6 +164,13 @@ bool alert_condition_evaluate(AlertCondition self)
     return true;
 }
 
+void alert_condition_for_each(AlertCondition self, AlertConditionForEachCb cb)
+{
+    if (self->num_requirements > 0) {
+        cb(self->variable_requirements[0]);
+    }
+}
+
 void alert_condition_reset(AlertCondition self)
 {
     self->num_items_in_reqs_array = 0;
