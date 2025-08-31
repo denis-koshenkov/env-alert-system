@@ -9,7 +9,7 @@
 #define CONFIG_LIGHT_INTENSITY_VALUE_MAX_NUM_INSTANCES 8
 #define CONFIG_LINKED_LIST_MAX_NUM_INSTANCES 27
 #define CONFIG_VARIABLE_REQUIREMENT_LIST_MAX_NUM_INSTANCES 10
-#define CONFIG_ALERT_CONDITION_MAX_NUM_INSTANCES 14
+#define CONFIG_ALERT_CONDITION_MAX_NUM_INSTANCES 16
 
 /** Maximal size of one variable requirement in bytes. We have different variable requirement types - e.g.
  * TemperatureVariableRequirement, PressureVariableRequirement, and so on. Each of these types might have a different
@@ -25,7 +25,7 @@
 #define CONFIG_VARIABLE_REQUIREMENT_MAX_SIZE 24
 
 /** Maximal allowed number of variable requirements in one alert condition. */
-#define CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS 4
+#define CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS 10
 
 /* Configs for port-specific modules */
 
@@ -37,6 +37,6 @@
 
 /** The maximal number of requirements that the fake variable requirement allocator module can allocate at the same
  * time. */
-#define CONFIG_FAKE_VARIABLE_REQUIREMENT_ALLOCATOR_NUM_REQUIREMENTS 7
+#define CONFIG_FAKE_VARIABLE_REQUIREMENT_ALLOCATOR_NUM_REQUIREMENTS 10
 
 #endif

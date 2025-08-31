@@ -3,9 +3,10 @@
 
 #include "alert_condition.h"
 #include "fake_variable_requirement.h"
+#include "eas_assert.h"
 #include "config.h"
 
-#define TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS 4
+#define TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS 10
 
 static VariableRequirement variable_requirements[TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS];
 
@@ -213,4 +214,55 @@ TEST(AlertCondition, EvaluateTrue1ReqTrueStartNewOredReqBeforeAdd)
     bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
 
     CHECK_EQUAL(expected_evaluate_result, actual_evaluate_result);
+}
+
+TEST(AlertCondition, StartNewOredCaledMoreTimesThanNeeded)
+{
+    fake_variable_requirement_set_evaluate_result(variable_requirements[0], true);
+    fake_variable_requirement_set_evaluate_result(variable_requirements[1], false);
+    fake_variable_requirement_set_evaluate_result(variable_requirements[2], true);
+
+    AlertCondition alert_condition = alert_condition_create();
+    alert_condition_start_new_ored_requirement(alert_condition);
+    alert_condition_start_new_ored_requirement(alert_condition);
+    alert_condition_start_new_ored_requirement(alert_condition);
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
+    alert_condition_start_new_ored_requirement(alert_condition);
+    alert_condition_start_new_ored_requirement(alert_condition);
+    alert_condition_start_new_ored_requirement(alert_condition);
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[1]);
+    alert_condition_start_new_ored_requirement(alert_condition);
+    alert_condition_start_new_ored_requirement(alert_condition);
+    alert_condition_start_new_ored_requirement(alert_condition);
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[2]);
+    alert_condition_start_new_ored_requirement(alert_condition);
+    alert_condition_start_new_ored_requirement(alert_condition);
+    alert_condition_start_new_ored_requirement(alert_condition);
+    bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
+
+    CHECK_EQUAL(false, actual_evaluate_result);
+}
+
+TEST(AlertCondition, StartNewOredCaledMoreTimesThanNeededMaxNumVariableReqs)
+{
+    /* Make sure the test contains enough variable requirements to test adding max num variables requirements */
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >=
+               CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS);
+
+    for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
+        fake_variable_requirement_set_evaluate_result(variable_requirements[i], false);
+    }
+
+    AlertCondition alert_condition = alert_condition_create();
+    /* start_new_ored_requirement is unnecessarily called once before the first requirement is added, twice in between
+     * adding subsequent requirements, and once after the last requirement. We are testing that excessive calling of
+     * this function does not affect with the result.*/
+    for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
+        alert_condition_start_new_ored_requirement(alert_condition);
+        alert_condition_add_variable_requirement(alert_condition, variable_requirements[i]);
+        alert_condition_start_new_ored_requirement(alert_condition);
+    }
+    bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
+
+    CHECK_EQUAL(false, actual_evaluate_result);
 }
