@@ -39,6 +39,8 @@ TEST(AlertCondition, EvaluateAssertsNoVariableRequirementsAdded)
 
 TEST(AlertCondition, EvaluateTrue1ReqTrue)
 {
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >= 1);
+
     VariableRequirement variable_requirement = variable_requirements[0];
     bool expected_evaluate_result = true;
     fake_variable_requirement_set_evaluate_result(variable_requirement, expected_evaluate_result);
@@ -52,6 +54,8 @@ TEST(AlertCondition, EvaluateTrue1ReqTrue)
 
 TEST(AlertCondition, EvaluateFalse1ReqFalse)
 {
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >= 1);
+
     VariableRequirement variable_requirement = variable_requirements[0];
     bool expected_evaluate_result = false;
     fake_variable_requirement_set_evaluate_result(variable_requirement, expected_evaluate_result);
@@ -65,6 +69,8 @@ TEST(AlertCondition, EvaluateFalse1ReqFalse)
 
 TEST(AlertCondition, EvaluateReturnsFalse2ReqsFalseOrFalse)
 {
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >= 2);
+
     fake_variable_requirement_set_evaluate_result(variable_requirements[0], false);
     fake_variable_requirement_set_evaluate_result(variable_requirements[1], false);
 
@@ -78,6 +84,8 @@ TEST(AlertCondition, EvaluateReturnsFalse2ReqsFalseOrFalse)
 
 TEST(AlertCondition, EvaluateReturnsTrue2ReqsFalseOrTrue)
 {
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >= 2);
+
     fake_variable_requirement_set_evaluate_result(variable_requirements[0], false);
     fake_variable_requirement_set_evaluate_result(variable_requirements[1], true);
 
@@ -91,6 +99,8 @@ TEST(AlertCondition, EvaluateReturnsTrue2ReqsFalseOrTrue)
 
 TEST(AlertCondition, EvaluateReturnsTrue2ReqsTrueOrFalse)
 {
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >= 2);
+
     fake_variable_requirement_set_evaluate_result(variable_requirements[0], true);
     fake_variable_requirement_set_evaluate_result(variable_requirements[1], false);
 
@@ -104,6 +114,8 @@ TEST(AlertCondition, EvaluateReturnsTrue2ReqsTrueOrFalse)
 
 TEST(AlertCondition, EvaluateReturnsTrue2ReqsTrueOrTrue)
 {
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >= 2);
+
     fake_variable_requirement_set_evaluate_result(variable_requirements[0], true);
     fake_variable_requirement_set_evaluate_result(variable_requirements[1], true);
 
@@ -117,6 +129,8 @@ TEST(AlertCondition, EvaluateReturnsTrue2ReqsTrueOrTrue)
 
 TEST(AlertCondition, EvaluateReturnsFalse2ReqsFalseAndFalse)
 {
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >= 2);
+
     fake_variable_requirement_set_evaluate_result(variable_requirements[0], false);
     fake_variable_requirement_set_evaluate_result(variable_requirements[1], false);
 
@@ -131,6 +145,8 @@ TEST(AlertCondition, EvaluateReturnsFalse2ReqsFalseAndFalse)
 
 TEST(AlertCondition, EvaluateReturnsFalse2ReqsFalseAndTrue)
 {
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >= 2);
+
     fake_variable_requirement_set_evaluate_result(variable_requirements[0], false);
     fake_variable_requirement_set_evaluate_result(variable_requirements[1], true);
 
@@ -145,6 +161,8 @@ TEST(AlertCondition, EvaluateReturnsFalse2ReqsFalseAndTrue)
 
 TEST(AlertCondition, EvaluateReturnsFalse2ReqsTrueAndFalse)
 {
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >= 2);
+
     fake_variable_requirement_set_evaluate_result(variable_requirements[0], true);
     fake_variable_requirement_set_evaluate_result(variable_requirements[1], false);
 
@@ -159,6 +177,8 @@ TEST(AlertCondition, EvaluateReturnsFalse2ReqsTrueAndFalse)
 
 TEST(AlertCondition, EvaluateReturnsTrue2ReqsTrueAndTrue)
 {
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >= 2);
+
     fake_variable_requirement_set_evaluate_result(variable_requirements[0], true);
     fake_variable_requirement_set_evaluate_result(variable_requirements[1], true);
 
@@ -173,6 +193,8 @@ TEST(AlertCondition, EvaluateReturnsTrue2ReqsTrueAndTrue)
 
 TEST(AlertCondition, EvaluateReturnsFalse4Reqs)
 {
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >= 4);
+
     /* true <=> ((false OR true) AND (false OR true)) */
     fake_variable_requirement_set_evaluate_result(variable_requirements[0], false);
     fake_variable_requirement_set_evaluate_result(variable_requirements[1], true);
@@ -192,6 +214,8 @@ TEST(AlertCondition, EvaluateReturnsFalse4Reqs)
 
 TEST(AlertCondition, AddVariableRequirementAssertsMoreReqsThanAllowedAdded)
 {
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >= 1);
+
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("!is_num_allowed_requirements_exceeded",
                                         "alert_condition_add_variable_requirement");
 
@@ -204,6 +228,8 @@ TEST(AlertCondition, AddVariableRequirementAssertsMoreReqsThanAllowedAdded)
 
 TEST(AlertCondition, EvaluateTrue1ReqTrueStartNewOredReqBeforeAdd)
 {
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >= 1);
+
     VariableRequirement variable_requirement = variable_requirements[0];
     bool expected_evaluate_result = true;
     fake_variable_requirement_set_evaluate_result(variable_requirement, expected_evaluate_result);
@@ -218,6 +244,8 @@ TEST(AlertCondition, EvaluateTrue1ReqTrueStartNewOredReqBeforeAdd)
 
 TEST(AlertCondition, StartNewOredCaledMoreTimesThanNeeded)
 {
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >= 3);
+
     fake_variable_requirement_set_evaluate_result(variable_requirements[0], true);
     fake_variable_requirement_set_evaluate_result(variable_requirements[1], false);
     fake_variable_requirement_set_evaluate_result(variable_requirements[2], true);
