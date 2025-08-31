@@ -166,6 +166,7 @@ bool alert_condition_evaluate(AlertCondition self)
 
 void alert_condition_for_each(AlertCondition self, AlertConditionForEachCb cb)
 {
+    EAS_ASSERT(cb);
     for (size_t i = 0; i < self->num_items_in_reqs_array; i++) {
         /* Skip the logical ANDs - represented by NULL pointers */
         if (self->variable_requirements[i] != NULL) {

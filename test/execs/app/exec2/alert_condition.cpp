@@ -678,3 +678,12 @@ TEST(AlertCondition, ForEachMixAndOr)
 
     for_each_verify(7);
 }
+
+TEST(AlertCondition, ForEachAssertsIfCbNull)
+{
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >= 1);
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
+
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("cb", "alert_condition_for_each");
+    alert_condition_for_each(alert_condition, NULL);
+}
