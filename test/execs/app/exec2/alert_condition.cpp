@@ -350,3 +350,87 @@ TEST(AlertCondition, EvaluateMaxNumVariableReqsAndedHalfFalse)
 
     CHECK_EQUAL(false, actual_evaluate_result);
 }
+
+TEST(AlertCondition, EvaluateMaxNumVariableReqsOredAllFalse)
+{
+    /* Make sure the test contains enough variable requirements to test adding max num variables requirements */
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >=
+               CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS);
+
+    for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
+        fake_variable_requirement_set_evaluate_result(variable_requirements[i], false);
+    }
+
+    AlertCondition alert_condition = alert_condition_create();
+    for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
+        alert_condition_add_variable_requirement(alert_condition, variable_requirements[i]);
+    }
+    bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
+
+    CHECK_EQUAL(false, actual_evaluate_result);
+}
+
+TEST(AlertCondition, EvaluateMaxNumVariableReqsOredAllTrue)
+{
+    /* Make sure the test contains enough variable requirements to test adding max num variables requirements */
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >=
+               CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS);
+
+    for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
+        fake_variable_requirement_set_evaluate_result(variable_requirements[i], true);
+    }
+
+    AlertCondition alert_condition = alert_condition_create();
+    for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
+        alert_condition_add_variable_requirement(alert_condition, variable_requirements[i]);
+    }
+    bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
+
+    CHECK_EQUAL(true, actual_evaluate_result);
+}
+
+/* The purpose of this test is to check that calling start_new_ored_requirement before adding variable requirements does
+ * not interpret any requirements as ANDed, if all of them are supposed to be one big ORed requirement. We set the first
+ * requirement to evaluate as false, so in case it does get misinterpreted as ANDed, the overall evaluation result will
+ * be false while we are expecting it to be true. */
+TEST(AlertCondition, StartNewOredBeforehandDoesNotInterpretTheFirstReqAsAnded)
+{
+    /* Make sure the test contains enough variable requirements to test adding max num variables requirements */
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >=
+               CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS);
+
+    fake_variable_requirement_set_evaluate_result(variable_requirements[0], false);
+    for (size_t i = 1; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
+        fake_variable_requirement_set_evaluate_result(variable_requirements[i], true);
+    }
+
+    AlertCondition alert_condition = alert_condition_create();
+    alert_condition_start_new_ored_requirement(alert_condition);
+    for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
+        alert_condition_add_variable_requirement(alert_condition, variable_requirements[i]);
+    }
+    bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
+
+    CHECK_EQUAL(true, actual_evaluate_result);
+}
+
+TEST(AlertCondition, EvaluateMaxNumVariableReqsOredHalfFalse)
+{
+    /* Make sure the test contains enough variable requirements to test adding max num variables requirements */
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >=
+               CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS);
+
+    bool evaluate_result = false;
+    for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
+        fake_variable_requirement_set_evaluate_result(variable_requirements[i], evaluate_result);
+        evaluate_result = !evaluate_result;
+    }
+
+    AlertCondition alert_condition = alert_condition_create();
+    for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
+        alert_condition_add_variable_requirement(alert_condition, variable_requirements[i]);
+    }
+    bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
+
+    CHECK_EQUAL(true, actual_evaluate_result);
+}
