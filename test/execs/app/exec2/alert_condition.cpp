@@ -602,12 +602,19 @@ TEST(AlertCondition, ResetRemovesAllVariableRequirements)
         alert_condition_add_variable_requirement(alert_condition, variable_requirements[i]);
     }
     alert_condition_reset(alert_condition);
-    for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
-        alert_condition_add_variable_requirement(alert_condition, variable_requirements[i]);
-    }
 
-    /* Not necessary to verify anything. If reset did not remove all the variable requirements, we would get an assert
-     * during the second for loop. */
+    /* Verify that condition is now empty */
+    alert_condition_for_each(alert_condition, for_each_cb);
+    for_each_verify(0);
+}
+
+TEST(AlertCondition, ResetKeepsConditionEmpty)
+{
+    alert_condition_reset(alert_condition);
+
+    /* Verify that condition is still is empty */
+    alert_condition_for_each(alert_condition, for_each_cb);
+    for_each_verify(0);
 }
 
 TEST(AlertCondition, ForEachDoesNotCallCbEmptyCondition)
