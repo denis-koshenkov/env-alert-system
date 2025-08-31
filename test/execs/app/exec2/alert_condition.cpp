@@ -200,3 +200,17 @@ TEST(AlertCondition, AddVariableRequirementAssertsMoreReqsThanAllowedAdded)
         alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
     }
 }
+
+TEST(AlertCondition, EvaluateTrue1ReqTrueStartNewOredReqBeforeAdd)
+{
+    VariableRequirement variable_requirement = variable_requirements[0];
+    bool expected_evaluate_result = true;
+    fake_variable_requirement_set_evaluate_result(variable_requirement, expected_evaluate_result);
+
+    AlertCondition alert_condition = alert_condition_create();
+    alert_condition_start_new_ored_requirement(alert_condition);
+    alert_condition_add_variable_requirement(alert_condition, variable_requirement);
+    bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
+
+    CHECK_EQUAL(expected_evaluate_result, actual_evaluate_result);
+}

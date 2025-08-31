@@ -92,6 +92,10 @@ static bool evaluate_ored_requirement(AlertCondition self, size_t start_idx, siz
         req_idx++;
     }
 
+    /* This assert fires if the loop body was never entered. This happens if start_idx points to a logical AND or is out
+     * of bounds. */
+    EAS_ASSERT(req_idx != start_idx);
+
     *end_idx = req_idx;
     return req_result;
 }
@@ -115,8 +119,12 @@ void alert_condition_add_variable_requirement(AlertCondition self, VariableRequi
     EAS_ASSERT(!is_num_allowed_requirements_exceeded);
 
     if (self->insert_and_before_next_requirement) {
-        /* NULL represents logical AND in the list of requirements */
-        add_requirement_to_list(self, NULL);
+        /* Do not add NULL to the array as the first element - it is already clear that the first element is a start of
+         * a new ORed requirement. */
+        if (self->num_requirements > 0) {
+            /* NULL represents logical AND in the list of requirements */
+            add_requirement_to_list(self, NULL);
+        }
         self->insert_and_before_next_requirement = false;
     }
     add_requirement_to_list(self, variable_requirement);
