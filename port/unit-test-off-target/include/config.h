@@ -9,7 +9,7 @@
 #define CONFIG_LIGHT_INTENSITY_VALUE_MAX_NUM_INSTANCES 8
 #define CONFIG_LINKED_LIST_MAX_NUM_INSTANCES 27
 #define CONFIG_VARIABLE_REQUIREMENT_LIST_MAX_NUM_INSTANCES 10
-#define CONFIG_ALERT_CONDITION_MAX_NUM_INSTANCES 11
+#define CONFIG_ALERT_CONDITION_MAX_NUM_INSTANCES 13
 
 /** Maximal size of one variable requirement in bytes. We have different variable requirement types - e.g.
  * TemperatureVariableRequirement, PressureVariableRequirement, and so on. Each of these types might have a different
@@ -23,6 +23,9 @@
  * of the buffer for one variable requirement.
  */
 #define CONFIG_VARIABLE_REQUIREMENT_MAX_SIZE 24
+
+/** Maximal allowed number of variable requirements in one alert condition. */
+#define CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS 4
 
 /* Configs for port-specific modules */
 

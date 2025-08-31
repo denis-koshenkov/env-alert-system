@@ -3,8 +3,9 @@
 
 #include "alert_condition.h"
 #include "fake_variable_requirement.h"
+#include "config.h"
 
-#define TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS 2
+#define TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS 4
 
 static VariableRequirement variable_requirements[TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS];
 
@@ -29,7 +30,7 @@ TEST_GROUP(AlertCondition)
 
 TEST(AlertCondition, EvaluateAssertsNoVariableRequirementsAdded)
 {
-    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self->variable_requirement_0", "alert_condition_evaluate");
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self->num_items_in_reqs_array > 0", "alert_condition_evaluate");
 
     AlertCondition alert_condition = alert_condition_create();
     bool unused = alert_condition_evaluate(alert_condition);
@@ -167,4 +168,35 @@ TEST(AlertCondition, EvaluateReturnsTrue2ReqsTrueAndTrue)
     bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
 
     CHECK_EQUAL(true, actual_evaluate_result);
+}
+
+TEST(AlertCondition, EvaluateReturnsFalse4Reqs)
+{
+    /* true <=> ((false OR true) AND (false OR true)) */
+    fake_variable_requirement_set_evaluate_result(variable_requirements[0], false);
+    fake_variable_requirement_set_evaluate_result(variable_requirements[1], true);
+    fake_variable_requirement_set_evaluate_result(variable_requirements[2], false);
+    fake_variable_requirement_set_evaluate_result(variable_requirements[3], true);
+
+    AlertCondition alert_condition = alert_condition_create();
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[1]);
+    alert_condition_start_new_ored_requirement(alert_condition);
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[2]);
+    alert_condition_add_variable_requirement(alert_condition, variable_requirements[3]);
+    bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
+
+    CHECK_EQUAL(true, actual_evaluate_result);
+}
+
+TEST(AlertCondition, AddVariableRequirementAssertsMoreReqsThanAllowedAdded)
+{
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("!is_num_allowed_requirements_exceeded",
+                                        "alert_condition_add_variable_requirement");
+
+    AlertCondition alert_condition = alert_condition_create();
+    /* Note the <= : we add one more variable requirement than it is allowed. */
+    for (size_t i = 0; i <= CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
+        alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
+    }
 }
