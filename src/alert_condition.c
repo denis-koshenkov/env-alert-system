@@ -114,6 +114,8 @@ AlertCondition alert_condition_create()
 
 void alert_condition_add_variable_requirement(AlertCondition self, VariableRequirement variable_requirement)
 {
+    EAS_ASSERT(self);
+    EAS_ASSERT(variable_requirement);
     bool is_num_allowed_requirements_exceeded =
         (self->num_requirements >= CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS);
     EAS_ASSERT(!is_num_allowed_requirements_exceeded);
@@ -133,11 +135,13 @@ void alert_condition_add_variable_requirement(AlertCondition self, VariableRequi
 
 void alert_condition_start_new_ored_requirement(AlertCondition self)
 {
+    EAS_ASSERT(self);
     self->insert_and_before_next_requirement = true;
 }
 
 bool alert_condition_evaluate(AlertCondition self)
 {
+    EAS_ASSERT(self);
     EAS_ASSERT(self->num_items_in_reqs_array > 0);
 
     bool ored_req_result;
@@ -166,7 +170,9 @@ bool alert_condition_evaluate(AlertCondition self)
 
 void alert_condition_for_each(AlertCondition self, AlertConditionForEachCb cb)
 {
+    EAS_ASSERT(self);
     EAS_ASSERT(cb);
+
     for (size_t i = 0; i < self->num_items_in_reqs_array; i++) {
         /* Skip the logical ANDs - represented by NULL pointers */
         if (self->variable_requirements[i] != NULL) {
@@ -177,6 +183,8 @@ void alert_condition_for_each(AlertCondition self, AlertConditionForEachCb cb)
 
 void alert_condition_reset(AlertCondition self)
 {
+    EAS_ASSERT(self);
+
     self->num_items_in_reqs_array = 0;
     self->num_requirements = 0;
     self->insert_and_before_next_requirement = false;

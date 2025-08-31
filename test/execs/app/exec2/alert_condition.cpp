@@ -687,3 +687,41 @@ TEST(AlertCondition, ForEachAssertsIfCbNull)
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("cb", "alert_condition_for_each");
     alert_condition_for_each(alert_condition, NULL);
 }
+
+TEST(AlertCondition, ForEachAssertsIfInstanceNull)
+{
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "alert_condition_for_each");
+    alert_condition_for_each(NULL, for_each_cb);
+}
+
+TEST(AlertCondition, ResetAssertsIfInstanceNull)
+{
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "alert_condition_reset");
+    alert_condition_reset(NULL);
+}
+
+TEST(AlertCondition, EvaluateAssertsIfInstanceNull)
+{
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "alert_condition_evaluate");
+    alert_condition_evaluate(NULL);
+}
+
+TEST(AlertCondition, StartNewOredRequirementAssertsIfInstanceNull)
+{
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "alert_condition_start_new_ored_requirement");
+    alert_condition_start_new_ored_requirement(NULL);
+}
+
+TEST(AlertCondition, AddVariableRequirementAssertsIfInstanceNull)
+{
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >= 1);
+
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "alert_condition_add_variable_requirement");
+    alert_condition_add_variable_requirement(NULL, variable_requirements[0]);
+}
+
+TEST(AlertCondition, AddVariableRequirementAssertsIfRequirementNull)
+{
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("variable_requirement", "alert_condition_add_variable_requirement");
+    alert_condition_add_variable_requirement(alert_condition, NULL);
+}
