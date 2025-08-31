@@ -9,6 +9,7 @@
 #define TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS 10
 
 static VariableRequirement variable_requirements[TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS];
+static AlertCondition alert_condition;
 
 // clang-format off
 TEST_GROUP(AlertCondition)
@@ -17,6 +18,16 @@ TEST_GROUP(AlertCondition)
     {
         for (size_t i = 0; i < TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
             variable_requirements[i] = fake_variable_requirement_create();
+        }
+        
+        /* All tests use the same alert condition instance in order to save memory and test the reset function.
+         * Create alert condition instance or reset it if it already exists before each test. */
+        static bool instance_created = false;
+        if (instance_created) {
+            alert_condition_reset(alert_condition);
+        } else {
+            alert_condition = alert_condition_create();
+            instance_created = true;
         }
     }
 
@@ -33,7 +44,6 @@ TEST(AlertCondition, EvaluateAssertsNoVariableRequirementsAdded)
 {
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self->num_items_in_reqs_array > 0", "alert_condition_evaluate");
 
-    AlertCondition alert_condition = alert_condition_create();
     bool unused = alert_condition_evaluate(alert_condition);
 }
 
@@ -45,7 +55,6 @@ TEST(AlertCondition, EvaluateTrue1ReqTrue)
     bool expected_evaluate_result = true;
     fake_variable_requirement_set_evaluate_result(variable_requirement, expected_evaluate_result);
 
-    AlertCondition alert_condition = alert_condition_create();
     alert_condition_add_variable_requirement(alert_condition, variable_requirement);
     bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
 
@@ -60,7 +69,6 @@ TEST(AlertCondition, EvaluateFalse1ReqFalse)
     bool expected_evaluate_result = false;
     fake_variable_requirement_set_evaluate_result(variable_requirement, expected_evaluate_result);
 
-    AlertCondition alert_condition = alert_condition_create();
     alert_condition_add_variable_requirement(alert_condition, variable_requirement);
     bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
 
@@ -74,7 +82,6 @@ TEST(AlertCondition, EvaluateReturnsFalse2ReqsFalseOrFalse)
     fake_variable_requirement_set_evaluate_result(variable_requirements[0], false);
     fake_variable_requirement_set_evaluate_result(variable_requirements[1], false);
 
-    AlertCondition alert_condition = alert_condition_create();
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[1]);
     bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
@@ -89,7 +96,6 @@ TEST(AlertCondition, EvaluateReturnsTrue2ReqsFalseOrTrue)
     fake_variable_requirement_set_evaluate_result(variable_requirements[0], false);
     fake_variable_requirement_set_evaluate_result(variable_requirements[1], true);
 
-    AlertCondition alert_condition = alert_condition_create();
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[1]);
     bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
@@ -104,7 +110,6 @@ TEST(AlertCondition, EvaluateReturnsTrue2ReqsTrueOrFalse)
     fake_variable_requirement_set_evaluate_result(variable_requirements[0], true);
     fake_variable_requirement_set_evaluate_result(variable_requirements[1], false);
 
-    AlertCondition alert_condition = alert_condition_create();
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[1]);
     bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
@@ -119,7 +124,6 @@ TEST(AlertCondition, EvaluateReturnsTrue2ReqsTrueOrTrue)
     fake_variable_requirement_set_evaluate_result(variable_requirements[0], true);
     fake_variable_requirement_set_evaluate_result(variable_requirements[1], true);
 
-    AlertCondition alert_condition = alert_condition_create();
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[1]);
     bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
@@ -134,7 +138,6 @@ TEST(AlertCondition, EvaluateReturnsFalse2ReqsFalseAndFalse)
     fake_variable_requirement_set_evaluate_result(variable_requirements[0], false);
     fake_variable_requirement_set_evaluate_result(variable_requirements[1], false);
 
-    AlertCondition alert_condition = alert_condition_create();
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
     alert_condition_start_new_ored_requirement(alert_condition);
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[1]);
@@ -150,7 +153,6 @@ TEST(AlertCondition, EvaluateReturnsFalse2ReqsFalseAndTrue)
     fake_variable_requirement_set_evaluate_result(variable_requirements[0], false);
     fake_variable_requirement_set_evaluate_result(variable_requirements[1], true);
 
-    AlertCondition alert_condition = alert_condition_create();
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
     alert_condition_start_new_ored_requirement(alert_condition);
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[1]);
@@ -166,7 +168,6 @@ TEST(AlertCondition, EvaluateReturnsFalse2ReqsTrueAndFalse)
     fake_variable_requirement_set_evaluate_result(variable_requirements[0], true);
     fake_variable_requirement_set_evaluate_result(variable_requirements[1], false);
 
-    AlertCondition alert_condition = alert_condition_create();
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
     alert_condition_start_new_ored_requirement(alert_condition);
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[1]);
@@ -182,7 +183,6 @@ TEST(AlertCondition, EvaluateReturnsTrue2ReqsTrueAndTrue)
     fake_variable_requirement_set_evaluate_result(variable_requirements[0], true);
     fake_variable_requirement_set_evaluate_result(variable_requirements[1], true);
 
-    AlertCondition alert_condition = alert_condition_create();
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
     alert_condition_start_new_ored_requirement(alert_condition);
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[1]);
@@ -201,7 +201,6 @@ TEST(AlertCondition, EvaluateReturnsFalse4Reqs)
     fake_variable_requirement_set_evaluate_result(variable_requirements[2], false);
     fake_variable_requirement_set_evaluate_result(variable_requirements[3], true);
 
-    AlertCondition alert_condition = alert_condition_create();
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[1]);
     alert_condition_start_new_ored_requirement(alert_condition);
@@ -219,7 +218,6 @@ TEST(AlertCondition, AddVariableRequirementAssertsMoreReqsThanAllowedAdded)
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("!is_num_allowed_requirements_exceeded",
                                         "alert_condition_add_variable_requirement");
 
-    AlertCondition alert_condition = alert_condition_create();
     /* Note the <= : we add one more variable requirement than it is allowed. */
     for (size_t i = 0; i <= CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
         alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
@@ -234,7 +232,6 @@ TEST(AlertCondition, EvaluateTrue1ReqTrueStartNewOredReqBeforeAdd)
     bool expected_evaluate_result = true;
     fake_variable_requirement_set_evaluate_result(variable_requirement, expected_evaluate_result);
 
-    AlertCondition alert_condition = alert_condition_create();
     alert_condition_start_new_ored_requirement(alert_condition);
     alert_condition_add_variable_requirement(alert_condition, variable_requirement);
     bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
@@ -250,7 +247,6 @@ TEST(AlertCondition, StartNewOredCaledMoreTimesThanNeeded)
     fake_variable_requirement_set_evaluate_result(variable_requirements[1], false);
     fake_variable_requirement_set_evaluate_result(variable_requirements[2], true);
 
-    AlertCondition alert_condition = alert_condition_create();
     alert_condition_start_new_ored_requirement(alert_condition);
     alert_condition_start_new_ored_requirement(alert_condition);
     alert_condition_start_new_ored_requirement(alert_condition);
@@ -281,7 +277,6 @@ TEST(AlertCondition, StartNewOredCaledMoreTimesThanNeededMaxNumVariableReqs)
         fake_variable_requirement_set_evaluate_result(variable_requirements[i], false);
     }
 
-    AlertCondition alert_condition = alert_condition_create();
     /* start_new_ored_requirement is unnecessarily called once before the first requirement is added, twice in between
      * adding subsequent requirements, and once after the last requirement. We are testing that excessive calling of
      * this function does not affect with the result.*/
@@ -305,7 +300,6 @@ TEST(AlertCondition, EvaluateMaxNumVariableReqsAndedAllFalse)
         fake_variable_requirement_set_evaluate_result(variable_requirements[i], false);
     }
 
-    AlertCondition alert_condition = alert_condition_create();
     for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
         alert_condition_start_new_ored_requirement(alert_condition);
         alert_condition_add_variable_requirement(alert_condition, variable_requirements[i]);
@@ -325,7 +319,6 @@ TEST(AlertCondition, EvaluateMaxNumVariableReqsAndedAllTrue)
         fake_variable_requirement_set_evaluate_result(variable_requirements[i], true);
     }
 
-    AlertCondition alert_condition = alert_condition_create();
     for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
         alert_condition_start_new_ored_requirement(alert_condition);
         alert_condition_add_variable_requirement(alert_condition, variable_requirements[i]);
@@ -347,7 +340,6 @@ TEST(AlertCondition, EvaluateMaxNumVariableReqsAndedOnlyOneFalse)
     fake_variable_requirement_set_evaluate_result(
         variable_requirements[CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS - 1], false);
 
-    AlertCondition alert_condition = alert_condition_create();
     for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
         alert_condition_start_new_ored_requirement(alert_condition);
         alert_condition_add_variable_requirement(alert_condition, variable_requirements[i]);
@@ -369,7 +361,6 @@ TEST(AlertCondition, EvaluateMaxNumVariableReqsAndedHalfFalse)
         evaluate_result = !evaluate_result;
     }
 
-    AlertCondition alert_condition = alert_condition_create();
     for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
         alert_condition_start_new_ored_requirement(alert_condition);
         alert_condition_add_variable_requirement(alert_condition, variable_requirements[i]);
@@ -389,7 +380,6 @@ TEST(AlertCondition, EvaluateMaxNumVariableReqsOredAllFalse)
         fake_variable_requirement_set_evaluate_result(variable_requirements[i], false);
     }
 
-    AlertCondition alert_condition = alert_condition_create();
     for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
         alert_condition_add_variable_requirement(alert_condition, variable_requirements[i]);
     }
@@ -408,7 +398,6 @@ TEST(AlertCondition, EvaluateMaxNumVariableReqsOredAllTrue)
         fake_variable_requirement_set_evaluate_result(variable_requirements[i], true);
     }
 
-    AlertCondition alert_condition = alert_condition_create();
     for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
         alert_condition_add_variable_requirement(alert_condition, variable_requirements[i]);
     }
@@ -432,7 +421,6 @@ TEST(AlertCondition, StartNewOredBeforehandDoesNotInterpretTheFirstReqAsAnded)
         fake_variable_requirement_set_evaluate_result(variable_requirements[i], true);
     }
 
-    AlertCondition alert_condition = alert_condition_create();
     alert_condition_start_new_ored_requirement(alert_condition);
     for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
         alert_condition_add_variable_requirement(alert_condition, variable_requirements[i]);
@@ -454,7 +442,6 @@ TEST(AlertCondition, EvaluateMaxNumVariableReqsOredHalfFalse)
         evaluate_result = !evaluate_result;
     }
 
-    AlertCondition alert_condition = alert_condition_create();
     for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
         alert_condition_add_variable_requirement(alert_condition, variable_requirements[i]);
     }
@@ -474,7 +461,6 @@ TEST(AlertCondition, EvaluateFalseAndTrueOrTrueOrTrueEqualsFalse)
         fake_variable_requirement_set_evaluate_result(variable_requirements[i], true);
     }
 
-    AlertCondition alert_condition = alert_condition_create();
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
     alert_condition_start_new_ored_requirement(alert_condition);
     for (size_t i = 1; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
@@ -497,7 +483,6 @@ TEST(AlertCondition, EvaluateTrueOrTrueOrTrueAndFalseEqualsFalse)
     fake_variable_requirement_set_evaluate_result(
         variable_requirements[CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS - 1], false);
 
-    AlertCondition alert_condition = alert_condition_create();
     for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS - 1; i++) {
         alert_condition_add_variable_requirement(alert_condition, variable_requirements[i]);
     }
@@ -526,7 +511,6 @@ TEST(AlertCondition, EvaluateAndOrMix1)
     fake_variable_requirement_set_evaluate_result(variable_requirements[8], true);
     fake_variable_requirement_set_evaluate_result(variable_requirements[9], false);
 
-    AlertCondition alert_condition = alert_condition_create();
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[1]);
     alert_condition_start_new_ored_requirement(alert_condition);
@@ -563,7 +547,6 @@ TEST(AlertCondition, EvaluateAndOrMix2)
     fake_variable_requirement_set_evaluate_result(variable_requirements[8], false);
     fake_variable_requirement_set_evaluate_result(variable_requirements[9], true);
 
-    AlertCondition alert_condition = alert_condition_create();
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[1]);
     alert_condition_start_new_ored_requirement(alert_condition);
@@ -581,4 +564,21 @@ TEST(AlertCondition, EvaluateAndOrMix2)
     bool actual_evaluate_result = alert_condition_evaluate(alert_condition);
 
     CHECK_EQUAL(true, actual_evaluate_result);
+}
+
+TEST(AlertCondition, ResetRemovesAllVariableRequirements)
+{
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >=
+               CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS);
+
+    for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
+        alert_condition_add_variable_requirement(alert_condition, variable_requirements[i]);
+    }
+    alert_condition_reset(alert_condition);
+    for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
+        alert_condition_add_variable_requirement(alert_condition, variable_requirements[i]);
+    }
+
+    /* Not necessary to verify anything. If reset did not remove all the variable requirements, we would get an assert
+     * during the second for loop. */
 }

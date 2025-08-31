@@ -163,3 +163,10 @@ bool alert_condition_evaluate(AlertCondition self)
     /* All ORed requirements evaluated to true -> condition evaluates to true */
     return true;
 }
+
+void alert_condition_reset(AlertCondition self)
+{
+    self->num_items_in_reqs_array = 0;
+    self->num_requirements = 0;
+    self->insert_and_before_next_requirement = false;
+}

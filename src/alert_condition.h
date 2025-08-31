@@ -20,6 +20,8 @@ void alert_condition_start_new_ored_requirement(AlertCondition self);
 
 bool alert_condition_evaluate(AlertCondition self);
 
+void alert_condition_reset(AlertCondition self);
+
 #ifdef __cplusplus
 }
 #endif
