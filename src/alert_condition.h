@@ -8,6 +8,7 @@ extern "C"
 
 #include <stdbool.h>
 
+#include "alert_condition_defs.h"
 #include "variable_requirement_defs.h"
 
 /**
@@ -75,7 +76,6 @@ extern "C"
  * instance had just been created. All variable requirements are removed as a result of calling @ref
  * alert_condition_reset.
  */
-typedef struct AlertConditionStruct *AlertCondition;
 
 /**
  * @brief Defines callback type to execute for each variable requirement as a part of @ref alert_condition_for_each.

@@ -19,6 +19,7 @@ target_sources(app_test_exec2 PRIVATE
     variable_requirement_list.c
     linked_list.cpp
     alert_condition.cpp
+    alert_conditions.cpp
 
     mocks/mock_value_holder.cpp
     mocks/mock_variable_requirement_allocator.cpp
