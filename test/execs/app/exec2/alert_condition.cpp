@@ -11,6 +11,31 @@
 static VariableRequirement variable_requirements[TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS];
 static AlertCondition alert_condition;
 
+static size_t for_each_count = 0;
+static bool for_each_instances_as_expected = true;
+
+static void reset_for_each_cb_data()
+{
+    for_each_count = 0;
+    for_each_instances_as_expected = true;
+}
+
+static void for_each_cb(VariableRequirement variable_requirement)
+{
+    EAS_ASSERT(for_each_count < TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS);
+
+    if (variable_requirement != variable_requirements[for_each_count]) {
+        for_each_instances_as_expected = false;
+    }
+    for_each_count++;
+}
+
+static void for_each_verify(size_t expected_count)
+{
+    CHECK_TRUE(for_each_instances_as_expected);
+    CHECK_EQUAL(expected_count, for_each_count);
+}
+
 // clang-format off
 TEST_GROUP(AlertCondition)
 {
@@ -29,6 +54,8 @@ TEST_GROUP(AlertCondition)
             alert_condition = alert_condition_create();
             instance_created = true;
         }
+
+        reset_for_each_cb_data();
     }
 
     void teardown()
@@ -583,38 +610,32 @@ TEST(AlertCondition, ResetRemovesAllVariableRequirements)
      * during the second for loop. */
 }
 
-static bool for_each_cb_called = false;
-static VariableRequirement for_each_var_req_instance = NULL;
-
-static void reset_for_each_cb_data()
-{
-    for_each_cb_called = false;
-    for_each_var_req_instance = NULL;
-}
-
-static void for_each_cb(VariableRequirement variable_requirement)
-{
-    for_each_cb_called = true;
-    for_each_var_req_instance = variable_requirement;
-}
-
 TEST(AlertCondition, ForEachDoesNotCallCbEmptyCondition)
 {
-    reset_for_each_cb_data();
-
     alert_condition_for_each(alert_condition, for_each_cb);
 
-    CHECK_FALSE(for_each_cb_called);
+    for_each_verify(0);
 }
 
 TEST(AlertCondition, ForEachCallsCbOnceOneVarReqInCondition)
 {
     EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >= 1);
-    reset_for_each_cb_data();
 
     alert_condition_add_variable_requirement(alert_condition, variable_requirements[0]);
     alert_condition_for_each(alert_condition, for_each_cb);
 
-    CHECK_TRUE(for_each_cb_called);
-    CHECK_EQUAL(variable_requirements[0], for_each_var_req_instance);
+    for_each_verify(1);
+}
+
+TEST(AlertCondition, ForEachMaxNumOredReqs)
+{
+    EAS_ASSERT(TEST_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS >=
+               CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS);
+
+    for (size_t i = 0; i < CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS; i++) {
+        alert_condition_add_variable_requirement(alert_condition, variable_requirements[i]);
+    }
+    alert_condition_for_each(alert_condition, for_each_cb);
+
+    for_each_verify(CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS);
 }

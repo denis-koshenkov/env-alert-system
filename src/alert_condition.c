@@ -166,8 +166,8 @@ bool alert_condition_evaluate(AlertCondition self)
 
 void alert_condition_for_each(AlertCondition self, AlertConditionForEachCb cb)
 {
-    if (self->num_requirements > 0) {
-        cb(self->variable_requirements[0]);
+    for (size_t i = 0; i < self->num_items_in_reqs_array; i++) {
+        cb(self->variable_requirements[i]);
     }
 }
 
