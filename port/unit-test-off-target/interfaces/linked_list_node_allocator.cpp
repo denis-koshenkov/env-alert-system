@@ -1,5 +1,5 @@
 #include "CppUTestExt/MockSupport.h"
-#include "mock_linked_list_node_allocator.h"
+#include "linked_list_node_allocator.h"
 
 LinkedListNode *linked_list_node_allocator_alloc()
 {

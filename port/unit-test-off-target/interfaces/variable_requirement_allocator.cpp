@@ -1,5 +1,5 @@
 #include "CppUTestExt/MockSupport.h"
-#include "mock_variable_requirement_allocator.h"
+#include "variable_requirement_allocator.h"
 
 void *variable_requirement_allocator_alloc()
 {

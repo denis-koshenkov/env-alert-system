@@ -16,8 +16,6 @@ target_sources(eas INTERFACE
     humidity_requirement.c
     light_intensity_requirement.c
     variable_requirement.c
-    variable_requirement_allocator.c
-    linked_list_node_allocator.c
     variable_requirement_list.c
     temperature_requirement_list.c
     pressure_requirement_list.c

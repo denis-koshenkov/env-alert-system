@@ -22,19 +22,12 @@ target_sources(app_test_exec2 PRIVATE
     alert_raiser.cpp
 
     mocks/mock_value_holder.cpp
-    mocks/mock_variable_requirement_allocator.cpp
     mocks/mock_current_temperature.cpp
     mocks/mock_current_pressure.cpp
     mocks/mock_current_humidity.cpp
     mocks/mock_current_light_intensity.cpp
-    mocks/mock_linked_list_node_allocator.cpp
     mocks/mock_variable_requirement.c
     mocks/mock_alert_notifier.cpp
-    mocks/eas_timer.cpp
-)
-
-target_include_directories(app_test_exec2 PRIVATE
-    mocks
 )
 
 target_link_libraries(app_test_exec2 PRIVATE test_common)
