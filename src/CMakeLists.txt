@@ -25,6 +25,7 @@ target_sources(eas INTERFACE
     light_intensity_requirement_list.c
     alert_condition.c
     variable_requirement_evaluator.c
+    alert_conditions.c
 )
 
 target_include_directories(eas INTERFACE

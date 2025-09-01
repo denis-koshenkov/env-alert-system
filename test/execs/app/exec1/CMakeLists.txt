@@ -11,12 +11,14 @@ target_sources(app_test_exec1 PRIVATE
     pressure_requirement_list.cpp
     humidity_requirement_list.cpp
     light_intensity_requirement_list.cpp
+    alert_conditions.cpp
 
     mocks/mock_temperature_value.cpp
     mocks/mock_pressure_value.cpp
     mocks/mock_humidity_value.cpp
     mocks/mock_light_intensity_value.cpp
     mocks/mock_variable_requirement_list.cpp
+    mocks/mock_alert_condition.cpp
 )
 
 target_link_libraries(app_test_exec1 PRIVATE test_common)

@@ -27,6 +27,13 @@
 /** Maximal allowed number of variable requirements in one alert condition. */
 #define CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS 10
 
+/**
+ * @brief Maximal number of alerts that can be registered in the system at the same time.
+ *
+ * Defines how many AlertCondition instances the AlertConditions module creates.
+ */
+#define CONFIG_MAX_NUM_ALERTS 10
+
 /* Configs for port-specific modules */
 
 /** Should correspond to the number of times <module_name>_create() will be called in the unit test program. */
