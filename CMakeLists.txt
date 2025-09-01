@@ -26,5 +26,5 @@ else()
     target_link_libraries(app PRIVATE eas port)
 endif()
 
-add_subdirectory(src)
-add_subdirectory("port/${PORT_DIR}")
+add_subdirectory(src/app)
+add_subdirectory("src/port/${PORT_DIR}")
