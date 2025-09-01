@@ -10,3 +10,5 @@ target_include_directories(port INTERFACE
     include
     interfaces
 )
+
+add_subdirectory(test)
