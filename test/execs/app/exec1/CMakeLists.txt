@@ -21,6 +21,18 @@ target_sources(app_test_exec1 PRIVATE
     mocks/mock_alert_condition.cpp
 )
 
+# FIXME: exec1 includes exec2 source
+target_sources(app_test_exec1 PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/../exec2/mocks/eas_timer.cpp
+)
+
+# FIXME: exec1 includes exec2 directory
+target_include_directories(app_test_exec1 PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/../exec2/mocks
+)
+
+
+
 target_link_libraries(app_test_exec1 PRIVATE test_common)
 
 # functions that are mocked are defined twice - once in production code, once in the mock.
