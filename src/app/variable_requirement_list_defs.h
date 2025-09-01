@@ -1,5 +1,5 @@
-#ifndef VARIABLE_REQUIREMENT_LIST_DEFS_H
-#define VARIABLE_REQUIREMENT_LIST_DEFS_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_VARIABLE_REQUIREMENT_LIST_DEFS_H
+#define ENV_ALERT_SYSTEM_SRC_APP_VARIABLE_REQUIREMENT_LIST_DEFS_H
 
 #ifdef __cplusplus
 extern "C"
@@ -31,4 +31,4 @@ typedef void (*VariableRequirementListForEachCb)(VariableRequirement variable_re
 }
 #endif
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_VARIABLE_REQUIREMENT_LIST_DEFS_H */

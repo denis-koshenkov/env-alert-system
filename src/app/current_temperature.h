@@ -1,5 +1,5 @@
-#ifndef CURRENT_TEMPERATURE_H
-#define CURRENT_TEMPERATURE_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_CURRENT_TEMPERATURE_H
+#define ENV_ALERT_SYSTEM_SRC_APP_CURRENT_TEMPERATURE_H
 
 #ifdef __cplusplus
 extern "C"
@@ -43,4 +43,4 @@ bool current_temperature_is_changed();
 }
 #endif
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_CURRENT_TEMPERATURE_H */

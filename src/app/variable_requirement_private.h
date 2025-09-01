@@ -1,5 +1,5 @@
-#ifndef VARIABLE_REQUIREMENT_PRIVATE_H
-#define VARIABLE_REQUIREMENT_PRIVATE_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_VARIABLE_REQUIREMENT_PRIVATE_H
+#define ENV_ALERT_SYSTEM_SRC_APP_VARIABLE_REQUIREMENT_PRIVATE_H
 
 #ifdef __cplusplus
 extern "C"
@@ -51,4 +51,4 @@ void variable_requirement_create(VariableRequirement self, VariableRequirementIn
 }
 #endif
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_VARIABLE_REQUIREMENT_PRIVATE_H */

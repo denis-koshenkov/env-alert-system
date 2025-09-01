@@ -1,5 +1,5 @@
-#ifndef UTILS_LINKED_LIST_H
-#define UTILS_LINKED_LIST_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_UTILS_LINKED_LIST_H
+#define ENV_ALERT_SYSTEM_SRC_APP_UTILS_LINKED_LIST_H
 
 #ifdef __cplusplus
 extern "C"
@@ -87,4 +87,4 @@ void linked_list_remove_on_condition(LinkedList self, LinkedListConditionCb cb, 
 }
 #endif
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_UTILS_LINKED_LIST_H */

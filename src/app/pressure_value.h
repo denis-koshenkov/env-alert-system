@@ -1,5 +1,5 @@
-#ifndef PRESSURE_VALUE_H
-#define PRESSURE_VALUE_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_PRESSURE_VALUE_H
+#define ENV_ALERT_SYSTEM_SRC_APP_PRESSURE_VALUE_H
 
 #ifdef __cplusplus
 extern "C"
@@ -58,4 +58,4 @@ bool pressure_value_is_value_changed(PressureValue pv);
 }
 #endif
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_PRESSURE_VALUE_H */

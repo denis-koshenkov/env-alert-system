@@ -1,5 +1,5 @@
-#ifndef LIGHT_INTENSITY_REQUIREMENT_LIST_H
-#define LIGHT_INTENSITY_REQUIREMENT_LIST_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_LIGHT_INTENSITY_REQUIREMENT_LIST_H
+#define ENV_ALERT_SYSTEM_SRC_APP_LIGHT_INTENSITY_REQUIREMENT_LIST_H
 
 #ifdef __cplusplus
 extern "C"
@@ -42,4 +42,4 @@ void light_intensity_requirement_list_remove_all_for_alert(uint8_t alert_id);
 }
 #endif
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_LIGHT_INTENSITY_REQUIREMENT_LIST_H */

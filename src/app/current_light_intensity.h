@@ -1,5 +1,5 @@
-#ifndef CURRENT_LIGHT_INTENSITY_H
-#define CURRENT_LIGHT_INTENSITY_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_CURRENT_LIGHT_INTENSITY_H
+#define ENV_ALERT_SYSTEM_SRC_APP_CURRENT_LIGHT_INTENSITY_H
 
 #ifdef __cplusplus
 extern "C"
@@ -43,4 +43,4 @@ bool current_light_intensity_is_changed();
 }
 #endif
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_CURRENT_LIGHT_INTENSITY_H */

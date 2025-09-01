@@ -1,5 +1,5 @@
-#ifndef VARIABLE_REQUIREMENT_H
-#define VARIABLE_REQUIREMENT_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_VARIABLE_REQUIREMENT_H
+#define ENV_ALERT_SYSTEM_SRC_APP_VARIABLE_REQUIREMENT_H
 
 #ifdef __cplusplus
 extern "C"
@@ -188,4 +188,4 @@ void variable_requirement_destroy(VariableRequirement self);
 }
 #endif
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_VARIABLE_REQUIREMENT_H */

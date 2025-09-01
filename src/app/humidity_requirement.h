@@ -1,5 +1,5 @@
-#ifndef HUMIDITY_REQUIREMENT_H
-#define HUMIDITY_REQUIREMENT_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_HUMIDITY_REQUIREMENT_H
+#define ENV_ALERT_SYSTEM_SRC_APP_HUMIDITY_REQUIREMENT_H
 
 #ifdef __cplusplus
 extern "C"
@@ -36,4 +36,4 @@ VariableRequirement humidity_requirement_create(uint8_t alert_id, uint8_t operat
 }
 #endif
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_HUMIDITY_REQUIREMENT_H */

@@ -1,5 +1,5 @@
-#ifndef CURRENT_PRESSURE_H
-#define CURRENT_PRESSURE_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_CURRENT_PRESSURE_H
+#define ENV_ALERT_SYSTEM_SRC_APP_CURRENT_PRESSURE_H
 
 #ifdef __cplusplus
 extern "C"
@@ -43,4 +43,4 @@ bool current_pressure_is_changed();
 }
 #endif
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_CURRENT_PRESSURE_H */

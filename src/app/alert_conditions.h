@@ -1,5 +1,5 @@
-#ifndef ALERT_CONDITIONS_H
-#define ALERT_CONDITIONS_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_ALERT_CONDITIONS_H
+#define ENV_ALERT_SYSTEM_SRC_APP_ALERT_CONDITIONS_H
 
 #ifdef __cplusplus
 extern "C"
@@ -52,4 +52,4 @@ AlertCondition alert_conditions_get_alert_condition(uint8_t alert_id);
 }
 #endif
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_ALERT_CONDITIONS_H */

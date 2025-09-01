@@ -1,5 +1,5 @@
-#ifndef ALERT_NOTIFIER_H
-#define ALERT_NOTIFIER_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_ALERT_NOTIFIER_H
+#define ENV_ALERT_SYSTEM_SRC_APP_ALERT_NOTIFIER_H
 
 #ifdef __cplusplus
 extern "C"
@@ -28,4 +28,4 @@ void alert_notifier_notify(uint8_t alert_id, bool is_raised);
 }
 #endif
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_ALERT_NOTIFIER_H */

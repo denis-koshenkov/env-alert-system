@@ -1,5 +1,5 @@
-#ifndef LIGHT_INTENSITY_VALUE_H
-#define LIGHT_INTENSITY_VALUE_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_LIGHT_INTENSITY_VALUE_H
+#define ENV_ALERT_SYSTEM_SRC_APP_LIGHT_INTENSITY_VALUE_H
 
 #ifdef __cplusplus
 extern "C"
@@ -58,4 +58,4 @@ bool light_intensity_value_is_value_changed(LightIntensityValue liv);
 }
 #endif
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_LIGHT_INTENSITY_VALUE_H */

@@ -1,5 +1,5 @@
-#ifndef UTILS_UTIL_H
-#define UTILS_UTIL_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_UTILS_UTIL_H
+#define ENV_ALERT_SYSTEM_SRC_APP_UTILS_UTIL_H
 
 #ifdef __cplusplus
 extern "C"
@@ -31,4 +31,4 @@ extern "C"
 }
 #endif
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_UTILS_UTIL_H */

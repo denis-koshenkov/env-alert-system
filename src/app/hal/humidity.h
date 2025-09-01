@@ -1,5 +1,5 @@
-#ifndef HAL_HUMIDITY_H
-#define HAL_HUMIDITY_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_HAL_HUMIDITY_H
+#define ENV_ALERT_SYSTEM_SRC_APP_HAL_HUMIDITY_H
 
 #ifdef __cplusplus
 extern "C"
@@ -28,4 +28,4 @@ typedef uint16_t Humidity;
 }
 #endif
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_HAL_HUMIDITY_H */

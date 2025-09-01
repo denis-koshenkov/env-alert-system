@@ -1,5 +1,5 @@
-#ifndef HAL_PRESSURE_H
-#define HAL_PRESSURE_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_HAL_PRESSURE_H
+#define ENV_ALERT_SYSTEM_SRC_APP_HAL_PRESSURE_H
 
 #ifdef __cplusplus
 extern "C"
@@ -26,4 +26,4 @@ typedef uint16_t Pressure;
 }
 #endif
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_HAL_PRESSURE_H */

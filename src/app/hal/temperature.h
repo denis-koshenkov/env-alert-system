@@ -1,5 +1,5 @@
-#ifndef HAL_TEMPERATURE_H
-#define HAL_TEMPERATURE_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_HAL_TEMPERATURE_H
+#define ENV_ALERT_SYSTEM_SRC_APP_HAL_TEMPERATURE_H
 
 #ifdef __cplusplus
 extern "C"
@@ -31,4 +31,4 @@ typedef int16_t Temperature;
 }
 #endif
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_HAL_TEMPERATURE_H */

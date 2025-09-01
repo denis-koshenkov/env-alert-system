@@ -1,5 +1,5 @@
-#ifndef UTILS_LINKED_LIST_PRIVATE_H
-#define UTILS_LINKED_LIST_PRIVATE_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_UTILS_LINKED_LIST_PRIVATE_H
+#define ENV_ALERT_SYSTEM_SRC_APP_UTILS_LINKED_LIST_PRIVATE_H
 
 #ifdef __cplusplus
 extern "C"
@@ -17,4 +17,4 @@ typedef struct LinkedListNode {
 }
 #endif
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_UTILS_LINKED_LIST_PRIVATE_H */

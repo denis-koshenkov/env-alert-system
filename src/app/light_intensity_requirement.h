@@ -1,5 +1,5 @@
-#ifndef LIGHT_INTENSITY_REQUIREMENT_H
-#define LIGHT_INTENSITY_REQUIREMENT_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_LIGHT_INTENSITY_REQUIREMENT_H
+#define ENV_ALERT_SYSTEM_SRC_APP_LIGHT_INTENSITY_REQUIREMENT_H
 
 #ifdef __cplusplus
 extern "C"
@@ -36,4 +36,4 @@ VariableRequirement light_intensity_requirement_create(uint8_t alert_id, uint8_t
 }
 #endif
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_LIGHT_INTENSITY_REQUIREMENT_H */

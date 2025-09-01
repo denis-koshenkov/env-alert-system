@@ -1,5 +1,5 @@
-#ifndef VARIABLE_REQUIREMENT_EVALUATOR_H
-#define VARIABLE_REQUIREMENT_EVALUATOR_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_VARIABLE_REQUIREMENT_EVALUATOR_H
+#define ENV_ALERT_SYSTEM_SRC_APP_VARIABLE_REQUIREMENT_EVALUATOR_H
 
 #ifdef __cplusplus
 extern "C"
@@ -34,4 +34,4 @@ bool variable_requirement_evaluator_evaluate(VariableRequirement variable_requir
 }
 #endif
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_VARIABLE_REQUIREMENT_EVALUATOR_H */

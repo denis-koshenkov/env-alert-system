@@ -1,5 +1,5 @@
-#ifndef PORT_PROD_FW_INCLUDE_CONFIG_H
-#define PORT_PROD_FW_INCLUDE_CONFIG_H
+#ifndef ENV_ALERT_SYSTEM_SRC_PORT_PROD_FW_INCLUDE_CONFIG_H
+#define ENV_ALERT_SYSTEM_SRC_PORT_PROD_FW_INCLUDE_CONFIG_H
 
 /** Maximal size of one variable requirement in bytes. We have different variable requirement types - e.g.
  * TemperatureVariableRequirement, PressureVariableRequirement, and so on. Each of these types might have a different
@@ -14,4 +14,4 @@
  */
 #define CONFIG_VARIABLE_REQUIREMENT_MAX_SIZE 1
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_PORT_PROD_FW_INCLUDE_CONFIG_H */

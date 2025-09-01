@@ -1,5 +1,5 @@
-#ifndef VARIABLE_REQUIREMENT_LIST_H
-#define VARIABLE_REQUIREMENT_LIST_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_VARIABLE_REQUIREMENT_LIST_H
+#define ENV_ALERT_SYSTEM_SRC_APP_VARIABLE_REQUIREMENT_LIST_H
 
 #ifdef __cplusplus
 extern "C"
@@ -54,4 +54,4 @@ void variable_requirement_list_remove_all_for_alert(VariableRequirementList self
 }
 #endif
 
-#endif
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_VARIABLE_REQUIREMENT_LIST_H */
