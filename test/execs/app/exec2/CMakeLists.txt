@@ -19,6 +19,7 @@ target_sources(app_test_exec2 PRIVATE
     variable_requirement_list.c
     linked_list.cpp
     alert_condition.cpp
+    alert_raiser.cpp
 
     mocks/mock_value_holder.cpp
     mocks/mock_variable_requirement_allocator.cpp
@@ -28,6 +29,7 @@ target_sources(app_test_exec2 PRIVATE
     mocks/mock_current_light_intensity.cpp
     mocks/mock_linked_list_node_allocator.cpp
     mocks/mock_variable_requirement.c
+    mocks/mock_alert_notifier.cpp
 )
 
 target_link_libraries(app_test_exec2 PRIVATE test_common)

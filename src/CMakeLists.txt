@@ -26,6 +26,8 @@ target_sources(eas INTERFACE
     alert_condition.c
     variable_requirement_evaluator.c
     alert_conditions.c
+    alert_raiser.c
+    alert_notifier.c
 )
 
 target_include_directories(eas INTERFACE
