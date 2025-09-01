@@ -1,7 +1,7 @@
-add_library(eas INTERFACE)
+add_library(eas_app INTERFACE)
 
 # main.c is not included, so that another main can be used for test executables
-target_sources(eas INTERFACE
+target_sources(eas_app INTERFACE
     value_holder.c
     temperature_value.c
     pressure_value.c
@@ -28,7 +28,7 @@ target_sources(eas INTERFACE
     alert_notifier.c
 )
 
-target_include_directories(eas INTERFACE
+target_include_directories(eas_app INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
