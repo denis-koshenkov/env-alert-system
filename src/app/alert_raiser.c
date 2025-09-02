@@ -58,24 +58,32 @@ static void cooldown_period_expired_cb(void *user_data)
 
 static void start_warmup_timer(AlertRaiser self)
 {
+    EAS_ASSERT(self);
+
     eas_timer_start(self->warmup_timer);
     self->is_warmup_timer_running = true;
 }
 
 static void start_cooldown_timer(AlertRaiser self)
 {
+    EAS_ASSERT(self);
+
     eas_timer_start(self->cooldown_timer);
     self->is_cooldown_timer_running = true;
 }
 
 static void stop_warmup_timer(AlertRaiser self)
 {
+    EAS_ASSERT(self);
+
     eas_timer_stop(self->warmup_timer);
     self->is_warmup_timer_running = false;
 }
 
 static void stop_cooldown_timer(AlertRaiser self)
 {
+    EAS_ASSERT(self);
+
     eas_timer_stop(self->cooldown_timer);
     self->is_cooldown_timer_running = false;
 }
@@ -101,6 +109,8 @@ AlertRaiser alert_raiser_create()
 
 void alert_raiser_set_alert(AlertRaiser self, uint8_t alert_id, uint32_t warmup_period_ms, uint32_t cooldown_period_ms)
 {
+    EAS_ASSERT(self);
+
     /* Stop any timers that are running for the old alert */
     if (self->is_warmup_timer_running) {
         stop_warmup_timer(self);
@@ -130,6 +140,7 @@ void alert_raiser_set_alert(AlertRaiser self, uint8_t alert_id, uint32_t warmup_
 
 void alert_raiser_set_alert_condition_result(AlertRaiser self, bool alert_condition_result)
 {
+    EAS_ASSERT(self);
     /* If an alert has not been set yet, we do not know for which alert this condition result is updated. An alert
      * should always be set prior to calling this function. */
     EAS_ASSERT(self->is_alert_set);

@@ -797,3 +797,48 @@ TEST(AlertRaiser, AlertIsInitiallySilenced)
     /* This call should have no effect - cooldown timer should not be started, since the alert is initially silenced. */
     alert_raiser_set_alert_condition_result(alert_raiser, false);
 }
+
+TEST(AlertRaiser, SetAlertAssertsIfInstanceNull)
+{
+    uint8_t alert_id = 0;
+    uint32_t warmup_period_ms = 132;
+    uint32_t cooldown_period_ms = 267;
+
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .ignoreOtherParameters()
+        .andReturnValue(warmup_timer);
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .ignoreOtherParameters()
+        .andReturnValue(cooldown_timer);
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "alert_raiser_set_alert");
+
+    AlertRaiser alert_raiser = alert_raiser_create();
+    alert_raiser_set_alert(NULL, alert_id, warmup_period_ms, cooldown_period_ms);
+}
+
+TEST(AlertRaiser, SetAlertConditionResultAssertsIfInstanceNull)
+{
+    uint8_t alert_id = 57;
+    uint32_t warmup_period_ms = 0;
+    uint32_t cooldown_period_ms = 0;
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .ignoreOtherParameters()
+        .andReturnValue(warmup_timer);
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .ignoreOtherParameters()
+        .andReturnValue(cooldown_timer);
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "alert_raiser_set_alert_condition_result");
+
+    /* Creates warmup and cooldown timer instances */
+    AlertRaiser alert_raiser = alert_raiser_create();
+    alert_raiser_set_alert(alert_raiser, alert_id, warmup_period_ms, cooldown_period_ms);
+    alert_raiser_set_alert_condition_result(NULL, true);
+}
