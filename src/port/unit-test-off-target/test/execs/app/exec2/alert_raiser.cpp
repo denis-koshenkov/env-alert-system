@@ -765,3 +765,35 @@ TEST(AlertRaiser, SetAlertConditionAssertsIfCalledBeforeSetAlert)
     AlertRaiser alert_raiser = alert_raiser_create();
     alert_raiser_set_alert_condition_result(alert_raiser, true);
 }
+
+TEST(AlertRaiser, AlertIsInitiallySilenced)
+{
+    uint8_t alert_id = 12;
+    uint32_t warmup_period_ms = 13;
+    uint32_t cooldown_period_ms = 14;
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .ignoreOtherParameters()
+        .andReturnValue(warmup_timer);
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .ignoreOtherParameters()
+        .andReturnValue(cooldown_timer);
+    mock()
+        .expectOneCall("eas_timer_set_period")
+        .withParameter("self", warmup_timer)
+        .withParameter("period_ms", warmup_period_ms);
+    mock()
+        .expectOneCall("eas_timer_set_period")
+        .withParameter("self", cooldown_timer)
+        .withParameter("period_ms", cooldown_period_ms);
+
+    /* Creates warmup and cooldown timer instances */
+    AlertRaiser alert_raiser = alert_raiser_create();
+    /* Sets timer period */
+    alert_raiser_set_alert(alert_raiser, alert_id, warmup_period_ms, cooldown_period_ms);
+    /* This call should have no effect - cooldown timer should not be started, since the alert is initially silenced. */
+    alert_raiser_set_alert_condition_result(alert_raiser, false);
+}
