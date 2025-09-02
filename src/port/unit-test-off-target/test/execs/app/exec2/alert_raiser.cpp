@@ -156,3 +156,46 @@ TEST(AlertRaiser, Warmup0CooldownNot0)
     /* Call the cooldown callback to simulate the warmup period expiring */
     cooldown_cb(cooldown_cb_user_data);
 }
+
+TEST(AlertRaiser, Warmup0Cooldown0ConditionResultSetSeveralTimes)
+{
+    uint8_t alert_id = 1;
+    uint32_t warmup_period_ms = 0;
+    uint32_t cooldown_period_ms = 0;
+
+    /* alert_raiser_create */
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .ignoreOtherParameters()
+        .andReturnValue(warmup_timer);
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .ignoreOtherParameters()
+        .andReturnValue(cooldown_timer);
+    /* First three calls to alert_raiser_set_alert_condition_result(true) */
+    mock().expectOneCall("alert_notifier_notify").withParameter("alert_id", alert_id).withParameter("is_raised", true);
+    /* First three calls to alert_raiser_set_alert_condition_result(false) */
+    mock().expectOneCall("alert_notifier_notify").withParameter("alert_id", alert_id).withParameter("is_raised", false);
+    /* Second two calls to alert_raiser_set_alert_condition_result(true) */
+    mock().expectOneCall("alert_notifier_notify").withParameter("alert_id", alert_id).withParameter("is_raised", true);
+    /* Second two calls to alert_raiser_set_alert_condition_result(false) */
+    mock().expectOneCall("alert_notifier_notify").withParameter("alert_id", alert_id).withParameter("is_raised", false);
+    /* Last call to alert_raiser_set_alert_condition_result(true) */
+    mock().expectOneCall("alert_notifier_notify").withParameter("alert_id", alert_id).withParameter("is_raised", true);
+
+    AlertRaiser alert_raiser = alert_raiser_create();
+    alert_raiser_set_alert(alert_raiser, alert_id, warmup_period_ms, cooldown_period_ms);
+    alert_raiser_set_alert_condition_result(alert_raiser, true);
+    alert_raiser_set_alert_condition_result(alert_raiser, true);
+    alert_raiser_set_alert_condition_result(alert_raiser, true);
+    alert_raiser_set_alert_condition_result(alert_raiser, false);
+    alert_raiser_set_alert_condition_result(alert_raiser, false);
+    alert_raiser_set_alert_condition_result(alert_raiser, false);
+    alert_raiser_set_alert_condition_result(alert_raiser, true);
+    alert_raiser_set_alert_condition_result(alert_raiser, true);
+    alert_raiser_set_alert_condition_result(alert_raiser, false);
+    alert_raiser_set_alert_condition_result(alert_raiser, false);
+    alert_raiser_set_alert_condition_result(alert_raiser, true);
+}
