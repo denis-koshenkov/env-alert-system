@@ -412,3 +412,91 @@ TEST(AlertRaiser, CooldownTimerCbExecutedAfterTimerStopped)
      * alert_notifier_notify(false), because the alert condition was already set to true. */
     cooldown_cb(cooldown_cb_user_data);
 }
+
+TEST(AlertRaiser, SetAlertConditionTrueAfterWarmupExpiredHasNoEffect)
+{
+    uint8_t alert_id = 3;
+    uint32_t warmup_period_ms = 5000;
+    uint32_t cooldown_period_ms = 0;
+
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .ignoreOtherParameters()
+        .andReturnValue(warmup_timer);
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .ignoreOtherParameters()
+        .andReturnValue(cooldown_timer);
+    mock()
+        .expectOneCall("eas_timer_set_period")
+        .withParameter("self", warmup_timer)
+        .withParameter("period_ms", warmup_period_ms);
+    mock().expectOneCall("eas_timer_start").withParameter("self", warmup_timer);
+    mock().expectOneCall("alert_notifier_notify").withParameter("alert_id", alert_id).withParameter("is_raised", true);
+    /* Do not expect another alert_notifier_notify(true) call */
+
+    /* Creates warmup and cooldown timer instances */
+    AlertRaiser alert_raiser = alert_raiser_create();
+    EasTimerCb warmup_cb = timer_cbs[0];
+    void *warmup_cb_user_data = timer_cbs_user_data[0];
+    /* Sets timer period */
+    alert_raiser_set_alert(alert_raiser, alert_id, warmup_period_ms, cooldown_period_ms);
+    /* Start the warmup timer */
+    alert_raiser_set_alert_condition_result(alert_raiser, true);
+    /* Raises the alert - calls alert_notifier_notify(true) */
+    warmup_cb(warmup_cb_user_data);
+    /* This call has no effect since the alert is already raised */
+    alert_raiser_set_alert_condition_result(alert_raiser, true);
+}
+
+TEST(AlertRaiser, SetAlertConditionTrueAfterCooldownExpiredHasNoEffect)
+{
+    uint8_t alert_id = 4;
+    uint32_t warmup_period_ms = 4321;
+    uint32_t cooldown_period_ms = 1234;
+
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .ignoreOtherParameters()
+        .andReturnValue(warmup_timer);
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .ignoreOtherParameters()
+        .andReturnValue(cooldown_timer);
+    mock()
+        .expectOneCall("eas_timer_set_period")
+        .withParameter("self", warmup_timer)
+        .withParameter("period_ms", warmup_period_ms);
+    mock()
+        .expectOneCall("eas_timer_set_period")
+        .withParameter("self", cooldown_timer)
+        .withParameter("period_ms", cooldown_period_ms);
+    mock().expectOneCall("eas_timer_start").withParameter("self", warmup_timer);
+    mock().expectOneCall("alert_notifier_notify").withParameter("alert_id", alert_id).withParameter("is_raised", true);
+    mock().expectOneCall("eas_timer_start").withParameter("self", cooldown_timer);
+    mock().expectOneCall("alert_notifier_notify").withParameter("alert_id", alert_id).withParameter("is_raised", false);
+    /* Do not expect another alert_notifier_notify(false) call */
+
+    /* Creates warmup and cooldown timer instances */
+    AlertRaiser alert_raiser = alert_raiser_create();
+    EasTimerCb warmup_cb = timer_cbs[0];
+    void *warmup_cb_user_data = timer_cbs_user_data[0];
+    EasTimerCb cooldown_cb = timer_cbs[1];
+    void *cooldown_cb_user_data = timer_cbs_user_data[1];
+    /* Sets timer period */
+    alert_raiser_set_alert(alert_raiser, alert_id, warmup_period_ms, cooldown_period_ms);
+    /* Start the warmup timer */
+    alert_raiser_set_alert_condition_result(alert_raiser, true);
+    /* Raises the alert - calls alert_notifier_notify(true) */
+    warmup_cb(warmup_cb_user_data);
+    /* Starts the cooldown timer */
+    alert_raiser_set_alert_condition_result(alert_raiser, false);
+    /* Silences the alert - calls alert_notifier_notify(false) */
+    cooldown_cb(cooldown_cb_user_data);
+    /* This call has no effect since the alert is already silenced */
+    alert_raiser_set_alert_condition_result(alert_raiser, false);
+}
