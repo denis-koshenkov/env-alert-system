@@ -1,0 +1,17 @@
+#ifndef ENV_ALERT_SYSTEM_SRC_PORT_UNIT_TEST_OFF_TARGET_TEST_EXECS_APP_EXEC1_MOCKS_MOCK_ALERT_RAISER_H
+#define ENV_ALERT_SYSTEM_SRC_PORT_UNIT_TEST_OFF_TARGET_TEST_EXECS_APP_EXEC1_MOCKS_MOCK_ALERT_RAISER_H
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+typedef struct AlertRaiserStruct *AlertRaiser;
+
+AlertRaiser alert_raiser_create();
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* ENV_ALERT_SYSTEM_SRC_PORT_UNIT_TEST_OFF_TARGET_TEST_EXECS_APP_EXEC1_MOCKS_MOCK_ALERT_RAISER_H */

@@ -9,6 +9,8 @@ extern "C"
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "alert_raiser_defs.h"
+
 /**
  * @brief Decides when an alert is raised/silenced based on alert condition result, warmup period, and cooldown period.
  *
@@ -74,7 +76,6 @@ extern "C"
  * Thus, the caller of this module only needs to keep updating the alert condition result, and the alert raiser will
  * ensure that all notifications for raising/silencing the alert are executed.
  */
-typedef struct AlertRaiserStruct *AlertRaiser;
 
 /**
  * @brief Create an alert raiser instance.

@@ -35,6 +35,9 @@
  */
 #define CONFIG_MAX_NUM_ALERTS 10
 
+/** Defines how many AlertRaiser instances the AlertRaisers module creates. */
+#define CONFIG_ALERT_RAISERS_NUM_INSTANCES_TO_CREATE CONFIG_MAX_NUM_ALERTS
+
 /* Configs for port-specific modules */
 
 /** Should correspond to the number of times <module_name>_create() will be called in the unit test program. */
