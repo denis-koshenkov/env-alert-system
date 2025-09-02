@@ -99,6 +99,9 @@ AlertRaiser alert_raiser_create()
 void alert_raiser_set_alert(AlertRaiser self, uint8_t alert_id, uint32_t warmup_period_ms, uint32_t cooldown_period_ms)
 {
     /* Stop any timers that are running for the old alert */
+    if (self->is_warmup_timer_running) {
+        stop_warmup_timer(self);
+    }
     if (self->is_cooldown_timer_running) {
         stop_cooldown_timer(self);
     }
