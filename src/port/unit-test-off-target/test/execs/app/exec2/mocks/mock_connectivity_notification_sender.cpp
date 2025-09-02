@@ -1,10 +1,10 @@
 #include "CppUTestExt/MockSupport.h"
 #include "mock_connectivity_notification_sender.h"
 
-void connectivity_notification_sender_send_notification(uint8_t alert_id, bool is_raised)
+void connectivity_notification_sender_send(uint8_t alert_id, bool is_raised)
 {
     mock()
-        .actualCall("connectivity_notification_sender_send_notification")
+        .actualCall("connectivity_notification_sender_send")
         .withParameter("alert_id", alert_id)
         .withParameter("is_raised", is_raised);
 }

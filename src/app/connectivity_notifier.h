@@ -9,6 +9,8 @@ extern "C"
 #include <stdint.h>
 #include <stdbool.h>
 
+void connectivity_notifier_register_notification(uint8_t alert_id);
+
 void connectivity_notifier_notify(uint8_t alert_id, bool is_raised);
 
 #ifdef __cplusplus

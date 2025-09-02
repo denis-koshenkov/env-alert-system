@@ -9,7 +9,7 @@ extern "C"
 #include <stdint.h>
 #include <stdbool.h>
 
-void connectivity_notification_sender_send_notification(uint8_t alert_id, bool is_raised);
+void connectivity_notification_sender_send(uint8_t alert_id, bool is_raised);
 
 #ifdef __cplusplus
 }
