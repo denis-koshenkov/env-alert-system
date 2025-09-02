@@ -12,7 +12,9 @@
 
 struct AlertRaiserStruct {
     EasTimer warmup_timer;
+    EasTimer cooldown_timer;
     uint32_t warmup_period_ms;
+    uint32_t cooldown_period_ms;
 };
 
 static struct AlertRaiserStruct instances[CONFIG_ALERT_RAISER_MAX_NUM_INSTANCES];
@@ -25,6 +27,7 @@ static void warmup_period_expired_cb(void *user_data)
 
 static void cooldown_period_expired_cb(void *user_data)
 {
+    alert_notifier_notify(0, false);
 }
 
 AlertRaiser alert_raiser_create()
@@ -34,8 +37,9 @@ AlertRaiser alert_raiser_create()
     instance_idx++;
 
     instance->warmup_timer = eas_timer_create(0, warmup_period_expired_cb, NULL);
-    eas_timer_create(0, cooldown_period_expired_cb, NULL);
+    instance->cooldown_timer = eas_timer_create(0, cooldown_period_expired_cb, NULL);
     instance->warmup_period_ms = 0;
+    instance->cooldown_period_ms = 0;
 
     return instance;
 }
@@ -45,13 +49,20 @@ void alert_raiser_set_alert(AlertRaiser self, uint8_t alert_id, uint32_t warmup_
     if (warmup_period_ms > 0) {
         eas_timer_set_period(self->warmup_timer, warmup_period_ms);
     }
+    if (cooldown_period_ms > 0) {
+        eas_timer_set_period(self->cooldown_timer, cooldown_period_ms);
+    }
+
     self->warmup_period_ms = warmup_period_ms;
+    self->cooldown_period_ms = cooldown_period_ms;
 }
 
 void alert_raiser_set_alert_condition_result(AlertRaiser self, bool alert_condition_result)
 {
-    if (self->warmup_period_ms > 0 && alert_condition_result) {
-        eas_timer_start(self->warmup_timer);
+    uint32_t period_ms = alert_condition_result ? self->warmup_period_ms : self->cooldown_period_ms;
+    if (period_ms > 0) {
+        EasTimer timer = alert_condition_result ? self->warmup_timer : self->cooldown_timer;
+        eas_timer_start(timer);
     } else {
         alert_notifier_notify(0, alert_condition_result);
     }
