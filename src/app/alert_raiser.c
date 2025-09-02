@@ -112,25 +112,35 @@ void alert_raiser_set_alert(AlertRaiser self, uint8_t alert_id, uint32_t warmup_
 
 void alert_raiser_set_alert_condition_result(AlertRaiser self, bool alert_condition_result)
 {
-    if (self->is_alert_raised == alert_condition_result) {
+    bool already_in_required_state = (self->is_alert_raised == alert_condition_result);
+
+    if (already_in_required_state) {
+        /* We are already in the required state. The only thing to do is to stop the timer that would change the
+         * state later, if such a timer is currently running. */
+
         /* If the alarm is raised, only the cooldown timer can be running to silence the alarm later. If the alarm
          * is silenced, only the warmup timer can be running to raise the alarm later. */
         bool is_timer_running = self->is_alert_raised ? self->is_cooldown_timer_running : self->is_warmup_timer_running;
         if (is_timer_running) {
             self->is_alert_raised ? stop_cooldown_timer(self) : stop_warmup_timer(self);
         }
-        return;
-    }
-
-    uint32_t period_ms = alert_condition_result ? self->warmup_period_ms : self->cooldown_period_ms;
-    if (period_ms > 0) {
-        bool is_timer_running =
-            alert_condition_result ? self->is_warmup_timer_running : self->is_cooldown_timer_running;
-        if (!is_timer_running) {
-            alert_condition_result ? start_warmup_timer(self) : start_cooldown_timer(self);
-        }
     } else {
-        alert_notifier_notify(self->alert_id, alert_condition_result);
-        self->is_alert_raised = alert_condition_result;
+        uint32_t period_ms = alert_condition_result ? self->warmup_period_ms : self->cooldown_period_ms;
+        if (period_ms > 0) {
+            /* We are not in the required state and timer period is > 0. We need to ensure that there is a timer running
+             * to change to the required state later. If there is no timer running, start it. If the timer is already
+             * running, do nothing - this means that the previous call to this function had the same
+             * alert_condition_result, and the timer had already been started. We should not restart the timer in that
+             * case. */
+            bool is_timer_running =
+                alert_condition_result ? self->is_warmup_timer_running : self->is_cooldown_timer_running;
+            if (!is_timer_running) {
+                alert_condition_result ? start_warmup_timer(self) : start_cooldown_timer(self);
+            }
+        } else {
+            /* We are not in the required state and the timer period is 0. Immediately change to the required state. */
+            alert_notifier_notify(self->alert_id, alert_condition_result);
+            self->is_alert_raised = alert_condition_result;
+        }
     }
 }
