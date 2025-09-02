@@ -1,0 +1,19 @@
+#ifndef ENV_ALERT_SYSTEM_SRC_PORT_UNIT_TEST_OFF_TARGET_TEST_EXECS_APP_EXEC2_MOCKS_MOCK_CONNECTIVITY_NOTIFICATION_SENDER_H
+#define ENV_ALERT_SYSTEM_SRC_PORT_UNIT_TEST_OFF_TARGET_TEST_EXECS_APP_EXEC2_MOCKS_MOCK_CONNECTIVITY_NOTIFICATION_SENDER_H
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+#include <stdint.h>
+#include <stdbool.h>
+
+void connectivity_notification_sender_send_notification(uint8_t alert_id, bool is_raised);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* ENV_ALERT_SYSTEM_SRC_PORT_UNIT_TEST_OFF_TARGET_TEST_EXECS_APP_EXEC2_MOCKS_MOCK_CONNECTIVITY_NOTIFICATION_SENDER_H \
+        */

@@ -37,6 +37,13 @@
 /** Defines how many AlertRaiser instances the AlertRaisers module creates. */
 #define CONFIG_ALERT_RAISERS_NUM_INSTANCES_TO_CREATE CONFIG_MAX_NUM_ALERTS
 
+/**
+ * @brief Defines the valid alert ids for which a connectivity notification can be sent.
+ *
+ * The valid alert ids are from 0 to CONFIG_CONNECTIVITY_NOTIFIER_MAX_NUM_ALERTS - 1, both including.
+ */
+#define CONFIG_CONNECTIVITY_NOTIFIER_MAX_NUM_ALERTS CONFIG_MAX_NUM_ALERTS
+
 /* Configs for port-specific modules */
 
 /** Should correspond to the number of times <module_name>_create() will be called in the unit test program. */

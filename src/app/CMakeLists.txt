@@ -27,6 +27,7 @@ target_sources(eas_app INTERFACE
     alert_raiser.c
     alert_notifier.c
     alert_raisers.c
+    connectivity_notifier.c
 )
 
 target_include_directories(eas_app INTERFACE
