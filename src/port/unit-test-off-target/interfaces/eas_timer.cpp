@@ -31,3 +31,8 @@ void eas_timer_start(EasTimer self)
 {
     mock().actualCall("eas_timer_start").withParameter("self", self);
 }
+
+void eas_timer_stop(EasTimer self)
+{
+    mock().actualCall("eas_timer_stop").withParameter("self", self);
+}

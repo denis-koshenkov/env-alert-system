@@ -12,9 +12,11 @@
 
 struct AlertRaiserStruct {
     EasTimer warmup_timer;
-    EasTimer cooldown_timer;
     uint32_t warmup_period_ms;
+    bool is_warmup_timer_running;
+    EasTimer cooldown_timer;
     uint32_t cooldown_period_ms;
+    bool is_cooldown_timer_running;
     uint8_t alert_id;
     bool is_raised;
 };
@@ -26,13 +28,42 @@ static void warmup_period_expired_cb(void *user_data)
 {
     AlertRaiser self = (AlertRaiser)(user_data);
 
-    alert_notifier_notify(0, true);
+    alert_notifier_notify(self->alert_id, true);
     self->is_raised = true;
+    self->is_warmup_timer_running = false;
 }
 
 static void cooldown_period_expired_cb(void *user_data)
 {
-    alert_notifier_notify(0, false);
+    AlertRaiser self = (AlertRaiser)(user_data);
+
+    alert_notifier_notify(self->alert_id, false);
+    self->is_raised = false;
+    self->is_cooldown_timer_running = false;
+}
+
+static void start_warmup_timer(AlertRaiser self)
+{
+    eas_timer_start(self->warmup_timer);
+    self->is_warmup_timer_running = true;
+}
+
+static void start_cooldown_timer(AlertRaiser self)
+{
+    eas_timer_start(self->cooldown_timer);
+    self->is_cooldown_timer_running = true;
+}
+
+static void stop_warmup_timer(AlertRaiser self)
+{
+    eas_timer_stop(self->warmup_timer);
+    self->is_warmup_timer_running = false;
+}
+
+static void stop_cooldown_timer(AlertRaiser self)
+{
+    eas_timer_stop(self->cooldown_timer);
+    self->is_cooldown_timer_running = false;
 }
 
 AlertRaiser alert_raiser_create()
@@ -42,9 +73,11 @@ AlertRaiser alert_raiser_create()
     instance_idx++;
 
     instance->warmup_timer = eas_timer_create(0, warmup_period_expired_cb, instance);
-    instance->cooldown_timer = eas_timer_create(0, cooldown_period_expired_cb, NULL);
     instance->warmup_period_ms = 0;
+    instance->is_warmup_timer_running = false;
+    instance->cooldown_timer = eas_timer_create(0, cooldown_period_expired_cb, instance);
     instance->cooldown_period_ms = 0;
+    instance->is_cooldown_timer_running = false;
     instance->alert_id = 0;
     instance->is_raised = false;
 
@@ -67,14 +100,25 @@ void alert_raiser_set_alert(AlertRaiser self, uint8_t alert_id, uint32_t warmup_
 
 void alert_raiser_set_alert_condition_result(AlertRaiser self, bool alert_condition_result)
 {
+    if (self->is_raised == alert_condition_result) {
+        /* If the alarm is raised, only the cooldown timer can be running to silence the alarm later. If the alarm is
+         * silenced, only the warmup timer can be running to raise the alarm later. */
+        bool is_timer_running = self->is_raised ? self->is_cooldown_timer_running : self->is_warmup_timer_running;
+        if (is_timer_running) {
+            self->is_raised ? stop_cooldown_timer(self) : stop_warmup_timer(self);
+        }
+        return;
+    }
+
     uint32_t period_ms = alert_condition_result ? self->warmup_period_ms : self->cooldown_period_ms;
     if (period_ms > 0) {
-        EasTimer timer = alert_condition_result ? self->warmup_timer : self->cooldown_timer;
-        eas_timer_start(timer);
-    } else {
-        if (self->is_raised != alert_condition_result) {
-            alert_notifier_notify(self->alert_id, alert_condition_result);
-            self->is_raised = alert_condition_result;
+        bool is_timer_running =
+            alert_condition_result ? self->is_warmup_timer_running : self->is_cooldown_timer_running;
+        if (!is_timer_running) {
+            alert_condition_result ? start_warmup_timer(self) : start_cooldown_timer(self);
         }
+    } else {
+        alert_notifier_notify(self->alert_id, alert_condition_result);
+        self->is_raised = alert_condition_result;
     }
 }

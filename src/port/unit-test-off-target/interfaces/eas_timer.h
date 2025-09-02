@@ -16,6 +16,8 @@ void eas_timer_set_period(EasTimer self, uint32_t period_ms);
 
 void eas_timer_start(EasTimer self);
 
+void eas_timer_stop(EasTimer self);
+
 #ifdef __cplusplus
 }
 #endif
