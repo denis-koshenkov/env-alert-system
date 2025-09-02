@@ -98,6 +98,17 @@ AlertRaiser alert_raiser_create()
 
 void alert_raiser_set_alert(AlertRaiser self, uint8_t alert_id, uint32_t warmup_period_ms, uint32_t cooldown_period_ms)
 {
+    /* Stop any timers that are running for the old alert */
+    if (self->is_cooldown_timer_running) {
+        stop_cooldown_timer(self);
+    }
+
+    /* If the old alert is raised, silence it before setting the new alert */
+    if (self->is_alert_raised) {
+        alert_notifier_notify(self->alert_id, false);
+        self->is_alert_raised = false;
+    }
+
     if (warmup_period_ms > 0) {
         eas_timer_set_period(self->warmup_timer, warmup_period_ms);
     }
@@ -118,8 +129,8 @@ void alert_raiser_set_alert_condition_result(AlertRaiser self, bool alert_condit
         /* We are already in the required state. The only thing to do is to stop the timer that would change the
          * state later, if such a timer is currently running. */
 
-        /* If the alarm is raised, only the cooldown timer can be running to silence the alarm later. If the alarm
-         * is silenced, only the warmup timer can be running to raise the alarm later. */
+        /* If the alert is raised, only the cooldown timer can be running to silence the alert later. If the alert
+         * is silenced, only the warmup timer can be running to raise the alert later. */
         bool is_timer_running = self->is_alert_raised ? self->is_cooldown_timer_running : self->is_warmup_timer_running;
         if (is_timer_running) {
             self->is_alert_raised ? stop_cooldown_timer(self) : stop_warmup_timer(self);

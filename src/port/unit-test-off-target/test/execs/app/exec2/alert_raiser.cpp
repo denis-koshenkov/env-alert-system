@@ -19,7 +19,11 @@ static EasTimer cooldown_timer = (EasTimer)0x43;
 TEST_GROUP(AlertRaiser)
 {
     void setup() {
-        /* Pass pointers and arrays to the mock object so that it populates them with warmup/cooldown callbacks and their user data*/
+        /* Order of expected calls is important for these tests. Fail the test if the expected mock calls do not happen
+        in the specified order */
+        mock().strictOrder();
+
+        /* Pass pointers and arrays to the mock object so that it populates them with warmup/cooldown callbacks and their user data */
         mock().setData("timerCbs", (void *)timer_cbs);
         mock().setData("timerCbsUserData", timer_cbs_user_data);
         /* Give the size of the arrays to the mock object so that it never does out of bound accesses */
@@ -499,4 +503,171 @@ TEST(AlertRaiser, SetAlertConditionTrueAfterCooldownExpiredHasNoEffect)
     cooldown_cb(cooldown_cb_user_data);
     /* This call has no effect since the alert is already silenced */
     alert_raiser_set_alert_condition_result(alert_raiser, false);
+}
+
+TEST(AlertRaiser, AlertIdAndTimerPeriodsAreOverwrittenWhenNewAlertIsSet)
+{
+    uint8_t alert_0_id = 5;
+    uint32_t alert_0_warmup_period_ms = 300;
+    uint32_t alert_0_cooldown_period_ms = 200;
+
+    uint8_t alert_1_id = 10;
+    uint32_t alert_1_warmup_period_ms = 0;
+    uint32_t alert_1_cooldown_period_ms = 0;
+
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .ignoreOtherParameters()
+        .andReturnValue(warmup_timer);
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .ignoreOtherParameters()
+        .andReturnValue(cooldown_timer);
+    /* Expected calls for alert 0 */
+    mock()
+        .expectOneCall("eas_timer_set_period")
+        .withParameter("self", warmup_timer)
+        .withParameter("period_ms", alert_0_warmup_period_ms);
+    mock()
+        .expectOneCall("eas_timer_set_period")
+        .withParameter("self", cooldown_timer)
+        .withParameter("period_ms", alert_0_cooldown_period_ms);
+    mock().expectOneCall("eas_timer_start").withParameter("self", warmup_timer);
+    mock()
+        .expectOneCall("alert_notifier_notify")
+        .withParameter("alert_id", alert_0_id)
+        .withParameter("is_raised", true);
+    mock().expectOneCall("eas_timer_start").withParameter("self", cooldown_timer);
+    mock()
+        .expectOneCall("alert_notifier_notify")
+        .withParameter("alert_id", alert_0_id)
+        .withParameter("is_raised", false);
+    /* Expected calls for alert 1 */
+    /* No expected calls to eas_timer_set_period, since both warmup and cooldown periods are 0 */
+    mock()
+        .expectOneCall("alert_notifier_notify")
+        .withParameter("alert_id", alert_1_id)
+        .withParameter("is_raised", true);
+    mock()
+        .expectOneCall("alert_notifier_notify")
+        .withParameter("alert_id", alert_1_id)
+        .withParameter("is_raised", false);
+
+    /* Creates warmup and cooldown timer instances */
+    AlertRaiser alert_raiser = alert_raiser_create();
+    EasTimerCb warmup_cb = timer_cbs[0];
+    void *warmup_cb_user_data = timer_cbs_user_data[0];
+    EasTimerCb cooldown_cb = timer_cbs[1];
+    void *cooldown_cb_user_data = timer_cbs_user_data[1];
+    /* Sets timer period */
+    alert_raiser_set_alert(alert_raiser, alert_0_id, alert_0_warmup_period_ms, alert_0_cooldown_period_ms);
+    /* Start the warmup timer */
+    alert_raiser_set_alert_condition_result(alert_raiser, true);
+    /* Raises the alert - calls alert_notifier_notify(true) */
+    warmup_cb(warmup_cb_user_data);
+    /* Starts the cooldown timer */
+    alert_raiser_set_alert_condition_result(alert_raiser, false);
+    /* Silences the alert - calls alert_notifier_notify(false) */
+    cooldown_cb(cooldown_cb_user_data);
+
+    /* Set a new alert */
+    alert_raiser_set_alert(alert_raiser, alert_1_id, alert_1_warmup_period_ms, alert_1_cooldown_period_ms);
+    /* Raises alert - warmup period is 0 */
+    alert_raiser_set_alert_condition_result(alert_raiser, true);
+    /* Silences alert - warmup period is 1 */
+    alert_raiser_set_alert_condition_result(alert_raiser, false);
+}
+
+TEST(AlertRaiser, CooldownTimerRunningWhenNewAlarmIsSet)
+{
+    uint8_t alert_0_id = 6;
+    uint32_t alert_0_warmup_period_ms = 500;
+    uint32_t alert_0_cooldown_period_ms = 600;
+
+    uint8_t alert_1_id = 255;
+    uint32_t alert_1_warmup_period_ms = 1;
+    uint32_t alert_1_cooldown_period_ms = 2;
+
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .ignoreOtherParameters()
+        .andReturnValue(warmup_timer);
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .ignoreOtherParameters()
+        .andReturnValue(cooldown_timer);
+    /* Expected calls for alert 0 */
+    mock()
+        .expectOneCall("eas_timer_set_period")
+        .withParameter("self", warmup_timer)
+        .withParameter("period_ms", alert_0_warmup_period_ms);
+    mock()
+        .expectOneCall("eas_timer_set_period")
+        .withParameter("self", cooldown_timer)
+        .withParameter("period_ms", alert_0_cooldown_period_ms);
+    mock().expectOneCall("eas_timer_start").withParameter("self", warmup_timer);
+    mock()
+        .expectOneCall("alert_notifier_notify")
+        .withParameter("alert_id", alert_0_id)
+        .withParameter("is_raised", true);
+    mock().expectOneCall("eas_timer_start").withParameter("self", cooldown_timer);
+    /* Expected calls for alert 1 */
+    mock().expectOneCall("eas_timer_stop").withParameter("self", cooldown_timer);
+    mock()
+        .expectOneCall("alert_notifier_notify")
+        .withParameter("alert_id", alert_0_id)
+        .withParameter("is_raised", false);
+    mock()
+        .expectOneCall("eas_timer_set_period")
+        .withParameter("self", warmup_timer)
+        .withParameter("period_ms", alert_1_warmup_period_ms);
+    mock()
+        .expectOneCall("eas_timer_set_period")
+        .withParameter("self", cooldown_timer)
+        .withParameter("period_ms", alert_1_cooldown_period_ms);
+    mock().expectOneCall("eas_timer_start").withParameter("self", warmup_timer);
+    mock()
+        .expectOneCall("alert_notifier_notify")
+        .withParameter("alert_id", alert_1_id)
+        .withParameter("is_raised", true);
+    mock().expectOneCall("eas_timer_start").withParameter("self", cooldown_timer);
+    mock()
+        .expectOneCall("alert_notifier_notify")
+        .withParameter("alert_id", alert_1_id)
+        .withParameter("is_raised", false);
+
+    /* Creates warmup and cooldown timer instances */
+    AlertRaiser alert_raiser = alert_raiser_create();
+    EasTimerCb warmup_cb = timer_cbs[0];
+    void *warmup_cb_user_data = timer_cbs_user_data[0];
+    EasTimerCb cooldown_cb = timer_cbs[1];
+    void *cooldown_cb_user_data = timer_cbs_user_data[1];
+    /* Sets timer period */
+    alert_raiser_set_alert(alert_raiser, alert_0_id, alert_0_warmup_period_ms, alert_0_cooldown_period_ms);
+    /* Start the warmup timer */
+    alert_raiser_set_alert_condition_result(alert_raiser, true);
+    /* Raises the alert - calls alert_notifier_notify(true) */
+    warmup_cb(warmup_cb_user_data);
+    /* Starts the cooldown timer */
+    alert_raiser_set_alert_condition_result(alert_raiser, false);
+
+    /* Old alert is currently raised and the cooldown timer is running. This call should stop the cooldown timer,
+     * silence the old alert, and set warmup and cooldown periods for the new alert. */
+    alert_raiser_set_alert(alert_raiser, alert_1_id, alert_1_warmup_period_ms, alert_1_cooldown_period_ms);
+    /* Cooldown for the old alert still gets executed - this should have no effect */
+    cooldown_cb(cooldown_cb_user_data);
+    /* New alert should be initially silenced - this call should have no effect */
+    alert_raiser_set_alert_condition_result(alert_raiser, false);
+    /* Starts the warmup timer */
+    alert_raiser_set_alert_condition_result(alert_raiser, true);
+    /* Raises the alert - calls alert_notifier_notify(true) */
+    warmup_cb(warmup_cb_user_data);
+    /* Starts the cooldown timer */
+    alert_raiser_set_alert_condition_result(alert_raiser, false);
+    /* Silences the alert - calls alert_notifier_notify(false) */
+    cooldown_cb(cooldown_cb_user_data);
 }
