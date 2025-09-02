@@ -7,7 +7,7 @@
 #include "config.h"
 #include "eas_assert.h"
 
-static AlertCondition expected_instances[CONFIG_MAX_NUM_ALERTS];
+static AlertCondition expected_instances[CONFIG_ALERT_CONDITIONS_NUM_INSTANCES_TO_CREATE];
 
 static AlertCondition map_expected_instance_index_to_instance(size_t index)
 {
@@ -18,7 +18,7 @@ static AlertCondition map_expected_instance_index_to_instance(size_t index)
 
 static void initialize_expected_instances()
 {
-    for (size_t i = 0; i < CONFIG_MAX_NUM_ALERTS; i++) {
+    for (size_t i = 0; i < CONFIG_ALERT_CONDITIONS_NUM_INSTANCES_TO_CREATE; i++) {
         expected_instances[i] = map_expected_instance_index_to_instance(i);
     }
 }
@@ -31,7 +31,7 @@ TEST_GROUP(AlertConditions){};
 TEST_ORDERED(AlertConditions, GetAssertsIfCalledBeforeCreateInstancesId0, 0)
 {
     uint8_t alert_id = 0;
-    EAS_ASSERT(alert_id < CONFIG_MAX_NUM_ALERTS);
+    EAS_ASSERT(alert_id < CONFIG_ALERT_CONDITIONS_NUM_INSTANCES_TO_CREATE);
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("alert_condition", "alert_conditions_get_alert_condition");
 
     AlertCondition alert_condition = alert_conditions_get_alert_condition(alert_id);
@@ -40,7 +40,7 @@ TEST_ORDERED(AlertConditions, GetAssertsIfCalledBeforeCreateInstancesId0, 0)
 TEST_ORDERED(AlertConditions, GetAssertsIfCalledBeforeCreateInstancesId2, 0)
 {
     uint8_t alert_id = 2;
-    EAS_ASSERT(alert_id < CONFIG_MAX_NUM_ALERTS);
+    EAS_ASSERT(alert_id < CONFIG_ALERT_CONDITIONS_NUM_INSTANCES_TO_CREATE);
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("alert_condition", "alert_conditions_get_alert_condition");
 
     AlertCondition alert_condition = alert_conditions_get_alert_condition(alert_id);
@@ -53,7 +53,7 @@ TEST_ORDERED(AlertConditions, GetReturnsCreatedInstances, 1)
     initialize_expected_instances();
 
     AlertCondition instance_to_return;
-    for (size_t i = 0; i < CONFIG_MAX_NUM_ALERTS; i++) {
+    for (size_t i = 0; i < CONFIG_ALERT_CONDITIONS_NUM_INSTANCES_TO_CREATE; i++) {
         instance_to_return = map_expected_instance_index_to_instance(i);
         mock().expectOneCall("alert_condition_create").andReturnValue(instance_to_return);
     }
@@ -62,7 +62,7 @@ TEST_ORDERED(AlertConditions, GetReturnsCreatedInstances, 1)
 
     AlertCondition actual_instance;
     AlertCondition expected_instance;
-    for (size_t i = 0; i < CONFIG_MAX_NUM_ALERTS; i++) {
+    for (size_t i = 0; i < CONFIG_ALERT_CONDITIONS_NUM_INSTANCES_TO_CREATE; i++) {
         actual_instance = alert_conditions_get_alert_condition(i);
         expected_instance = map_expected_instance_index_to_instance(i);
 
@@ -75,7 +75,7 @@ TEST_ORDERED(AlertConditions, GetReturnsCreatedInstances, 1)
 
 TEST_ORDERED(AlertConditions, GetAssertsInvalidAlertId, 2)
 {
-    uint8_t invalid_alert_id = CONFIG_MAX_NUM_ALERTS;
+    uint8_t invalid_alert_id = CONFIG_ALERT_CONDITIONS_NUM_INSTANCES_TO_CREATE;
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("is_valid_alert_id", "alert_conditions_get_alert_condition");
 
     AlertCondition alert_condition = alert_conditions_get_alert_condition(invalid_alert_id);

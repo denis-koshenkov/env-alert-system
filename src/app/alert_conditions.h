@@ -13,8 +13,8 @@ extern "C"
 /**
  * @brief Stores alert condition instances for each alert.
  *
- * This module creates and stores CONFIG_MAX_NUM_ALERTS alert condition instances. An instance for an alert with a
- * certain alert id can be retrieved by calling @ref alert_conditions_get_alert_condition.
+ * This module creates and stores CONFIG_ALERT_CONDITIONS_NUM_INSTANCES_TO_CREATE alert condition instances. An instance
+ * for an alert with a certain alert id can be retrieved by calling @ref alert_conditions_get_alert_condition.
  *
  * # Usage
  * ```
@@ -28,7 +28,7 @@ extern "C"
  */
 
 /**
- * @brief Creates and stores CONFIG_MAX_NUM_ALERTS alert condition instances.
+ * @brief Creates and stores CONFIG_ALERT_CONDITIONS_NUM_INSTANCES_TO_CREATE alert condition instances.
  *
  * Should be called once before @ref alert_conditions_get_alert_condition is called.
  *
@@ -43,7 +43,7 @@ void alert_conditions_create_instances();
  *
  * @return AlertCondition Alert condition instance for the alert with id @p alert_id.
  *
- * @note Fires an assert if alert_id >= CONFIG_MAX_NUM_ALERTS is passed.
+ * @note Fires an assert if alert_id >= CONFIG_ALERT_CONDITIONS_NUM_INSTANCES_TO_CREATE is passed.
  * @note Fires an assert if called before @ref alert_conditions_create_instances.
  */
 AlertCondition alert_conditions_get_alert_condition(uint8_t alert_id);
