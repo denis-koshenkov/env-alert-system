@@ -1,5 +1,6 @@
 #include "CppUTest/TestHarness.h"
 #include "CppUTestExt/MockSupport.h"
+#include "CppUTestExt/TestAssertPlugin.h"
 
 #include "alert_raiser.h"
 #include "eas_timer_defs.h"
@@ -745,4 +746,22 @@ TEST(AlertRaiser, WarmupTimerRunningWhenNewAlarmIsSet)
     alert_raiser_set_alert_condition_result(alert_raiser, false);
     /* Silences the alert - calls alert_notifier_notify(false) */
     cooldown_cb(cooldown_cb_user_data);
+}
+
+TEST(AlertRaiser, SetAlertConditionAssertsIfCalledBeforeSetAlert)
+{
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .ignoreOtherParameters()
+        .andReturnValue(warmup_timer);
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .ignoreOtherParameters()
+        .andReturnValue(cooldown_timer);
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self->is_alert_set", "alert_raiser_set_alert_condition_result");
+
+    AlertRaiser alert_raiser = alert_raiser_create();
+    alert_raiser_set_alert_condition_result(alert_raiser, true);
 }

@@ -19,6 +19,8 @@ struct AlertRaiserStruct {
     bool is_cooldown_timer_running;
     uint8_t alert_id;
     bool is_alert_raised;
+    /* True if alert_raiser_set_alert has been called at least once for this instance, false otherwise. */
+    bool is_alert_set;
 };
 
 static struct AlertRaiserStruct instances[CONFIG_ALERT_RAISER_MAX_NUM_INSTANCES];
@@ -92,6 +94,7 @@ AlertRaiser alert_raiser_create()
     instance->is_cooldown_timer_running = false;
     instance->alert_id = 0;
     instance->is_alert_raised = false;
+    instance->is_alert_set = false;
 
     return instance;
 }
@@ -122,10 +125,15 @@ void alert_raiser_set_alert(AlertRaiser self, uint8_t alert_id, uint32_t warmup_
     self->warmup_period_ms = warmup_period_ms;
     self->cooldown_period_ms = cooldown_period_ms;
     self->alert_id = alert_id;
+    self->is_alert_set = true;
 }
 
 void alert_raiser_set_alert_condition_result(AlertRaiser self, bool alert_condition_result)
 {
+    /* If an alert has not been set yet, we do not know for which alert this condition result is updated. An alert
+     * should always be set prior to calling this function. */
+    EAS_ASSERT(self->is_alert_set);
+
     bool already_in_required_state = (self->is_alert_raised == alert_condition_result);
 
     if (already_in_required_state) {
