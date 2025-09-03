@@ -44,6 +44,13 @@
  */
 #define CONFIG_CONNECTIVITY_NOTIFIER_MAX_NUM_ALERTS CONFIG_MAX_NUM_ALERTS
 
+/**
+ * @brief Defines the valid alert ids for which a led notification can be sent.
+ *
+ * The valid alert ids are from 0 to CONFIG_LED_NOTIFIER_MAX_NUM_ALERTS - 1, both including.
+ */
+#define CONFIG_LED_NOTIFIER_MAX_NUM_ALERTS CONFIG_MAX_NUM_ALERTS
+
 /* Configs for port-specific modules */
 
 /** Should correspond to the number of times <module_name>_create() will be called in the unit test program. */

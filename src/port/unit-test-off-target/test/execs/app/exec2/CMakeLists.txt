@@ -21,6 +21,7 @@ target_sources(app_test_exec2 PRIVATE
     alert_condition.cpp
     alert_raiser.cpp
     connectivity_notifier.cpp
+    led_notifier.cpp
 
     mocks/mock_value_holder.cpp
     mocks/mock_current_temperature.cpp
@@ -30,6 +31,7 @@ target_sources(app_test_exec2 PRIVATE
     mocks/mock_variable_requirement.c
     mocks/mock_alert_notifier.cpp
     mocks/mock_connectivity_notification_sender.cpp
+    mocks/mock_led_notification_executor.cpp
 )
 
 target_link_libraries(app_test_exec2 PRIVATE test_common)
