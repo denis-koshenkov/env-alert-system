@@ -10,6 +10,8 @@ extern "C"
 
 void led_manager_add_notification(LedColor led_color, LedPattern led_pattern);
 
+void led_manager_remove_notification(LedColor led_color, LedPattern led_pattern);
+
 #ifdef __cplusplus
 }
 #endif
