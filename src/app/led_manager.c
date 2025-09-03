@@ -3,5 +3,5 @@
 
 void led_manager_add_notification(LedColor led_color, LedPattern led_pattern)
 {
-    led_set(LED_COLOR_RED, LED_PATTERN_STATIC);
+    led_set(led_color, led_pattern);
 }

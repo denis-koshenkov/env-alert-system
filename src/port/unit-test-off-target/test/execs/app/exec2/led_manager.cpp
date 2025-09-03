@@ -13,3 +13,12 @@ TEST(LedManager, AddNotificationSetsLed)
 
     led_manager_add_notification(led_color, led_pattern);
 }
+
+TEST(LedManager, AddNotificationSetsLedGreenAlert)
+{
+    LedColor led_color = LED_COLOR_GREEN;
+    LedPattern led_pattern = LED_PATTERN_ALERT;
+    mock().expectOneCall("led_set").withParameter("led_color", led_color).withParameter("led_pattern", led_pattern);
+
+    led_manager_add_notification(led_color, led_pattern);
+}
