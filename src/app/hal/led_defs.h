@@ -17,6 +17,8 @@ typedef enum LedColor {
 typedef enum LedPattern {
     /**< The color is displayed without any changes in led intensity. */
     LED_PATTERN_STATIC,
+    /**< The led is blinking fast to showcase urgency. */
+    LED_PATTERN_ALERT,
 } LedPattern;
 
 #ifdef __cplusplus
