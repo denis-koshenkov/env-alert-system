@@ -31,6 +31,7 @@ target_sources(eas_app INTERFACE
     connectivity_notification_sender.c
     led_notifier.c
     led_notification_executor.c
+    led_manager.c
 )
 
 target_include_directories(eas_app INTERFACE
