@@ -23,16 +23,6 @@ static bool is_valid_alert_id(uint8_t alert_id)
     return (alert_id < CONFIG_LED_NOTIFIER_MAX_NUM_ALERTS);
 }
 
-void led_notifier_notify(uint8_t alert_id, bool is_raised)
-{
-    EAS_ASSERT(is_valid_alert_id(alert_id));
-
-    if (alert_led_notifications[alert_id].is_enabled) {
-        led_notification_executor_execute(alert_led_notifications[alert_id].led_color,
-                                          alert_led_notifications[alert_id].led_pattern, is_raised);
-    }
-}
-
 void led_notifier_enable_notifications(uint8_t alert_id, LedColor led_color, LedPattern led_pattern)
 {
     EAS_ASSERT(is_valid_alert_id(alert_id));
@@ -47,4 +37,14 @@ void led_notifier_disable_notifications(uint8_t alert_id)
     EAS_ASSERT(is_valid_alert_id(alert_id));
 
     alert_led_notifications[alert_id].is_enabled = false;
+}
+
+void led_notifier_notify(uint8_t alert_id, bool is_raised)
+{
+    EAS_ASSERT(is_valid_alert_id(alert_id));
+
+    if (alert_led_notifications[alert_id].is_enabled) {
+        led_notification_executor_execute(alert_led_notifications[alert_id].led_color,
+                                          alert_led_notifications[alert_id].led_pattern, is_raised);
+    }
 }
