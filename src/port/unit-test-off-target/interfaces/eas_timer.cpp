@@ -2,7 +2,7 @@
 #include "eas_timer.h"
 #include "eas_assert.h"
 
-EasTimer eas_timer_create(uint32_t period_ms, EasTimerCb cb, void *user_data)
+EasTimer eas_timer_create(uint32_t period_ms, bool periodic, EasTimerCb cb, void *user_data)
 {
     EasTimerCb *timer_cbs = (EasTimerCb *)mock().getData("timerCbs").getPointerValue();
     void **timer_cbs_user_data = (void **)mock().getData("timerCbsUserData").getPointerValue();
@@ -17,6 +17,7 @@ EasTimer eas_timer_create(uint32_t period_ms, EasTimerCb cb, void *user_data)
     mock()
         .actualCall("eas_timer_create")
         .withParameter("period_ms", period_ms)
+        .withParameter("periodic", periodic)
         .withParameter("cb", cb)
         .withParameter("user_data", user_data);
     return (EasTimer)mock().pointerReturnValue();

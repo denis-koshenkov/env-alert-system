@@ -51,6 +51,15 @@
  */
 #define CONFIG_LED_NOTIFIER_MAX_NUM_ALERTS CONFIG_MAX_NUM_ALERTS
 
+/** If there is more than one led notification added to the led manager, the led manager periodically switches between
+ * displaying all added notifications.
+ *
+ * This config defines for how many seconds one led notification is displayed before switching to displaying the next
+ * notification. If there are 0 or 1 notifications added to the LED manager, the value of this config does not affect
+ * the behavior.
+ */
+#define CONFIG_LED_MANAGER_NOTIFICATION_DURATION_SECONDS 5
+
 /* Configs for port-specific modules */
 
 /** Should correspond to the number of times <module_name>_create() will be called in the unit test program. */

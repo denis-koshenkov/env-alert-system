@@ -10,7 +10,11 @@ extern "C"
 
 #include "eas_timer_defs.h"
 
-EasTimer eas_timer_create(uint32_t period_ms, EasTimerCb cb, void *user_data);
+/* Convenience macros for readability to pass to the "periodic" parameter of eas_timer_create */
+#define EAS_TIMER_PERIODIC true
+#define EAS_TIMER_ONE_SHOT false
+
+EasTimer eas_timer_create(uint32_t period_ms, bool periodic, EasTimerCb cb, void *user_data);
 
 void eas_timer_set_period(EasTimer self, uint32_t period_ms);
 

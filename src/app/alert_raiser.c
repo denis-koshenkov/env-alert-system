@@ -94,10 +94,10 @@ AlertRaiser alert_raiser_create()
     struct AlertRaiserStruct *instance = &instances[instance_idx];
     instance_idx++;
 
-    instance->warmup_timer = eas_timer_create(0, warmup_period_expired_cb, instance);
+    instance->warmup_timer = eas_timer_create(0, EAS_TIMER_ONE_SHOT, warmup_period_expired_cb, instance);
     instance->warmup_period_ms = 0;
     instance->is_warmup_timer_running = false;
-    instance->cooldown_timer = eas_timer_create(0, cooldown_period_expired_cb, instance);
+    instance->cooldown_timer = eas_timer_create(0, EAS_TIMER_ONE_SHOT, cooldown_period_expired_cb, instance);
     instance->cooldown_period_ms = 0;
     instance->is_cooldown_timer_running = false;
     instance->alert_id = 0;
