@@ -5,6 +5,8 @@
 #include "led_manager.h"
 #include "config.h"
 #include "eas_timer_defs.h"
+#include "linked_list_node_allocator.h"
+#include "fake_linked_list_node_allocator.h"
 
 /* Notification duration is defined in seconds in the config. The expected timer period is equal to the notification
  * duration, but it is defined in ms. Convert seconds to ms. */
@@ -30,6 +32,12 @@ TEST_GROUP(LedManager)
         mock().setData("timerCbs", (void *)&timer_cb);
         mock().setData("timerCbsUserData", &timer_cb_user_data);
         mock().setData("numTimerCbs", (unsigned int)1);
+        
+        /* Linked list will directly call fake linked list node allocator which uses the memory block allocator. If we use 
+         * the mock linked list node allocator, the tests will need to expect calls to it. This is not relevant for LedManager
+         * tests - they are testing the LedManager behavior, not the way it stores notifications internally. */
+        UT_PTR_SET(linked_list_node_allocator_alloc, fake_linked_list_node_allocator_alloc);
+        UT_PTR_SET(linked_list_node_allocator_free, fake_linked_list_node_allocator_free);
     }
 };
 // clang-format on
