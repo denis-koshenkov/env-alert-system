@@ -60,6 +60,15 @@ LinkedList linked_list_create();
  */
 void linked_list_prepend(LinkedList self, void *element);
 
+/**
+ * @brief Add an element to the end of the linked list.
+ *
+ * Less efficient than @ref linked_list_prepend, because the implementation needs to iterate till the end of the list.
+ * Use @ref linked_list_prepend if the order of elements in the list does not matter.
+ *
+ * @param self Linked list instance returned by @ref linked_list_create.
+ * @param element Element to add to the list.
+ */
 void linked_list_append(LinkedList self, void *element);
 
 /**

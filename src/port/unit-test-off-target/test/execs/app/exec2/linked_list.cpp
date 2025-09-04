@@ -170,6 +170,27 @@ TEST(LinkedList, PrependFiresAssertIfFailedToAllocateNode)
     linked_list_prepend(linked_list, &element);
 }
 
+TEST(LinkedList, AppendFiresAssertIfFailedToAllocateNode)
+{
+    LinkedList linked_list = linked_list_create();
+    LinkedListIdElement element = {.id = 0};
+
+    /* linked_list_node_allocator_alloc returns NULL if it fails to allocate the node. We expect linked_list_append to
+     * detect this and fire an assert. */
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue((LinkedListNode *)NULL);
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("new_node", "linked_list_append");
+
+    linked_list_append(linked_list, &element);
+}
+
+TEST(LinkedList, AppendRaisesAssertIfListIsNull)
+{
+    LinkedListIdElement id_element_0 = {.id = 0};
+
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "linked_list_append");
+    linked_list_append(NULL, &id_element_0);
+}
+
 TEST(LinkedList, ListEmptyAfterCreate)
 {
     LinkedList linked_list = linked_list_create();

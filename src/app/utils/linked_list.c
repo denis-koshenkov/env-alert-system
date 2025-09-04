@@ -103,7 +103,10 @@ void linked_list_prepend(LinkedList self, void *element)
 
 void linked_list_append(LinkedList self, void *element)
 {
+    EAS_ASSERT(self);
+
     LinkedListNode *new_node = linked_list_node_allocator_alloc();
+    EAS_ASSERT(new_node);
     new_node->element = element;
     new_node->next = NULL;
 
