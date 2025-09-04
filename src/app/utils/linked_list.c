@@ -48,9 +48,11 @@ static bool remove_element_condition_cb(void *element, void *user_data)
  * @param cb This callback is called for each element in the list. If the callback for the element returns true, then
  * the element is removed from the list. If the callback for the element returns false, the element is kept in the list.
  * @param user_data User data to pass to the callback. Can be NULL.
+ *
+ * @return size_t Number of elements removed from the list.
  */
-void linked_list_remove_on_condition_with_limit(LinkedList self, size_t max_num_elements_to_remove,
-                                                LinkedListConditionCb cb, void *user_data)
+size_t linked_list_remove_on_condition_with_limit(LinkedList self, size_t max_num_elements_to_remove,
+                                                  LinkedListConditionCb cb, void *user_data)
 {
     EAS_ASSERT(self);
     EAS_ASSERT(cb);
@@ -73,6 +75,7 @@ void linked_list_remove_on_condition_with_limit(LinkedList self, size_t max_num_
             node = node->next;
         }
     }
+    return num_removed_elements;
 }
 
 LinkedList linked_list_create()
@@ -98,11 +101,15 @@ void linked_list_add(LinkedList self, void *element)
     new_node->next = previous_head;
 }
 
-void linked_list_remove(LinkedList self, void *element)
+bool linked_list_remove(LinkedList self, void *element)
 {
     EAS_ASSERT(self);
 
-    linked_list_remove_on_condition_with_limit(self, 1, remove_element_condition_cb, element);
+    size_t num_removed = linked_list_remove_on_condition_with_limit(self, 1, remove_element_condition_cb, element);
+    /* At most one element was supposed to be removed from the list */
+    EAS_ASSERT(num_removed <= 1);
+    /* 1 -> element was removed, 0 -> element was not removed */
+    return (num_removed == 1);
 }
 
 void linked_list_for_each(LinkedList self, LinkedListForEachCb cb, void *user_data)
@@ -120,5 +127,6 @@ void linked_list_remove_on_condition(LinkedList self, LinkedListConditionCb cb, 
     EAS_ASSERT(self);
     EAS_ASSERT(cb);
 
+    /* Does not matter how many elements are removed - do not care about return value */
     linked_list_remove_on_condition_with_limit(self, LINKED_LIST_REMOVE_NO_LIMIT, cb, user_data);
 }

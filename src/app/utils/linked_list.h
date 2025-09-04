@@ -58,7 +58,18 @@ LinkedList linked_list_create();
  */
 void linked_list_add(LinkedList self, void *element);
 
-void linked_list_remove(LinkedList self, void *element);
+/**
+ * @brief Remove an element from the list.
+ *
+ * @param self Linked list instance returned by @ref linked_list_create.
+ * @param element Element to remove.
+ *
+ * @return true The element was removed from the list.
+ * @return false The element is not present in the list, so it was not removed.
+ *
+ * @note If multiple occurrences of the elements are present in the list, only the first one is removed.
+ */
+bool linked_list_remove(LinkedList self, void *element);
 
 /**
  * @brief Execute a callback for each element in the list.

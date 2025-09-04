@@ -445,9 +445,10 @@ TEST(LinkedList, RemoveOnlyElement)
     /* Exercise */
     LinkedList linked_list = linked_list_create();
     linked_list_add(linked_list, &id_element_0);
-    linked_list_remove(linked_list, &id_element_0);
+    bool is_removed = linked_list_remove(linked_list, &id_element_0);
 
     /* Verify */
+    CHECK_TRUE(is_removed);
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
     verify_expected_id_elements();
 }
@@ -466,10 +467,12 @@ TEST(LinkedList, RemoveTwoElements)
     LinkedList linked_list = linked_list_create();
     linked_list_add(linked_list, &id_element_0);
     linked_list_add(linked_list, &id_element_1);
-    linked_list_remove(linked_list, &id_element_0);
-    linked_list_remove(linked_list, &id_element_1);
+    bool is_removed_0 = linked_list_remove(linked_list, &id_element_0);
+    bool is_removed_1 = linked_list_remove(linked_list, &id_element_1);
 
     /* Verify */
+    CHECK_TRUE(is_removed_0);
+    CHECK_TRUE(is_removed_1);
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
     verify_expected_id_elements();
 }
@@ -487,9 +490,10 @@ TEST(LinkedList, RemoveOneOfTwoElements)
     LinkedList linked_list = linked_list_create();
     linked_list_add(linked_list, &id_element_0);
     linked_list_add(linked_list, &id_element_1);
-    linked_list_remove(linked_list, &id_element_0);
+    bool is_removed = linked_list_remove(linked_list, &id_element_0);
 
     /* Verify */
+    CHECK_TRUE(is_removed);
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
     verify_expected_id_elements();
 }
@@ -510,9 +514,10 @@ TEST(LinkedList, RemoveRemovesOnlyOneOfTwoIdenticalElements)
     LinkedList linked_list = linked_list_create();
     linked_list_add(linked_list, &id_element_0);
     linked_list_add(linked_list, &id_element_0);
-    linked_list_remove(linked_list, &id_element_0);
+    bool is_removed = linked_list_remove(linked_list, &id_element_0);
 
     /* Verify */
+    CHECK_TRUE(is_removed);
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
     verify_expected_id_elements();
 }
@@ -547,13 +552,41 @@ TEST(LinkedList, RemoveInRandomOrder)
     linked_list_add(linked_list, &id_element_2);
     linked_list_add(linked_list, &id_element_3);
     linked_list_add(linked_list, &id_element_4);
-    linked_list_remove(linked_list, &id_element_2);
-    linked_list_remove(linked_list, &id_element_4);
-    linked_list_remove(linked_list, &id_element_0);
-    linked_list_remove(linked_list, &id_element_3);
-    linked_list_remove(linked_list, &id_element_1);
+    bool all_removed = true;
+    all_removed = all_removed && linked_list_remove(linked_list, &id_element_2);
+    all_removed = all_removed && linked_list_remove(linked_list, &id_element_4);
+    all_removed = all_removed && linked_list_remove(linked_list, &id_element_0);
+    all_removed = all_removed && linked_list_remove(linked_list, &id_element_3);
+    all_removed = all_removed && linked_list_remove(linked_list, &id_element_1);
 
     /* Verify */
+    CHECK_TRUE(all_removed);
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
     verify_expected_id_elements();
+}
+
+TEST(LinkedList, RemoveReturnsFalseEmptyList)
+{
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = false};
+
+    LinkedList linked_list = linked_list_create();
+    bool is_removed = linked_list_remove(linked_list, &id_element_0);
+
+    CHECK_FALSE(is_removed);
+}
+
+TEST(LinkedList, RemoveReturnsFalseElementNotInList)
+{
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_1 = {.id = 0, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_2 = {.id = 0, .condition_evaluation_result = false};
+
+    LinkedList linked_list = linked_list_create();
+    linked_list_add(linked_list, &id_element_0);
+    linked_list_add(linked_list, &id_element_1);
+    bool is_removed = linked_list_remove(linked_list, &id_element_2);
+
+    CHECK_FALSE(is_removed);
 }
