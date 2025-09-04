@@ -16,27 +16,35 @@ typedef struct LinkedListIdElement {
 #define LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS 10
 static bool actual_elements_in_list[LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS];
 static bool expected_elements_in_list[LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS];
+static size_t actual_num_elements_in_list = 0;
+static size_t expected_num_elements_in_list = 0;
 
 static void expect_id_element_in_list(uint8_t id)
 {
     expected_elements_in_list[id] = true;
+    expected_num_elements_in_list++;
 }
 
 static void actual_id_element_detected_in_list(uint8_t id)
 {
     actual_elements_in_list[id] = true;
+    actual_num_elements_in_list++;
 }
 
 static void reset_expected_actual_id_elements()
 {
     memset(expected_elements_in_list, 0, LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(bool));
     memset(actual_elements_in_list, 0, LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(bool));
+    actual_num_elements_in_list = 0;
+    expected_num_elements_in_list = 0;
 }
 
-static bool expected_id_elements_match_actual()
+static void verify_expected_id_elements()
 {
-    return (memcmp(expected_elements_in_list, actual_elements_in_list,
-                   LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(bool)) == 0);
+    bool expected_elements_match_actual = (memcmp(expected_elements_in_list, actual_elements_in_list,
+                                                  LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(bool)) == 0);
+    CHECK_TRUE(expected_elements_match_actual);
+    CHECK_EQUAL(expected_num_elements_in_list, actual_num_elements_in_list);
 }
 
 static void for_each_cb_id_elements(void *element, void *user_data)
@@ -154,7 +162,7 @@ TEST(LinkedList, ListEmptyAfterCreate)
 {
     LinkedList linked_list = linked_list_create();
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
-    CHECK_TRUE(expected_id_elements_match_actual());
+    verify_expected_id_elements();
 }
 
 TEST(LinkedList, ElementIsTheOnlyInListAfterAdding)
@@ -167,7 +175,7 @@ TEST(LinkedList, ElementIsTheOnlyInListAfterAdding)
     linked_list_add(linked_list, &id_element_3);
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
 
-    CHECK_TRUE(expected_id_elements_match_actual());
+    verify_expected_id_elements();
 }
 
 TEST(LinkedList, TwoElementsInListAfterAddingTwoElements)
@@ -185,7 +193,7 @@ TEST(LinkedList, TwoElementsInListAfterAddingTwoElements)
     linked_list_add(linked_list, &id_element_2);
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
 
-    CHECK_TRUE(expected_id_elements_match_actual());
+    verify_expected_id_elements();
 }
 
 TEST(LinkedList, ForEachPassesUserDataToCallback)
@@ -205,7 +213,7 @@ TEST(LinkedList, RemoveOnConditionEmptyListStillEmpty)
 {
     LinkedList linked_list = linked_list_create();
     linked_list_remove_on_condition(linked_list, condition_id_element_cb, NULL);
-    CHECK_TRUE(expected_id_elements_match_actual());
+    verify_expected_id_elements();
 }
 
 TEST(LinkedList, RemoveOnConditionDoesNotRemoveElementConditionFalse)
@@ -222,7 +230,7 @@ TEST(LinkedList, RemoveOnConditionDoesNotRemoveElementConditionFalse)
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
-    CHECK_TRUE(expected_id_elements_match_actual());
+    verify_expected_id_elements();
 }
 
 TEST(LinkedList, RemoveOnConditionRemovesElementConditionTrue)
@@ -239,7 +247,7 @@ TEST(LinkedList, RemoveOnConditionRemovesElementConditionTrue)
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
-    CHECK_TRUE(expected_id_elements_match_actual());
+    verify_expected_id_elements();
 }
 
 TEST(LinkedList, RemoveOnConditionRemovesAllElementsConditionTrue)
@@ -264,7 +272,7 @@ TEST(LinkedList, RemoveOnConditionRemovesAllElementsConditionTrue)
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
-    CHECK_TRUE(expected_id_elements_match_actual());
+    verify_expected_id_elements();
 }
 
 TEST(LinkedList, RemoveOnConditionKeepsAllElementsConditionFalse)
@@ -289,7 +297,7 @@ TEST(LinkedList, RemoveOnConditionKeepsAllElementsConditionFalse)
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
-    CHECK_TRUE(expected_id_elements_match_actual());
+    verify_expected_id_elements();
 }
 
 TEST(LinkedList, RemoveOnConditionRemovesElementsWithConditionTrueKeepsElementsWithConditionFalse)
@@ -323,7 +331,7 @@ TEST(LinkedList, RemoveOnConditionRemovesElementsWithConditionTrueKeepsElementsW
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
-    CHECK_TRUE(expected_id_elements_match_actual());
+    verify_expected_id_elements();
 }
 
 TEST(LinkedList, RemoveOnConditionRemovesOnlyFirstElement)
@@ -347,7 +355,7 @@ TEST(LinkedList, RemoveOnConditionRemovesOnlyFirstElement)
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
-    CHECK_TRUE(expected_id_elements_match_actual());
+    verify_expected_id_elements();
 }
 
 TEST(LinkedList, RemoveOnConditionRemovesOnlyLastElement)
@@ -371,7 +379,7 @@ TEST(LinkedList, RemoveOnConditionRemovesOnlyLastElement)
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
-    CHECK_TRUE(expected_id_elements_match_actual());
+    verify_expected_id_elements();
 }
 
 TEST(LinkedList, RemoveOnConditionRemovesOnlyMiddleElement)
@@ -403,7 +411,7 @@ TEST(LinkedList, RemoveOnConditionRemovesOnlyMiddleElement)
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
-    CHECK_TRUE(expected_id_elements_match_actual());
+    verify_expected_id_elements();
 }
 
 TEST(LinkedList, RemoveOnConditionPassesUserDataToCallback)
@@ -433,5 +441,70 @@ TEST(LinkedList, RemoveOnlyElement)
 
     /* Verify */
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
-    CHECK_TRUE(expected_id_elements_match_actual());
+    verify_expected_id_elements();
+}
+
+TEST(LinkedList, RemoveTwoElements)
+{
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_1 = {.id = 1, .condition_evaluation_result = false};
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_1_node);
+    /* Not expecting any elements in the list */
+
+    /* Exercise */
+    LinkedList linked_list = linked_list_create();
+    linked_list_add(linked_list, &id_element_0);
+    linked_list_add(linked_list, &id_element_1);
+    linked_list_remove(linked_list, &id_element_0);
+    linked_list_remove(linked_list, &id_element_1);
+
+    /* Verify */
+    linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
+    verify_expected_id_elements();
+}
+
+TEST(LinkedList, RemoveOneOfTwoElements)
+{
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_1 = {.id = 1, .condition_evaluation_result = false};
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_0_node);
+    expect_id_element_in_list(1);
+
+    /* Exercise */
+    LinkedList linked_list = linked_list_create();
+    linked_list_add(linked_list, &id_element_0);
+    linked_list_add(linked_list, &id_element_1);
+    linked_list_remove(linked_list, &id_element_0);
+
+    /* Verify */
+    linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
+    verify_expected_id_elements();
+}
+
+TEST(LinkedList, RemoveRemovesOnlyOneOfTwoIdenticalElements)
+{
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = false};
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    /* Using id_element_1_node memory for the second copy of id_element_0 element in the list */
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
+    /* linked_list_remove should remove the first element in the list that matches the requested one to remove. Since
+     * linked_list_add adds the element to the beginning of the list, we expect the memory of id_element_1_node to be
+     * freed, since it is added to the list last. */
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_1_node);
+    expect_id_element_in_list(0);
+
+    /* Exercise */
+    LinkedList linked_list = linked_list_create();
+    linked_list_add(linked_list, &id_element_0);
+    linked_list_add(linked_list, &id_element_0);
+    linked_list_remove(linked_list, &id_element_0);
+
+    /* Verify */
+    linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
+    verify_expected_id_elements();
 }
