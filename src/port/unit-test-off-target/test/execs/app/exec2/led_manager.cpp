@@ -77,27 +77,25 @@ TEST(LedManager, PeriodicallySwitchBetweenTwoNotifications)
         .ignoreOtherParameters()
         .andReturnValue(timer);
     mock().expectOneCall("eas_timer_start").withParameter("self", timer);
-    // mock().expectOneCall("led_set").withParameter("led_color", led_color_1).withParameter("led_pattern",
-    // led_pattern_1); mock().expectOneCall("led_set").withParameter("led_color",
-    // led_color_0).withParameter("led_pattern", led_pattern_0);
-    // mock().expectOneCall("led_set").withParameter("led_color", led_color_1).withParameter("led_pattern",
-    // led_pattern_1); mock().expectOneCall("led_set").withParameter("led_color",
-    // led_color_0).withParameter("led_pattern", led_pattern_0);
-    // mock().expectOneCall("eas_timer_stop").withParameter("self", timer);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_1).withParameter("led_pattern", led_pattern_1);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_0).withParameter("led_pattern", led_pattern_0);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_1).withParameter("led_pattern", led_pattern_1);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_0).withParameter("led_pattern", led_pattern_0);
+    mock().expectOneCall("eas_timer_stop").withParameter("self", timer);
     mock().expectOneCall("led_turn_off");
 
     /* Calls led_set */
     led_manager_add_notification(led_color_0, led_pattern_0);
     /* Two notifications added - need to alternate between them. Creates and starts a timer. */
     led_manager_add_notification(led_color_1, led_pattern_1);
-    // /* Period for notification 0 expired, should call led_set to start displaying notification 1 */
-    // timer_cb(timer_cb_user_data);
+    /* Period for notification 0 expired, should call led_set to start displaying notification 1 */
+    timer_cb(timer_cb_user_data);
+    /* Period for notification 1 expired, should call led_set to start displaying notification 0 */
+    timer_cb(timer_cb_user_data);
+    /* Period for notification 0 expired, should call led_set to start displaying notification 1 */
+    timer_cb(timer_cb_user_data);
     // /* Period for notification 1 expired, should call led_set to start displaying notification 0 */
-    // timer_cb(timer_cb_user_data);
-    // /* Period for notification 0 expired, should call led_set to start displaying notification 1 */
-    // timer_cb(timer_cb_user_data);
-    // /* Period for notification 1 expired, should call led_set to start displaying notification 0 */
-    // timer_cb(timer_cb_user_data);
+    timer_cb(timer_cb_user_data);
 
     /* Clean up */
     /* Currently displaying notification 0, this call removes notification 1. No extra calls to led expected - it should
