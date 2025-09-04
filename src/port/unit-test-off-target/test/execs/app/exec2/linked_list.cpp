@@ -103,12 +103,12 @@ TEST_GROUP(LinkedList)
 };
 // clang-format on
 
-TEST(LinkedList, AddRaisesAssertIfListIsNull)
+TEST(LinkedList, PrependRaisesAssertIfListIsNull)
 {
     LinkedListIdElement id_element_0 = {.id = 0};
 
-    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "linked_list_add");
-    linked_list_add(NULL, &id_element_0);
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "linked_list_prepend");
+    linked_list_prepend(NULL, &id_element_0);
 }
 
 TEST(LinkedList, ForEachRaisesAssertIfListIsNull)
@@ -124,7 +124,7 @@ TEST(LinkedList, ForEachRaisesAssertIfCbIsNUll)
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
 
     LinkedList linked_list = linked_list_create();
-    linked_list_add(linked_list, &id_element_0);
+    linked_list_prepend(linked_list, &id_element_0);
     linked_list_for_each(linked_list, NULL, NULL);
 }
 
@@ -141,7 +141,7 @@ TEST(LinkedList, RemoveOnConditionRaisesAssertIfCbIsNUll)
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
 
     LinkedList linked_list = linked_list_create();
-    linked_list_add(linked_list, &id_element_0);
+    linked_list_prepend(linked_list, &id_element_0);
     linked_list_remove_on_condition(linked_list, NULL, NULL);
 }
 
@@ -153,17 +153,17 @@ TEST(LinkedList, RemoveRaisesAssertIfListIsNUll)
     linked_list_remove(NULL, &element);
 }
 
-TEST(LinkedList, AddFiresAssertIfFailedToAllocateNode)
+TEST(LinkedList, PrependFiresAssertIfFailedToAllocateNode)
 {
     LinkedList linked_list = linked_list_create();
     LinkedListIdElement element = {.id = 0};
 
-    /* linked_list_node_allocator_alloc returns NULL if it fails to allocate the node. We expect linked_list_add to
+    /* linked_list_node_allocator_alloc returns NULL if it fails to allocate the node. We expect linked_list_prepend to
      * detect this and fire an assert. */
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue((LinkedListNode *)NULL);
-    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("new_node", "linked_list_add");
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("new_node", "linked_list_prepend");
 
-    linked_list_add(linked_list, &element);
+    linked_list_prepend(linked_list, &element);
 }
 
 TEST(LinkedList, ListEmptyAfterCreate)
@@ -173,20 +173,20 @@ TEST(LinkedList, ListEmptyAfterCreate)
     verify_expected_id_elements();
 }
 
-TEST(LinkedList, ElementIsTheOnlyInListAfterAdding)
+TEST(LinkedList, ElementIsTheOnlyInListAfterPrepend)
 {
     LinkedListIdElement id_element_3 = {.id = 3};
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_3_node);
     expect_id_element_in_list(3);
 
     LinkedList linked_list = linked_list_create();
-    linked_list_add(linked_list, &id_element_3);
+    linked_list_prepend(linked_list, &id_element_3);
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
 
     verify_expected_id_elements();
 }
 
-TEST(LinkedList, TwoElementsInListAfterAddingTwoElements)
+TEST(LinkedList, TwoElementsInListAfterPrependingTwoElements)
 {
 
     LinkedListIdElement id_element_0 = {.id = 0};
@@ -197,8 +197,8 @@ TEST(LinkedList, TwoElementsInListAfterAddingTwoElements)
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_2_node);
 
     LinkedList linked_list = linked_list_create();
-    linked_list_add(linked_list, &id_element_0);
-    linked_list_add(linked_list, &id_element_2);
+    linked_list_prepend(linked_list, &id_element_0);
+    linked_list_prepend(linked_list, &id_element_2);
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
 
     verify_expected_id_elements();
@@ -211,7 +211,7 @@ TEST(LinkedList, ForEachPassesUserDataToCallback)
 
     LinkedList linked_list = linked_list_create();
     uint8_t expected_user_data = 42;
-    linked_list_add(linked_list, &id_element_0);
+    linked_list_prepend(linked_list, &id_element_0);
     linked_list_for_each(linked_list, save_actual_user_data_cb, &expected_user_data);
 
     CHECK_EQUAL(&expected_user_data, actual_user_data);
@@ -233,7 +233,7 @@ TEST(LinkedList, RemoveOnConditionDoesNotRemoveElementConditionFalse)
 
     /* Exercise */
     LinkedList linked_list = linked_list_create();
-    linked_list_add(linked_list, &id_element_0);
+    linked_list_prepend(linked_list, &id_element_0);
     linked_list_remove_on_condition(linked_list, condition_id_element_cb, NULL);
 
     /* Verify */
@@ -250,7 +250,7 @@ TEST(LinkedList, RemoveOnConditionRemovesElementConditionTrue)
 
     /* Exercise */
     LinkedList linked_list = linked_list_create();
-    linked_list_add(linked_list, &id_element_0);
+    linked_list_prepend(linked_list, &id_element_0);
     linked_list_remove_on_condition(linked_list, condition_id_element_cb, NULL);
 
     /* Verify */
@@ -273,9 +273,9 @@ TEST(LinkedList, RemoveOnConditionRemovesAllElementsConditionTrue)
 
     /* Exercise */
     LinkedList linked_list = linked_list_create();
-    linked_list_add(linked_list, &id_element_0);
-    linked_list_add(linked_list, &id_element_1);
-    linked_list_add(linked_list, &id_element_2);
+    linked_list_prepend(linked_list, &id_element_0);
+    linked_list_prepend(linked_list, &id_element_1);
+    linked_list_prepend(linked_list, &id_element_2);
     linked_list_remove_on_condition(linked_list, condition_id_element_cb, NULL);
 
     /* Verify */
@@ -298,9 +298,9 @@ TEST(LinkedList, RemoveOnConditionKeepsAllElementsConditionFalse)
 
     /* Exercise */
     LinkedList linked_list = linked_list_create();
-    linked_list_add(linked_list, &id_element_0);
-    linked_list_add(linked_list, &id_element_1);
-    linked_list_add(linked_list, &id_element_2);
+    linked_list_prepend(linked_list, &id_element_0);
+    linked_list_prepend(linked_list, &id_element_1);
+    linked_list_prepend(linked_list, &id_element_2);
     linked_list_remove_on_condition(linked_list, condition_id_element_cb, NULL);
 
     /* Verify */
@@ -330,11 +330,11 @@ TEST(LinkedList, RemoveOnConditionRemovesElementsWithConditionTrueKeepsElementsW
 
     /* Exercise */
     LinkedList linked_list = linked_list_create();
-    linked_list_add(linked_list, &id_element_0);
-    linked_list_add(linked_list, &id_element_1);
-    linked_list_add(linked_list, &id_element_2);
-    linked_list_add(linked_list, &id_element_3);
-    linked_list_add(linked_list, &id_element_4);
+    linked_list_prepend(linked_list, &id_element_0);
+    linked_list_prepend(linked_list, &id_element_1);
+    linked_list_prepend(linked_list, &id_element_2);
+    linked_list_prepend(linked_list, &id_element_3);
+    linked_list_prepend(linked_list, &id_element_4);
     linked_list_remove_on_condition(linked_list, condition_id_element_cb, NULL);
 
     /* Verify */
@@ -356,9 +356,9 @@ TEST(LinkedList, RemoveOnConditionRemovesOnlyFirstElement)
 
     /* Exercise */
     LinkedList linked_list = linked_list_create();
-    linked_list_add(linked_list, &id_element_0);
-    linked_list_add(linked_list, &id_element_1);
-    linked_list_add(linked_list, &id_element_2);
+    linked_list_prepend(linked_list, &id_element_0);
+    linked_list_prepend(linked_list, &id_element_1);
+    linked_list_prepend(linked_list, &id_element_2);
     linked_list_remove_on_condition(linked_list, condition_id_element_cb, NULL);
 
     /* Verify */
@@ -380,9 +380,9 @@ TEST(LinkedList, RemoveOnConditionRemovesOnlyLastElement)
 
     /* Exercise */
     LinkedList linked_list = linked_list_create();
-    linked_list_add(linked_list, &id_element_0);
-    linked_list_add(linked_list, &id_element_1);
-    linked_list_add(linked_list, &id_element_2);
+    linked_list_prepend(linked_list, &id_element_0);
+    linked_list_prepend(linked_list, &id_element_1);
+    linked_list_prepend(linked_list, &id_element_2);
     linked_list_remove_on_condition(linked_list, condition_id_element_cb, NULL);
 
     /* Verify */
@@ -410,11 +410,11 @@ TEST(LinkedList, RemoveOnConditionRemovesOnlyMiddleElement)
 
     /* Exercise */
     LinkedList linked_list = linked_list_create();
-    linked_list_add(linked_list, &id_element_2);
-    linked_list_add(linked_list, &id_element_0);
-    linked_list_add(linked_list, &id_element_4);
-    linked_list_add(linked_list, &id_element_1);
-    linked_list_add(linked_list, &id_element_3);
+    linked_list_prepend(linked_list, &id_element_2);
+    linked_list_prepend(linked_list, &id_element_0);
+    linked_list_prepend(linked_list, &id_element_4);
+    linked_list_prepend(linked_list, &id_element_1);
+    linked_list_prepend(linked_list, &id_element_3);
     linked_list_remove_on_condition(linked_list, condition_id_element_cb, NULL);
 
     /* Verify */
@@ -429,7 +429,7 @@ TEST(LinkedList, RemoveOnConditionPassesUserDataToCallback)
 
     LinkedList linked_list = linked_list_create();
     uint8_t expected_user_data = 24;
-    linked_list_add(linked_list, &id_element_0);
+    linked_list_prepend(linked_list, &id_element_0);
     linked_list_remove_on_condition(linked_list, remove_on_condition_save_use_data_cb, &expected_user_data);
 
     CHECK_EQUAL(&expected_user_data, remove_on_condition_actual_user_data);
@@ -444,7 +444,7 @@ TEST(LinkedList, RemoveOnlyElement)
 
     /* Exercise */
     LinkedList linked_list = linked_list_create();
-    linked_list_add(linked_list, &id_element_0);
+    linked_list_prepend(linked_list, &id_element_0);
     bool is_removed = linked_list_remove(linked_list, &id_element_0);
 
     /* Verify */
@@ -465,8 +465,8 @@ TEST(LinkedList, RemoveTwoElements)
 
     /* Exercise */
     LinkedList linked_list = linked_list_create();
-    linked_list_add(linked_list, &id_element_0);
-    linked_list_add(linked_list, &id_element_1);
+    linked_list_prepend(linked_list, &id_element_0);
+    linked_list_prepend(linked_list, &id_element_1);
     bool is_removed_0 = linked_list_remove(linked_list, &id_element_0);
     bool is_removed_1 = linked_list_remove(linked_list, &id_element_1);
 
@@ -488,8 +488,8 @@ TEST(LinkedList, RemoveOneOfTwoElements)
 
     /* Exercise */
     LinkedList linked_list = linked_list_create();
-    linked_list_add(linked_list, &id_element_0);
-    linked_list_add(linked_list, &id_element_1);
+    linked_list_prepend(linked_list, &id_element_0);
+    linked_list_prepend(linked_list, &id_element_1);
     bool is_removed = linked_list_remove(linked_list, &id_element_0);
 
     /* Verify */
@@ -505,15 +505,15 @@ TEST(LinkedList, RemoveRemovesOnlyOneOfTwoIdenticalElements)
     /* Using id_element_1_node memory for the second copy of id_element_0 element in the list */
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
     /* linked_list_remove should remove the first element in the list that matches the requested one to remove. Since
-     * linked_list_add adds the element to the beginning of the list, we expect the memory of id_element_1_node to be
-     * freed, since it is added to the list last. */
+     * linked_list_prepend adds the element to the beginning of the list, we expect the memory of id_element_1_node to
+     * be freed, since it is added to the list last. */
     mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_1_node);
     expect_id_element_in_list(0);
 
     /* Exercise */
     LinkedList linked_list = linked_list_create();
-    linked_list_add(linked_list, &id_element_0);
-    linked_list_add(linked_list, &id_element_0);
+    linked_list_prepend(linked_list, &id_element_0);
+    linked_list_prepend(linked_list, &id_element_0);
     bool is_removed = linked_list_remove(linked_list, &id_element_0);
 
     /* Verify */
@@ -547,11 +547,11 @@ TEST(LinkedList, RemoveInRandomOrder)
 
     /* Exercise */
     LinkedList linked_list = linked_list_create();
-    linked_list_add(linked_list, &id_element_0);
-    linked_list_add(linked_list, &id_element_1);
-    linked_list_add(linked_list, &id_element_2);
-    linked_list_add(linked_list, &id_element_3);
-    linked_list_add(linked_list, &id_element_4);
+    linked_list_prepend(linked_list, &id_element_0);
+    linked_list_prepend(linked_list, &id_element_1);
+    linked_list_prepend(linked_list, &id_element_2);
+    linked_list_prepend(linked_list, &id_element_3);
+    linked_list_prepend(linked_list, &id_element_4);
     bool all_removed = true;
     all_removed = all_removed && linked_list_remove(linked_list, &id_element_2);
     all_removed = all_removed && linked_list_remove(linked_list, &id_element_4);
@@ -584,8 +584,8 @@ TEST(LinkedList, RemoveReturnsFalseElementNotInList)
     LinkedListIdElement id_element_2 = {.id = 0, .condition_evaluation_result = false};
 
     LinkedList linked_list = linked_list_create();
-    linked_list_add(linked_list, &id_element_0);
-    linked_list_add(linked_list, &id_element_1);
+    linked_list_prepend(linked_list, &id_element_0);
+    linked_list_prepend(linked_list, &id_element_1);
     bool is_removed = linked_list_remove(linked_list, &id_element_2);
 
     CHECK_FALSE(is_removed);

@@ -50,13 +50,15 @@ LinkedList linked_list_create();
 /**
  * @brief Add an element to the beginning of the linked list.
  *
+ * More efficient than @ref linked_list_append, because there is no need to iterate till the end of the list.
+ *
  * Since the element is added to the beginning of the list, the subsequent calls to @ref linked_list_for_each or @ref
  * linked_list_remove_on_condition will handle this newly added element first, before all the elements added previously.
  *
  * @param self Linked list instance returned by @ref linked_list_create.
  * @param element Element to add to the list.
  */
-void linked_list_add(LinkedList self, void *element);
+void linked_list_prepend(LinkedList self, void *element);
 
 /**
  * @brief Remove an element from the list.

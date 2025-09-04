@@ -68,7 +68,7 @@ VariableRequirementList variable_requirement_list_create()
 void variable_requirement_list_add(VariableRequirementList self, VariableRequirement variable_requirement)
 {
     EAS_ASSERT(self);
-    linked_list_add(self->linked_list, variable_requirement);
+    linked_list_prepend(self->linked_list, variable_requirement);
 }
 
 void variable_requirement_list_for_each(VariableRequirementList self, VariableRequirementListForEachCb cb)

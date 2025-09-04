@@ -88,7 +88,7 @@ LinkedList linked_list_create()
     return instance;
 }
 
-void linked_list_add(LinkedList self, void *element)
+void linked_list_prepend(LinkedList self, void *element)
 {
     EAS_ASSERT(self);
 
