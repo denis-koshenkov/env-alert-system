@@ -7,6 +7,7 @@
 #include "utils/linked_list.h"
 #include "fake_linked_list_node_allocator.h"
 #include "config.h"
+#include "eas_assert.h"
 
 typedef struct LinkedListIdElement {
     uint8_t id;
@@ -14,37 +15,40 @@ typedef struct LinkedListIdElement {
 } LinkedListIdElement;
 
 #define LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS 10
-static bool actual_elements_in_list[LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS];
-static bool expected_elements_in_list[LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS];
-static size_t actual_num_elements_in_list = 0;
-static size_t expected_num_elements_in_list = 0;
+static uint8_t actual_elements_in_list[LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS];
+static uint8_t expected_elements_in_list[LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS];
+static size_t num_actual_elements_in_list = 0;
+static size_t num_expected_elements_in_list = 0;
 
+/** This function should be called in the order in which the elements are expected to appear in the list. */
 static void expect_id_element_in_list(uint8_t id)
 {
-    expected_elements_in_list[id] = true;
-    expected_num_elements_in_list++;
+    EAS_ASSERT(num_expected_elements_in_list < LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS);
+    expected_elements_in_list[num_expected_elements_in_list] = id;
+    num_expected_elements_in_list++;
 }
 
 static void actual_id_element_detected_in_list(uint8_t id)
 {
-    actual_elements_in_list[id] = true;
-    actual_num_elements_in_list++;
+    EAS_ASSERT(num_actual_elements_in_list < LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS);
+    actual_elements_in_list[num_actual_elements_in_list] = id;
+    num_actual_elements_in_list++;
 }
 
 static void reset_expected_actual_id_elements()
 {
-    memset(expected_elements_in_list, 0, LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(bool));
-    memset(actual_elements_in_list, 0, LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(bool));
-    actual_num_elements_in_list = 0;
-    expected_num_elements_in_list = 0;
+    /* These arrays will contain ids, and 0 is a valid id. Set it to 0xFF (invalid id) to avoid false positives. */
+    memset(expected_elements_in_list, 0xFF, LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(uint8_t));
+    memset(actual_elements_in_list, 0xFF, LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(uint8_t));
+    num_actual_elements_in_list = 0;
+    num_expected_elements_in_list = 0;
 }
 
 static void verify_expected_id_elements()
 {
     bool expected_elements_match_actual = (memcmp(expected_elements_in_list, actual_elements_in_list,
-                                                  LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(bool)) == 0);
+                                                  LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(uint8_t)) == 0);
     CHECK_TRUE(expected_elements_match_actual);
-    CHECK_EQUAL(expected_num_elements_in_list, actual_num_elements_in_list);
 }
 
 static void for_each_cb_id_elements(void *element, void *user_data)
@@ -188,13 +192,12 @@ TEST(LinkedList, ElementIsTheOnlyInListAfterPrepend)
 
 TEST(LinkedList, TwoElementsInListAfterPrependingTwoElements)
 {
-
-    LinkedListIdElement id_element_0 = {.id = 0};
-    LinkedListIdElement id_element_2 = {.id = 2};
-    expect_id_element_in_list(0);
-    expect_id_element_in_list(2);
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_2_node);
+    LinkedListIdElement id_element_0 = {.id = 0};
+    LinkedListIdElement id_element_2 = {.id = 2};
+    expect_id_element_in_list(2);
+    expect_id_element_in_list(0);
 
     LinkedList linked_list = linked_list_create();
     linked_list_prepend(linked_list, &id_element_0);
@@ -292,9 +295,9 @@ TEST(LinkedList, RemoveOnConditionKeepsAllElementsConditionFalse)
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_2_node);
     /* We expect all three elements to be in the list, since condition is false for all of them. */
-    expect_id_element_in_list(0);
-    expect_id_element_in_list(1);
     expect_id_element_in_list(2);
+    expect_id_element_in_list(1);
+    expect_id_element_in_list(0);
 
     /* Exercise */
     LinkedList linked_list = linked_list_create();
@@ -325,8 +328,8 @@ TEST(LinkedList, RemoveOnConditionRemovesElementsWithConditionTrueKeepsElementsW
     mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_4_node);
     /* Condition is false for elements 0, 3 - they should be kept, condition true false for elements 1, 2, 4 - they
      * should be removed. */
-    expect_id_element_in_list(0);
     expect_id_element_in_list(3);
+    expect_id_element_in_list(0);
 
     /* Exercise */
     LinkedList linked_list = linked_list_create();
@@ -342,7 +345,7 @@ TEST(LinkedList, RemoveOnConditionRemovesElementsWithConditionTrueKeepsElementsW
     verify_expected_id_elements();
 }
 
-TEST(LinkedList, RemoveOnConditionRemovesOnlyFirstElement)
+TEST(LinkedList, RemoveOnConditionRemovesOnlyLastElement)
 {
     LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = true};
     LinkedListIdElement id_element_1 = {.id = 1, .condition_evaluation_result = false};
@@ -351,8 +354,8 @@ TEST(LinkedList, RemoveOnConditionRemovesOnlyFirstElement)
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_2_node);
     mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_0_node);
-    expect_id_element_in_list(1);
     expect_id_element_in_list(2);
+    expect_id_element_in_list(1);
 
     /* Exercise */
     LinkedList linked_list = linked_list_create();
@@ -366,7 +369,7 @@ TEST(LinkedList, RemoveOnConditionRemovesOnlyFirstElement)
     verify_expected_id_elements();
 }
 
-TEST(LinkedList, RemoveOnConditionRemovesOnlyLastElement)
+TEST(LinkedList, RemoveOnConditionRemovesOnlyFirstElement)
 {
     LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = false};
     LinkedListIdElement id_element_1 = {.id = 1, .condition_evaluation_result = false};
@@ -375,8 +378,8 @@ TEST(LinkedList, RemoveOnConditionRemovesOnlyLastElement)
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_2_node);
     mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_2_node);
-    expect_id_element_in_list(0);
     expect_id_element_in_list(1);
+    expect_id_element_in_list(0);
 
     /* Exercise */
     LinkedList linked_list = linked_list_create();
@@ -403,10 +406,10 @@ TEST(LinkedList, RemoveOnConditionRemovesOnlyMiddleElement)
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
     mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_3_node);
     mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_4_node);
-    expect_id_element_in_list(2);
-    expect_id_element_in_list(0);
-    expect_id_element_in_list(1);
     expect_id_element_in_list(3);
+    expect_id_element_in_list(1);
+    expect_id_element_in_list(0);
+    expect_id_element_in_list(2);
 
     /* Exercise */
     LinkedList linked_list = linked_list_create();
