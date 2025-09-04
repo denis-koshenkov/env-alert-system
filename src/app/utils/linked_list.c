@@ -40,6 +40,12 @@ void linked_list_add(LinkedList self, void *element)
     new_node->next = previous_head;
 }
 
+void linked_list_remove(LinkedList self, void *element)
+{
+    linked_list_node_allocator_free(self->head);
+    self->head = NULL;
+}
+
 void linked_list_for_each(LinkedList self, LinkedListForEachCb cb, void *user_data)
 {
     EAS_ASSERT(self);

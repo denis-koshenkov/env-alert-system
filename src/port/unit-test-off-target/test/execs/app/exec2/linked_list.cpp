@@ -418,3 +418,20 @@ TEST(LinkedList, RemoveOnConditionPassesUserDataToCallback)
 
     CHECK_EQUAL(&expected_user_data, remove_on_condition_actual_user_data);
 }
+
+TEST(LinkedList, RemoveOnlyElement)
+{
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = false};
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_0_node);
+    /* Not expecting any elements in the list */
+
+    /* Exercise */
+    LinkedList linked_list = linked_list_create();
+    linked_list_add(linked_list, &id_element_0);
+    linked_list_remove(linked_list, &id_element_0);
+
+    /* Verify */
+    linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
+    CHECK_TRUE(expected_id_elements_match_actual());
+}

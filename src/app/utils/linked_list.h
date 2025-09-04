@@ -58,6 +58,8 @@ LinkedList linked_list_create();
  */
 void linked_list_add(LinkedList self, void *element);
 
+void linked_list_remove(LinkedList self, void *element);
+
 /**
  * @brief Execute a callback for each element in the list.
  *
