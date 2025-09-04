@@ -145,6 +145,14 @@ TEST(LinkedList, RemoveOnConditionRaisesAssertIfCbIsNUll)
     linked_list_remove_on_condition(linked_list, NULL, NULL);
 }
 
+TEST(LinkedList, RemoveRaisesAssertIfListIsNUll)
+{
+    LinkedListIdElement element = {.id = 0};
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "linked_list_remove");
+
+    linked_list_remove(NULL, &element);
+}
+
 TEST(LinkedList, AddFiresAssertIfFailedToAllocateNode)
 {
     LinkedList linked_list = linked_list_create();

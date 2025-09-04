@@ -100,6 +100,8 @@ void linked_list_add(LinkedList self, void *element)
 
 void linked_list_remove(LinkedList self, void *element)
 {
+    EAS_ASSERT(self);
+
     linked_list_remove_on_condition_with_limit(self, 1, remove_element_condition_cb, element);
 }
 
