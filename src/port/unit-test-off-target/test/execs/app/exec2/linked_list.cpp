@@ -508,3 +508,44 @@ TEST(LinkedList, RemoveRemovesOnlyOneOfTwoIdenticalElements)
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
     verify_expected_id_elements();
 }
+
+TEST(LinkedList, RemoveInRandomOrder)
+{
+    /* To ensure that the linked list removes the elements in the requested order - calls to
+     * linked_list_node_allocator_free should be in the order they are specified */
+    mock().strictOrder();
+
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_1 = {.id = 1, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_2 = {.id = 2, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_3 = {.id = 3, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_4 = {.id = 4, .condition_evaluation_result = false};
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_2_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_3_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_4_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_2_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_4_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_3_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_1_node);
+    /* Not expecting any elements in the list - all should get removed */
+
+    /* Exercise */
+    LinkedList linked_list = linked_list_create();
+    linked_list_add(linked_list, &id_element_0);
+    linked_list_add(linked_list, &id_element_1);
+    linked_list_add(linked_list, &id_element_2);
+    linked_list_add(linked_list, &id_element_3);
+    linked_list_add(linked_list, &id_element_4);
+    linked_list_remove(linked_list, &id_element_2);
+    linked_list_remove(linked_list, &id_element_4);
+    linked_list_remove(linked_list, &id_element_0);
+    linked_list_remove(linked_list, &id_element_3);
+    linked_list_remove(linked_list, &id_element_1);
+
+    /* Verify */
+    linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
+    verify_expected_id_elements();
+}
