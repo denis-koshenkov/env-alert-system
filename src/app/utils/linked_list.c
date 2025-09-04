@@ -101,6 +101,23 @@ void linked_list_prepend(LinkedList self, void *element)
     new_node->next = previous_head;
 }
 
+void linked_list_append(LinkedList self, void *element)
+{
+    LinkedListNode *new_node = linked_list_node_allocator_alloc();
+    new_node->element = element;
+    new_node->next = NULL;
+
+    if (self->head == NULL) {
+        self->head = new_node;
+    } else {
+        LinkedListNode *current_node = self->head;
+        while (current_node->next != NULL) {
+            current_node = current_node->next;
+        }
+        current_node->next = new_node;
+    }
+}
+
 bool linked_list_remove(LinkedList self, void *element)
 {
     EAS_ASSERT(self);

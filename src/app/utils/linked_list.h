@@ -60,6 +60,8 @@ LinkedList linked_list_create();
  */
 void linked_list_prepend(LinkedList self, void *element);
 
+void linked_list_append(LinkedList self, void *element);
+
 /**
  * @brief Remove an element from the list.
  *

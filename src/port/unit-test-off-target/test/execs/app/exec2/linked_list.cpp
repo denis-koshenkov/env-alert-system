@@ -593,3 +593,54 @@ TEST(LinkedList, RemoveReturnsFalseElementNotInList)
 
     CHECK_FALSE(is_removed);
 }
+
+TEST(LinkedList, AppendAddsOneElementToEmptyList)
+{
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = false};
+    expect_id_element_in_list(0);
+
+    LinkedList linked_list = linked_list_create();
+    linked_list_append(linked_list, &id_element_0);
+
+    linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
+    verify_expected_id_elements();
+}
+
+TEST(LinkedList, AppendAddsTwoElementsToEmptyList)
+{
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_1 = {.id = 1, .condition_evaluation_result = false};
+    expect_id_element_in_list(0);
+    expect_id_element_in_list(1);
+
+    LinkedList linked_list = linked_list_create();
+    linked_list_append(linked_list, &id_element_0);
+    linked_list_append(linked_list, &id_element_1);
+
+    linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
+    verify_expected_id_elements();
+}
+
+TEST(LinkedList, AppendAddsThreeElementsToEmptyList)
+{
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_2_node);
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_1 = {.id = 1, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_2 = {.id = 2, .condition_evaluation_result = false};
+    expect_id_element_in_list(0);
+    expect_id_element_in_list(1);
+    expect_id_element_in_list(2);
+
+    LinkedList linked_list = linked_list_create();
+    linked_list_append(linked_list, &id_element_0);
+    linked_list_append(linked_list, &id_element_1);
+    linked_list_append(linked_list, &id_element_2);
+
+    linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
+    verify_expected_id_elements();
+}
