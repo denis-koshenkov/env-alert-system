@@ -665,3 +665,132 @@ TEST(LinkedList, AppendAddsThreeElementsToEmptyList)
     linked_list_for_each(linked_list, for_each_cb_id_elements, NULL);
     verify_expected_id_elements();
 }
+
+TEST(LinkedList, IteratorEmptyList)
+{
+    LinkedList linked_list = linked_list_create();
+    void *iterator = linked_list_iterator_init(linked_list);
+    void **element;
+    bool is_valid_element = linked_list_iterator_next(linked_list, &iterator, element);
+
+    /* There are 0 elements in the list, so the first call to iterator_next should signal the end of the list. */
+    CHECK_FALSE(is_valid_element);
+}
+
+TEST(LinkedList, IteratorOneElementInList)
+{
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = false};
+    LinkedListIdElement *retrieved_element_0;
+    LinkedListIdElement *retrieved_element_1;
+
+    LinkedList linked_list = linked_list_create();
+    linked_list_append(linked_list, &id_element_0);
+    void *iterator = linked_list_iterator_init(linked_list);
+    bool is_valid_element_0 = linked_list_iterator_next(linked_list, &iterator, (void **)&retrieved_element_0);
+    bool is_valid_element_1 = linked_list_iterator_next(linked_list, &iterator, (void **)&retrieved_element_1);
+
+    CHECK_TRUE(is_valid_element_0);
+    CHECK_FALSE(is_valid_element_1);
+    CHECK_EQUAL(&id_element_0, retrieved_element_0);
+}
+
+TEST(LinkedList, IteratorFourElementsInList)
+{
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_2_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_3_node);
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_1 = {.id = 1, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_2 = {.id = 2, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_3 = {.id = 3, .condition_evaluation_result = false};
+    LinkedListIdElement *retrieved_element_0;
+    LinkedListIdElement *retrieved_element_1;
+    LinkedListIdElement *retrieved_element_2;
+    LinkedListIdElement *retrieved_element_3;
+    LinkedListIdElement *retrieved_element_4;
+
+    LinkedList linked_list = linked_list_create();
+    linked_list_append(linked_list, &id_element_0);
+    linked_list_append(linked_list, &id_element_1);
+    linked_list_append(linked_list, &id_element_2);
+    linked_list_append(linked_list, &id_element_3);
+    void *iterator = linked_list_iterator_init(linked_list);
+    bool is_valid_element_0 = linked_list_iterator_next(linked_list, &iterator, (void **)&retrieved_element_0);
+    bool is_valid_element_1 = linked_list_iterator_next(linked_list, &iterator, (void **)&retrieved_element_1);
+    bool is_valid_element_2 = linked_list_iterator_next(linked_list, &iterator, (void **)&retrieved_element_2);
+    bool is_valid_element_3 = linked_list_iterator_next(linked_list, &iterator, (void **)&retrieved_element_3);
+    /* All 4 elements have been iterated, we reached the end of the list. Should return false. */
+    bool is_valid_element_4 = linked_list_iterator_next(linked_list, &iterator, (void **)&retrieved_element_4);
+
+    CHECK_TRUE(is_valid_element_0);
+    CHECK_TRUE(is_valid_element_1);
+    CHECK_TRUE(is_valid_element_2);
+    CHECK_TRUE(is_valid_element_3);
+    CHECK_FALSE(is_valid_element_4);
+    CHECK_EQUAL(&id_element_0, retrieved_element_0);
+    CHECK_EQUAL(&id_element_1, retrieved_element_1);
+    CHECK_EQUAL(&id_element_2, retrieved_element_2);
+    CHECK_EQUAL(&id_element_3, retrieved_element_3);
+}
+
+TEST(LinkedList, TwoSimultaneousIterators)
+{
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_2_node);
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_1 = {.id = 1, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_2 = {.id = 2, .condition_evaluation_result = false};
+    LinkedListIdElement *iterator_0_element_0;
+    LinkedListIdElement *iterator_0_element_1;
+    LinkedListIdElement *iterator_0_element_2;
+    LinkedListIdElement *iterator_0_element_3;
+    LinkedListIdElement *iterator_1_element_0;
+    LinkedListIdElement *iterator_1_element_1;
+    LinkedListIdElement *iterator_1_element_2;
+    LinkedListIdElement *iterator_1_element_3;
+
+    LinkedList linked_list = linked_list_create();
+    linked_list_append(linked_list, &id_element_0);
+    linked_list_append(linked_list, &id_element_1);
+    linked_list_append(linked_list, &id_element_2);
+    void *iterator_0 = linked_list_iterator_init(linked_list);
+    /* Iterate over the first two elements with iterator 0. */
+    bool iter_0_element_0_valid = linked_list_iterator_next(linked_list, &iterator_0, (void **)&iterator_0_element_0);
+    bool iter_0_element_1_valid = linked_list_iterator_next(linked_list, &iterator_0, (void **)&iterator_0_element_1);
+    /* First element with iterator 1. */
+    void *iterator_1 = linked_list_iterator_init(linked_list);
+    bool iter_1_element_0_valid = linked_list_iterator_next(linked_list, &iterator_1, (void **)&iterator_1_element_0);
+    /* Finish iteration with iterator 0. */
+    bool iter_0_element_2_valid = linked_list_iterator_next(linked_list, &iterator_0, (void **)&iterator_0_element_2);
+    bool iter_0_element_3_valid = linked_list_iterator_next(linked_list, &iterator_0, (void **)&iterator_0_element_3);
+    /* Finish iteration with iterator 1. */
+    bool iter_1_element_1_valid = linked_list_iterator_next(linked_list, &iterator_1, (void **)&iterator_1_element_1);
+    bool iter_1_element_2_valid = linked_list_iterator_next(linked_list, &iterator_1, (void **)&iterator_1_element_2);
+    bool iter_1_element_3_valid = linked_list_iterator_next(linked_list, &iterator_1, (void **)&iterator_1_element_3);
+
+    /* Validate iteration with iterator 0. */
+    CHECK_TRUE(iter_0_element_0_valid);
+    CHECK_TRUE(iter_0_element_1_valid);
+    CHECK_TRUE(iter_0_element_2_valid);
+    CHECK_FALSE(iter_0_element_3_valid);
+    CHECK_EQUAL(&id_element_0, iterator_0_element_0);
+    CHECK_EQUAL(&id_element_1, iterator_0_element_1);
+    CHECK_EQUAL(&id_element_2, iterator_0_element_2);
+    /* Validate iteration with iterator 1. */
+    CHECK_TRUE(iter_1_element_0_valid);
+    CHECK_TRUE(iter_1_element_1_valid);
+    CHECK_TRUE(iter_1_element_2_valid);
+    CHECK_FALSE(iter_1_element_3_valid);
+    CHECK_EQUAL(&id_element_0, iterator_1_element_0);
+    CHECK_EQUAL(&id_element_1, iterator_1_element_1);
+    CHECK_EQUAL(&id_element_2, iterator_1_element_2);
+}
+
+TEST(LinkedList, IteratorInitAssertsIfListIsNull)
+{
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "linked_list_iterator_init");
+    void *iterator = linked_list_iterator_init(NULL);
+}

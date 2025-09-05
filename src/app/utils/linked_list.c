@@ -150,3 +150,21 @@ void linked_list_remove_on_condition(LinkedList self, LinkedListConditionCb cb, 
     /* Does not matter how many elements are removed - do not care about return value */
     linked_list_remove_on_condition_with_limit(self, LINKED_LIST_REMOVE_NO_LIMIT, cb, user_data);
 }
+
+void *linked_list_iterator_init(LinkedList self)
+{
+    EAS_ASSERT(self);
+    return self->head;
+}
+
+bool linked_list_iterator_next(LinkedList self, void **iterator, void **element)
+{
+    LinkedListNode *current_node = (LinkedListNode *)*iterator;
+    if (current_node) {
+        *element = current_node->element;
+        *iterator = current_node->next;
+        return true;
+    } else {
+        return false;
+    }
+}

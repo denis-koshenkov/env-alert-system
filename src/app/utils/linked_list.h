@@ -10,6 +10,45 @@ extern "C"
 
 /**
  * @brief Singly linked list.
+ *
+ * It is possible to iterate over all the elements in the linked list by using @ref linked_list_iterator_init and @ref
+ * linked_list_iterator_next. Usage:
+ *
+ * ```
+ * // Create a linked list and add some elements
+ * size_t element0 = 42;
+ * size_t element1 = 24;
+ * LinkedList linked_list = linked_list_create();
+ * linked_list_prepend(linked_list, &element1);
+ * linked_list_prepend(linked_list, &element0);
+ *
+ * // Initialize the iterator
+ * void *iterator = linked_list_iterator_init();
+ *
+ * // This will set element0_retrieved to the address of element0 passed to linked_list_prepend
+ * // is_valid_element0 will be true, since linked_list_iterator_next retrieved a valid element
+ * size_t *element0_retrieved;
+ * bool is_valid_element0 = linked_list_iterator_next(linked_list, &iterator, (void **)&element0_retrieved);
+ *
+ * // This will set element1_retrieved to the address of element1 passed to linked_list_prepend
+ * // is_valid_element1 will be true, since linked_list_iterator_next retrieved a valid element
+ * size_t *element1_retrieved;
+ * bool is_valid_element1 = linked_list_iterator_next(linked_list, &iterator, (void **)&element1_retrieved);
+ *
+ * // We already iterated over all elements in the list. There is no next element to retrieve. is_valid_element2 will
+ * // be false. element2_retrieved has undefined value.
+ * size_t *element2_retrieved;
+ * bool is_valid_element2 = linked_list_iterator_next(linked_list, &iterator, (void **)&element2_retrieved);
+ * ```
+ *
+ * If an element is added to the list or removed from the list after @ref linked_list_iterator_init is called, that
+ * iterator should no longer be used. It is not allowed to call @ref linked_list_iterator_next with an iterator that was
+ * initialized before elements were added or removed. If elements are added or removed, a new iterator needs to be
+ * initialized and only then passed to @ref linked_list_iterator_next. The iteration will then start from the first
+ * element in the list.
+ *
+ * The reason for this is that the iterator is implemented as a pointer to a linked list node. If that node is removed
+ * from the list, the iterator is pointing to already freed memory.
  */
 typedef struct LinkedListStruct *LinkedList;
 
@@ -108,6 +147,33 @@ void linked_list_for_each(LinkedList self, LinkedListForEachCb cb, void *user_da
  * calling this function at all.
  */
 void linked_list_remove_on_condition(LinkedList self, LinkedListConditionCb cb, void *user_data);
+
+/**
+ * @brief Initialize a linked list iterator.
+ *
+ * @param self Linked list instance returned by @ref linked_list_create.
+ *
+ * @return void* Initialized iterator.
+ */
+void *linked_list_iterator_init(LinkedList self);
+
+/**
+ * @brief Retrieve the next element in the list using the iterator.
+ *
+ * @param self Linked list instance returned by @ref linked_list_create.
+ * @param iterator Address of the iterator returned by @ref linked_list_iterator_init.
+ * @param[out] element Address of the current retrieved element is written to this parameter. This only happens if true
+ * is returned. If this function returns false, this parameter is considered to have an undefined value and should not
+ * be dereferenced.
+ *
+ * @return true The next element was successfully retrieved and written to @p element.
+ * @return false There is no next element to retrieve - the end of the list has been reached.
+ *
+ * @warning It is not allowed to call this function if after @p iterator was initialized, elements were added to or
+ * removed from the list. If that happens, a new iterator needs to be initialized and the iteration has to start from
+ * the beginning of the list.
+ */
+bool linked_list_iterator_next(LinkedList self, void **iterator, void **element);
 
 #ifdef __cplusplus
 }
