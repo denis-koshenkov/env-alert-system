@@ -668,10 +668,11 @@ TEST(LinkedList, AppendAddsThreeElementsToEmptyList)
 
 TEST(LinkedList, IteratorEmptyList)
 {
+    LinkedListIdElement *retrieved_element;
+
     LinkedList linked_list = linked_list_create();
     void *iterator = linked_list_iterator_init(linked_list);
-    void **element;
-    bool is_valid_element = linked_list_iterator_next(&iterator, element);
+    bool is_valid_element = linked_list_iterator_next(&iterator, (void **)&retrieved_element);
 
     /* There are 0 elements in the list, so the first call to iterator_next should signal the end of the list. */
     CHECK_FALSE(is_valid_element);
@@ -793,4 +794,24 @@ TEST(LinkedList, IteratorInitAssertsIfListIsNull)
 {
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "linked_list_iterator_init");
     void *iterator = linked_list_iterator_init(NULL);
+}
+
+TEST(LinkedList, IteratorNextAssertsIfIteratorIsNull)
+{
+    LinkedListIdElement *retrieved_element_0;
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("iterator", "linked_list_iterator_next");
+
+    bool is_valid_element = linked_list_iterator_next(NULL, (void **)&retrieved_element_0);
+}
+
+TEST(LinkedList, IteratorNextAssertsIfElementIsNull)
+{
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = false};
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("element", "linked_list_iterator_next");
+
+    LinkedList linked_list = linked_list_create();
+    linked_list_append(linked_list, &id_element_0);
+    void *iterator = linked_list_iterator_init(linked_list);
+    bool is_valid_element = linked_list_iterator_next(&iterator, NULL);
 }

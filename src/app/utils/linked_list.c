@@ -154,11 +154,15 @@ void linked_list_remove_on_condition(LinkedList self, LinkedListConditionCb cb, 
 void *linked_list_iterator_init(LinkedList self)
 {
     EAS_ASSERT(self);
+
     return self->head;
 }
 
 bool linked_list_iterator_next(void **iterator, void **element)
 {
+    EAS_ASSERT(iterator);
+    EAS_ASSERT(element);
+
     LinkedListNode *current_node = (LinkedListNode *)*iterator;
     if (current_node) {
         *element = current_node->element;
