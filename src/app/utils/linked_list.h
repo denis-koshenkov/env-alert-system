@@ -28,17 +28,17 @@ extern "C"
  * // This will set element0_retrieved to the address of element0 passed to linked_list_prepend
  * // is_valid_element0 will be true, since linked_list_iterator_next retrieved a valid element
  * size_t *element0_retrieved;
- * bool is_valid_element0 = linked_list_iterator_next(linked_list, &iterator, (void **)&element0_retrieved);
+ * bool is_valid_element0 = linked_list_iterator_next(&iterator, (void **)&element0_retrieved);
  *
  * // This will set element1_retrieved to the address of element1 passed to linked_list_prepend
  * // is_valid_element1 will be true, since linked_list_iterator_next retrieved a valid element
  * size_t *element1_retrieved;
- * bool is_valid_element1 = linked_list_iterator_next(linked_list, &iterator, (void **)&element1_retrieved);
+ * bool is_valid_element1 = linked_list_iterator_next(&iterator, (void **)&element1_retrieved);
  *
  * // We already iterated over all elements in the list. There is no next element to retrieve. is_valid_element2 will
  * // be false. element2_retrieved has undefined value.
  * size_t *element2_retrieved;
- * bool is_valid_element2 = linked_list_iterator_next(linked_list, &iterator, (void **)&element2_retrieved);
+ * bool is_valid_element2 = linked_list_iterator_next(&iterator, (void **)&element2_retrieved);
  * ```
  *
  * If an element is added to the list or removed from the list after @ref linked_list_iterator_init is called, that
@@ -160,7 +160,6 @@ void *linked_list_iterator_init(LinkedList self);
 /**
  * @brief Retrieve the next element in the list using the iterator.
  *
- * @param self Linked list instance returned by @ref linked_list_create.
  * @param iterator Address of the iterator returned by @ref linked_list_iterator_init.
  * @param[out] element Address of the current retrieved element is written to this parameter. This only happens if true
  * is returned. If this function returns false, this parameter is considered to have an undefined value and should not
@@ -173,7 +172,7 @@ void *linked_list_iterator_init(LinkedList self);
  * removed from the list. If that happens, a new iterator needs to be initialized and the iteration has to start from
  * the beginning of the list.
  */
-bool linked_list_iterator_next(LinkedList self, void **iterator, void **element);
+bool linked_list_iterator_next(void **iterator, void **element);
 
 #ifdef __cplusplus
 }

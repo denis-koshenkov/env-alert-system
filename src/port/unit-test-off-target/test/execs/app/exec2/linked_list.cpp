@@ -671,7 +671,7 @@ TEST(LinkedList, IteratorEmptyList)
     LinkedList linked_list = linked_list_create();
     void *iterator = linked_list_iterator_init(linked_list);
     void **element;
-    bool is_valid_element = linked_list_iterator_next(linked_list, &iterator, element);
+    bool is_valid_element = linked_list_iterator_next(&iterator, element);
 
     /* There are 0 elements in the list, so the first call to iterator_next should signal the end of the list. */
     CHECK_FALSE(is_valid_element);
@@ -687,8 +687,8 @@ TEST(LinkedList, IteratorOneElementInList)
     LinkedList linked_list = linked_list_create();
     linked_list_append(linked_list, &id_element_0);
     void *iterator = linked_list_iterator_init(linked_list);
-    bool is_valid_element_0 = linked_list_iterator_next(linked_list, &iterator, (void **)&retrieved_element_0);
-    bool is_valid_element_1 = linked_list_iterator_next(linked_list, &iterator, (void **)&retrieved_element_1);
+    bool is_valid_element_0 = linked_list_iterator_next(&iterator, (void **)&retrieved_element_0);
+    bool is_valid_element_1 = linked_list_iterator_next(&iterator, (void **)&retrieved_element_1);
 
     CHECK_TRUE(is_valid_element_0);
     CHECK_FALSE(is_valid_element_1);
@@ -717,12 +717,12 @@ TEST(LinkedList, IteratorFourElementsInList)
     linked_list_append(linked_list, &id_element_2);
     linked_list_append(linked_list, &id_element_3);
     void *iterator = linked_list_iterator_init(linked_list);
-    bool is_valid_element_0 = linked_list_iterator_next(linked_list, &iterator, (void **)&retrieved_element_0);
-    bool is_valid_element_1 = linked_list_iterator_next(linked_list, &iterator, (void **)&retrieved_element_1);
-    bool is_valid_element_2 = linked_list_iterator_next(linked_list, &iterator, (void **)&retrieved_element_2);
-    bool is_valid_element_3 = linked_list_iterator_next(linked_list, &iterator, (void **)&retrieved_element_3);
+    bool is_valid_element_0 = linked_list_iterator_next(&iterator, (void **)&retrieved_element_0);
+    bool is_valid_element_1 = linked_list_iterator_next(&iterator, (void **)&retrieved_element_1);
+    bool is_valid_element_2 = linked_list_iterator_next(&iterator, (void **)&retrieved_element_2);
+    bool is_valid_element_3 = linked_list_iterator_next(&iterator, (void **)&retrieved_element_3);
     /* All 4 elements have been iterated, we reached the end of the list. Should return false. */
-    bool is_valid_element_4 = linked_list_iterator_next(linked_list, &iterator, (void **)&retrieved_element_4);
+    bool is_valid_element_4 = linked_list_iterator_next(&iterator, (void **)&retrieved_element_4);
 
     CHECK_TRUE(is_valid_element_0);
     CHECK_TRUE(is_valid_element_1);
@@ -758,18 +758,18 @@ TEST(LinkedList, TwoSimultaneousIterators)
     linked_list_append(linked_list, &id_element_2);
     void *iterator_0 = linked_list_iterator_init(linked_list);
     /* Iterate over the first two elements with iterator 0. */
-    bool iter_0_element_0_valid = linked_list_iterator_next(linked_list, &iterator_0, (void **)&iterator_0_element_0);
-    bool iter_0_element_1_valid = linked_list_iterator_next(linked_list, &iterator_0, (void **)&iterator_0_element_1);
+    bool iter_0_element_0_valid = linked_list_iterator_next(&iterator_0, (void **)&iterator_0_element_0);
+    bool iter_0_element_1_valid = linked_list_iterator_next(&iterator_0, (void **)&iterator_0_element_1);
     /* First element with iterator 1. */
     void *iterator_1 = linked_list_iterator_init(linked_list);
-    bool iter_1_element_0_valid = linked_list_iterator_next(linked_list, &iterator_1, (void **)&iterator_1_element_0);
+    bool iter_1_element_0_valid = linked_list_iterator_next(&iterator_1, (void **)&iterator_1_element_0);
     /* Finish iteration with iterator 0. */
-    bool iter_0_element_2_valid = linked_list_iterator_next(linked_list, &iterator_0, (void **)&iterator_0_element_2);
-    bool iter_0_element_3_valid = linked_list_iterator_next(linked_list, &iterator_0, (void **)&iterator_0_element_3);
+    bool iter_0_element_2_valid = linked_list_iterator_next(&iterator_0, (void **)&iterator_0_element_2);
+    bool iter_0_element_3_valid = linked_list_iterator_next(&iterator_0, (void **)&iterator_0_element_3);
     /* Finish iteration with iterator 1. */
-    bool iter_1_element_1_valid = linked_list_iterator_next(linked_list, &iterator_1, (void **)&iterator_1_element_1);
-    bool iter_1_element_2_valid = linked_list_iterator_next(linked_list, &iterator_1, (void **)&iterator_1_element_2);
-    bool iter_1_element_3_valid = linked_list_iterator_next(linked_list, &iterator_1, (void **)&iterator_1_element_3);
+    bool iter_1_element_1_valid = linked_list_iterator_next(&iterator_1, (void **)&iterator_1_element_1);
+    bool iter_1_element_2_valid = linked_list_iterator_next(&iterator_1, (void **)&iterator_1_element_2);
+    bool iter_1_element_3_valid = linked_list_iterator_next(&iterator_1, (void **)&iterator_1_element_3);
 
     /* Validate iteration with iterator 0. */
     CHECK_TRUE(iter_0_element_0_valid);

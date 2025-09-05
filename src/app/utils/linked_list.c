@@ -157,7 +157,7 @@ void *linked_list_iterator_init(LinkedList self)
     return self->head;
 }
 
-bool linked_list_iterator_next(LinkedList self, void **iterator, void **element)
+bool linked_list_iterator_next(void **iterator, void **element)
 {
     LinkedListNode *current_node = (LinkedListNode *)*iterator;
     if (current_node) {
