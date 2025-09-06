@@ -229,19 +229,6 @@ static void remove_notification_from_list(LedColor led_color, LedPattern led_pat
     num_notifications--;
 }
 
-static void start_switching_notification_display()
-{
-    /* This function is called when there was only one notification in the list, and the second one had just been added.
-     * We advance the iterator to point to the first notification, but we do not display it, because it is already being
-     * displayed. When the timer expires, the iterator will advance to the second notification, and the led will display
-     * the second notification. */
-
-    reset_notification_iterator();
-    /* Ignore return value - we only need to advance the iterator */
-    advance_notification_iterator();
-    eas_timer_start(get_timer_instance());
-}
-
 void led_manager_add_notification(LedColor led_color, LedPattern led_pattern)
 {
     LedNotification *led_notification = led_notification_allocator_alloc();
@@ -254,7 +241,13 @@ void led_manager_add_notification(LedColor led_color, LedPattern led_pattern)
         display_notification(led_notification);
     } else if (num_notifications == 2) {
         /* This is the second notification. Need to start alternating between displaying the two notifications. */
-        start_switching_notification_display();
+        reset_notification_iterator();
+        /* We advance the iterator to point to the first notification, but we do not display it, because it is
+         * already being displayed. When the timer expires, the iterator will advance to the second notification, and
+         * the led will display the second notification. */
+        /* Ignore return value - we only need to advance the iterator */
+        advance_notification_iterator();
+        eas_timer_start(get_timer_instance());
     }
 }
 
