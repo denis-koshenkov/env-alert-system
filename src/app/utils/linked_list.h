@@ -8,6 +8,8 @@ extern "C"
 
 #include <stdbool.h>
 
+#define LINKED_LIST_REMOVE_NO_LIMIT SIZE_MAX
+
 /**
  * @brief Singly linked list.
  *
@@ -80,6 +82,14 @@ typedef void (*LinkedListForEachCb)(void *element, void *user_data);
 typedef bool (*LinkedListConditionCb)(void *element, void *user_data);
 
 /**
+ * @brief Callback type to execute for each element before removing it.
+ *
+ * @param element Element that is about to be removed.
+ * @param user_data User data.
+ */
+typedef void (*LinkedListPreRemoveCb)(void *element, void *user_data);
+
+/**
  * @brief Create a linked list instance.
  *
  * @return LinkedList Created linked list instance.
@@ -138,6 +148,9 @@ void linked_list_for_each(LinkedList self, LinkedListForEachCb cb, void *user_da
 /**
  * @brief Remove all elements from the list that satisfy a certain condition.
  *
+ * Equivalent to calling:
+ * linked_list_remove_on_condition_with_limit(self, LINKED_LIST_REMOVE_NO_LIMIT, cb, user_data, NULL, NULL);
+ *
  * @param self Linked list instance returned by @ref linked_list_create.
  * @param cb This callback is called for each element in the list. If the callback for the element returns true, then
  * the element is removed from the list. If the callback for the element returns false, the element is kept in the list.
@@ -147,6 +160,31 @@ void linked_list_for_each(LinkedList self, LinkedListForEachCb cb, void *user_da
  * calling this function at all.
  */
 void linked_list_remove_on_condition(LinkedList self, LinkedListConditionCb cb, void *user_data);
+
+/**
+ * @brief Remove all elements from the list that satisfy a certain condition with limit and pre remove callback.
+ *
+ * @param self Linked list instance returned by @ref linked_list_create.
+ * @param max_num_elements_to_remove Maximal number of elements to remove. If the implementation removes this number
+ * of elements from the list, it exits immediately without iterating through the rest of the list. Pass
+ * LINKED_LIST_REMOVE_NO_LIMIT if all elements that satisfy the condition should be removed from the list, regardless of
+ * how many.
+ * @param condition_cb This callback is called for each element in the list. If the callback for the element returns
+ * true, then the element is removed from the list. If the callback for the element returns false, the element is kept
+ * in the list.
+ * @param condition_cb_user_data User data to pass to the condition callback. Can be NULL.
+ * @param pre_remove_cb Optional callback that is called for each element that is removed from the list right before the
+ * element is removed. Can be NULL.
+ * @param pre_remove_cb_user_data User data to pass to the pre remove callback. Can be NULL.
+ *
+ * @return size_t Number of elements removed from the list.
+ *
+ * @note Fires an assert if @p condition_cb is NULL. Calling this function with @p condition_cb equal to NULL would be
+ * equivalent to not calling this function at all.
+ */
+size_t linked_list_remove_on_condition_with_limit(LinkedList self, size_t max_num_elements_to_remove,
+                                                  LinkedListConditionCb condition_cb, void *condition_cb_user_data,
+                                                  LinkedListPreRemoveCb pre_remove_cb, void *pre_remove_cb_user_data);
 
 /**
  * @brief Initialize a linked list iterator.

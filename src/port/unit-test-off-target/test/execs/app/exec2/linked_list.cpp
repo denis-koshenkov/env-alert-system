@@ -20,6 +20,12 @@ static uint8_t expected_elements_in_list[LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS];
 static size_t num_actual_elements_in_list = 0;
 static size_t num_expected_elements_in_list = 0;
 
+/* Variables for keeping track of what elements are removed from the list when testing remove functionality. */
+static LinkedListIdElement *actual_removed_elements[LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS];
+static LinkedListIdElement *expected_removed_elements[LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS];
+static size_t num_actual_removed_elements = 0;
+static size_t num_expected_removed_elements = 0;
+
 /** This function should be called in the order in which the elements are expected to appear in the list. */
 static void expect_id_element_in_list(uint8_t id)
 {
@@ -51,6 +57,35 @@ static void verify_expected_id_elements()
     CHECK_TRUE(expected_elements_match_actual);
 }
 
+/** This function should be called in the order in which the elements are expected to be removed from the list. */
+static void expect_element_to_be_removed(LinkedListIdElement *id_element)
+{
+    EAS_ASSERT(num_expected_removed_elements < LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS);
+    expected_removed_elements[num_expected_removed_elements] = id_element;
+    num_expected_removed_elements++;
+}
+
+static void actual_element_removed(LinkedListIdElement *id_element)
+{
+    EAS_ASSERT(num_actual_removed_elements < LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS);
+    actual_removed_elements[num_actual_removed_elements] = id_element;
+    num_actual_removed_elements++;
+}
+
+static void reset_expected_actual_removed_elements()
+{
+    memset(expected_removed_elements, 0, LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(LinkedListIdElement *));
+    memset(actual_removed_elements, 0, LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(LinkedListIdElement *));
+    num_actual_removed_elements = 0;
+    num_expected_removed_elements = 0;
+}
+
+static void verify_expected_removed_elements()
+{
+    MEMCMP_EQUAL(expected_removed_elements, actual_removed_elements,
+                 LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(LinkedListIdElement *));
+}
+
 static void for_each_cb_id_elements(void *element, void *user_data)
 {
     LinkedListIdElement *id_element = (LinkedListIdElement *)element;
@@ -76,6 +111,17 @@ static bool remove_on_condition_save_use_data_cb(void *element, void *user_data)
     return false;
 }
 
+static void *actual_pre_remove_user_data = NULL;
+static void pre_remove_save_user_data_cb(void *element, void *user_data)
+{
+    actual_pre_remove_user_data = user_data;
+}
+
+static void pre_remove_cb(void *element, void *user_data)
+{
+    actual_element_removed((LinkedListIdElement *)element);
+}
+
 static LinkedListNode *id_element_0_node;
 static LinkedListNode *id_element_1_node;
 static LinkedListNode *id_element_2_node;
@@ -88,6 +134,7 @@ TEST_GROUP(LinkedList)
     void setup()
     {
         reset_expected_actual_id_elements();
+        reset_expected_actual_removed_elements();
 
         id_element_0_node = fake_linked_list_node_allocator_alloc();
         id_element_1_node = fake_linked_list_node_allocator_alloc();
@@ -814,4 +861,103 @@ TEST(LinkedList, IteratorNextAssertsIfElementIsNull)
     linked_list_append(linked_list, &id_element_0);
     void *iterator = linked_list_iterator_init(linked_list);
     bool is_valid_element = linked_list_iterator_next(&iterator, NULL);
+}
+
+TEST(LinkedList, RemoveOnConditionWithLimitCallsPreRemoveCbs)
+{
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_2_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_2_node);
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = true};
+    LinkedListIdElement id_element_1 = {.id = 1, .condition_evaluation_result = false};
+    LinkedListIdElement id_element_2 = {.id = 2, .condition_evaluation_result = true};
+    expect_element_to_be_removed(&id_element_0);
+    expect_element_to_be_removed(&id_element_2);
+
+    LinkedList linked_list = linked_list_create();
+    linked_list_append(linked_list, &id_element_0);
+    linked_list_append(linked_list, &id_element_1);
+    linked_list_append(linked_list, &id_element_2);
+    size_t num_removed_elements = linked_list_remove_on_condition_with_limit(
+        linked_list, LINKED_LIST_REMOVE_NO_LIMIT, condition_id_element_cb, NULL, pre_remove_cb, NULL);
+
+    CHECK_EQUAL(2, num_removed_elements);
+    verify_expected_removed_elements();
+}
+
+TEST(LinkedList, RemoveOnConditionWithLimitRespectsLimit)
+{
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_2_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_0_node);
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = true};
+    LinkedListIdElement id_element_1 = {.id = 1, .condition_evaluation_result = true};
+    LinkedListIdElement id_element_2 = {.id = 2, .condition_evaluation_result = true};
+    expect_element_to_be_removed(&id_element_0);
+
+    LinkedList linked_list = linked_list_create();
+    linked_list_append(linked_list, &id_element_0);
+    linked_list_append(linked_list, &id_element_1);
+    linked_list_append(linked_list, &id_element_2);
+    /* All three elements return true from their condition callback, but we expect only the first element to be removed,
+     * since we are setting limit to 1. */
+    size_t num_removed_elements =
+        linked_list_remove_on_condition_with_limit(linked_list, 1, condition_id_element_cb, NULL, pre_remove_cb, NULL);
+
+    CHECK_EQUAL(1, num_removed_elements);
+    verify_expected_removed_elements();
+}
+
+TEST(LinkedList, RemoveOnConditionWithLimitReturns0ListEmpty)
+{
+    /* Do not expect any elements to be removed - list is empty */
+
+    LinkedList linked_list = linked_list_create();
+    size_t num_removed_elements = linked_list_remove_on_condition_with_limit(
+        linked_list, LINKED_LIST_REMOVE_NO_LIMIT, condition_id_element_cb, NULL, pre_remove_cb, NULL);
+
+    CHECK_EQUAL(0, num_removed_elements);
+    verify_expected_removed_elements();
+}
+
+TEST(LinkedList, RemoveOnConditionWithLimit0DoesNotRemoveAnyElements)
+{
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_1_node);
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_2_node);
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = true};
+    LinkedListIdElement id_element_1 = {.id = 1, .condition_evaluation_result = true};
+    LinkedListIdElement id_element_2 = {.id = 2, .condition_evaluation_result = true};
+
+    LinkedList linked_list = linked_list_create();
+    linked_list_append(linked_list, &id_element_0);
+    linked_list_append(linked_list, &id_element_1);
+    linked_list_append(linked_list, &id_element_2);
+    /* All three elements return true from their condition callback, but we expect no elements to be removed, since we
+     * are setting limit to 0. */
+    size_t num_removed_elements =
+        linked_list_remove_on_condition_with_limit(linked_list, 0, condition_id_element_cb, NULL, pre_remove_cb, NULL);
+
+    CHECK_EQUAL(0, num_removed_elements);
+    verify_expected_removed_elements();
+}
+
+TEST(LinkedList, RemoveOnConditionWithLimitPassesUserDataToPreRemoveCb)
+{
+    mock().expectOneCall("linked_list_node_allocator_alloc").andReturnValue(id_element_0_node);
+    mock().expectOneCall("linked_list_node_allocator_free").withParameter("linked_list_node", id_element_0_node);
+    LinkedListIdElement id_element_0 = {.id = 0, .condition_evaluation_result = true};
+    void *expected_pre_remove_user_data = (void *)0x42;
+
+    LinkedList linked_list = linked_list_create();
+    linked_list_append(linked_list, &id_element_0);
+    size_t num_removed_elements = linked_list_remove_on_condition_with_limit(
+        linked_list, 1, condition_id_element_cb, NULL, pre_remove_save_user_data_cb, expected_pre_remove_user_data);
+
+    CHECK_EQUAL(1, num_removed_elements);
+    CHECK_EQUAL(expected_pre_remove_user_data, actual_pre_remove_user_data);
+    verify_expected_removed_elements();
 }
