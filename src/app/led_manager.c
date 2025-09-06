@@ -216,17 +216,37 @@ static void find_next_notification_after_removed_and_free(void *element, void *u
     led_notification_allocator_free(led_notification_to_remove);
 }
 
-static void remove_notification_from_list(LedColor led_color, LedPattern led_pattern,
+/**
+ * @brief Remove a notification from the list of notifications.
+ *
+ * If there are several notifications in the list with color @p led_color and pattern @p led_pattern, removes only the
+ * first such notification.
+ *
+ * @param led_color Led notification color.
+ * @param led_pattern Led notification pattern.
+ * @param pre_remove_cb Linked list pre remove callback to execute before removing the notification from the linked list
+ * of notifications.
+ *
+ * @return true Notification was found and removed.
+ * @return false Notification was not found in the list, nothing is done.
+ */
+static bool remove_notification_from_list(LedColor led_color, LedPattern led_pattern,
                                           LinkedListPreRemoveCb pre_remove_cb)
 {
     LedNotification led_notification_to_remove = {.led_color = led_color, .led_pattern = led_pattern};
 
     /* Remove at most one element. It can be the case that there are several notification with the same color and
-     * pattern. Here we want to remove only the first occurrence. Free the allocated led notification memory before
-     * removing it from the list. */
+     * pattern. Here we want to remove only the first occurrence. */
     size_t num_removed = linked_list_remove_on_condition_with_limit(get_linked_list_instance(), 1, remove_condition_cb,
                                                                     &led_notification_to_remove, pre_remove_cb, NULL);
-    num_notifications--;
+    EAS_ASSERT(num_removed <= 1);
+
+    if (num_removed == 1) {
+        num_notifications--;
+        return true;
+    } else { /* num_removed == 0 */
+        return false;
+    }
 }
 
 void led_manager_add_notification(LedColor led_color, LedPattern led_pattern)
@@ -261,12 +281,24 @@ void led_manager_add_notification(LedColor led_color, LedPattern led_pattern)
 
 bool led_manager_remove_notification(LedColor led_color, LedPattern led_pattern)
 {
+    if (num_notifications == 0) {
+        return false;
+    }
+
     if (num_notifications == 1) {
-        remove_notification_from_list(led_color, led_pattern, free_led_notification);
+        bool is_removed = remove_notification_from_list(led_color, led_pattern, free_led_notification);
+        if (!is_removed) {
+            return false;
+        }
         /* The last notification was removed. Turn off the led - no notifications to display. */
         turn_off_led();
     } else if (num_notifications == 2) {
-        remove_notification_from_list(led_color, led_pattern, find_next_notification_after_removed_and_free);
+        bool is_removed =
+            remove_notification_from_list(led_color, led_pattern, find_next_notification_after_removed_and_free);
+        if (!is_removed) {
+            return false;
+        }
+
         /* There were 2 notifications in the list, and now there is only one. If we were already displaying the
          * notification that is left, we do not need to do anything. However, if we were displaying the notification we
          * just removed, we need to set the led to the notification that is left. */
@@ -277,7 +309,12 @@ bool led_manager_remove_notification(LedColor led_color, LedPattern led_pattern)
         /* Since there is only one notification left, we need to stop switching between notification. */
         eas_timer_stop(get_timer_instance());
     } else {
-        remove_notification_from_list(led_color, led_pattern, find_next_notification_after_removed_and_free);
+        bool is_removed =
+            remove_notification_from_list(led_color, led_pattern, find_next_notification_after_removed_and_free);
+        if (!is_removed) {
+            return false;
+        }
+
         if (displayed_notification == removed_notification) {
             /* We removed the notification that was being displayed. We need to start displaying the notification after
              * the one that was removed. */

@@ -319,3 +319,111 @@ TEST_ORDERED(LedManager, CurrentlyDisplayedNotificationIsRemoved, 1)
     CHECK_TRUE(removed_notification2);
     CHECK_TRUE(removed_notification1);
 }
+
+TEST_ORDERED(LedManager, RemoveNotificationReturnsFalseNothingAdded, 1)
+{
+    LedColor led_color = LED_COLOR_RED;
+    LedPattern led_pattern = LED_PATTERN_STATIC;
+
+    bool removed_notification = led_manager_remove_notification(led_color, led_pattern);
+
+    CHECK_FALSE(removed_notification);
+}
+
+TEST_ORDERED(LedManager, RemoveNotificationReturnsFalseOneNotificationAdded, 1)
+{
+    LedColor led_color_0 = LED_COLOR_GREEN;
+    LedPattern led_pattern_0 = LED_PATTERN_ALERT;
+    LedColor led_color_1 = LED_COLOR_BLUE;
+    LedPattern led_pattern_1 = LED_PATTERN_STATIC;
+    mock().expectOneCall("led_notification_allocator_alloc").andReturnValue(&led_notification_0);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_0).withParameter("led_pattern", led_pattern_0);
+    mock().expectOneCall("led_notification_allocator_free").withParameter("led_notification", &led_notification_0);
+    mock().expectOneCall("led_turn_off");
+
+    led_manager_add_notification(led_color_0, led_pattern_0);
+
+    bool removed_notification1 = led_manager_remove_notification(led_color_1, led_pattern_1);
+
+    CHECK_FALSE(removed_notification1);
+
+    /* Clean up */
+    bool removed_notification0 = led_manager_remove_notification(led_color_0, led_pattern_0);
+    CHECK_TRUE(removed_notification0);
+}
+
+TEST_ORDERED(LedManager, RemoveNotificationReturnsFalseTwoNotificationsAdded, 1)
+{
+    LedColor led_color_0 = LED_COLOR_RED;
+    LedPattern led_pattern_0 = LED_PATTERN_ALERT;
+    LedColor led_color_1 = LED_COLOR_GREEN;
+    LedPattern led_pattern_1 = LED_PATTERN_STATIC;
+    LedColor led_color_2 = LED_COLOR_BLUE;
+    LedPattern led_pattern_2 = LED_PATTERN_ALERT;
+    mock().expectOneCall("led_notification_allocator_alloc").andReturnValue(&led_notification_0);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_0).withParameter("led_pattern", led_pattern_0);
+    mock().expectOneCall("led_notification_allocator_alloc").andReturnValue(&led_notification_1);
+    mock().expectOneCall("eas_timer_start").withParameter("self", timer);
+    /* Clean up */
+    mock().expectOneCall("led_notification_allocator_free").withParameter("led_notification", &led_notification_1);
+    mock().expectOneCall("eas_timer_stop").withParameter("self", timer);
+    mock().expectOneCall("led_notification_allocator_free").withParameter("led_notification", &led_notification_0);
+    mock().expectOneCall("led_turn_off");
+
+    /* Allocates notification 0 and sets led to notification 0 */
+    led_manager_add_notification(led_color_0, led_pattern_0);
+    /* Allocates notification 1 and starts notification timer */
+    led_manager_add_notification(led_color_1, led_pattern_1);
+
+    bool removed_notification2 = led_manager_remove_notification(led_color_2, led_pattern_2);
+
+    CHECK_FALSE(removed_notification2);
+
+    /* Clean up */
+    bool removed_notification1 = led_manager_remove_notification(led_color_1, led_pattern_1);
+    bool removed_notification0 = led_manager_remove_notification(led_color_0, led_pattern_0);
+    CHECK_TRUE(removed_notification1);
+    CHECK_TRUE(removed_notification0);
+}
+
+TEST_ORDERED(LedManager, RemoveNotificationReturnsFalseThreeNotificationsAdded, 1)
+{
+    LedColor led_color_0 = LED_COLOR_RED;
+    LedPattern led_pattern_0 = LED_PATTERN_STATIC;
+    LedColor led_color_1 = LED_COLOR_GREEN;
+    LedPattern led_pattern_1 = LED_PATTERN_ALERT;
+    LedColor led_color_2 = LED_COLOR_BLUE;
+    LedPattern led_pattern_2 = LED_PATTERN_STATIC;
+    LedColor led_color_3 = LED_COLOR_RED;
+    LedPattern led_pattern_3 = LED_PATTERN_ALERT;
+    mock().expectOneCall("led_notification_allocator_alloc").andReturnValue(&led_notification_0);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_0).withParameter("led_pattern", led_pattern_0);
+    mock().expectOneCall("led_notification_allocator_alloc").andReturnValue(&led_notification_1);
+    mock().expectOneCall("eas_timer_start").withParameter("self", timer);
+    mock().expectOneCall("led_notification_allocator_alloc").andReturnValue(&led_notification_2);
+    /* Clean up */
+    mock().expectOneCall("led_notification_allocator_free").withParameter("led_notification", &led_notification_2);
+    mock().expectOneCall("led_notification_allocator_free").withParameter("led_notification", &led_notification_1);
+    mock().expectOneCall("eas_timer_stop").withParameter("self", timer);
+    mock().expectOneCall("led_notification_allocator_free").withParameter("led_notification", &led_notification_0);
+    mock().expectOneCall("led_turn_off");
+
+    /* Allocates notification 0 and sets led to notification 0 */
+    led_manager_add_notification(led_color_0, led_pattern_0);
+    /* Allocates notification 1 and starts notification timer */
+    led_manager_add_notification(led_color_1, led_pattern_1);
+    /* Allocates notification 2 */
+    led_manager_add_notification(led_color_2, led_pattern_2);
+
+    bool removed_notification3 = led_manager_remove_notification(led_color_3, led_pattern_3);
+
+    CHECK_FALSE(removed_notification3);
+
+    /* Clean up */
+    bool removed_notification2 = led_manager_remove_notification(led_color_2, led_pattern_2);
+    bool removed_notification1 = led_manager_remove_notification(led_color_1, led_pattern_1);
+    bool removed_notification0 = led_manager_remove_notification(led_color_0, led_pattern_0);
+    CHECK_TRUE(removed_notification2);
+    CHECK_TRUE(removed_notification1);
+    CHECK_TRUE(removed_notification0);
+}
