@@ -90,9 +90,12 @@ TEST_ORDERED(LedManager, PeriodicallySwitchBetweenTwoNotifications, 0)
 
     /* Currently displaying notification 0, this call removes notification 1. No extra calls to led expected - it should
      * keep displaying notification 0. It should stop the timer, since there is only 1 notification in total. */
-    led_manager_remove_notification(led_color_1, led_pattern_1);
-    // /* The last notification is removed. Should turn off the led. */
-    led_manager_remove_notification(led_color_0, led_pattern_0);
+    bool removed_notification1 = led_manager_remove_notification(led_color_1, led_pattern_1);
+    /* The last notification is removed. Should turn off the led. */
+    bool removed_notification0 = led_manager_remove_notification(led_color_0, led_pattern_0);
+
+    CHECK_TRUE(removed_notification1);
+    CHECK_TRUE(removed_notification0);
 }
 
 TEST_ORDERED(LedManager, AddNotificationSetsLed, 1)
@@ -109,7 +112,8 @@ TEST_ORDERED(LedManager, AddNotificationSetsLed, 1)
 
     /* Clean up */
     /* Calls led_turn_off, since there are now no added notifications - led should be off */
-    led_manager_remove_notification(led_color, led_pattern);
+    bool removed_notification = led_manager_remove_notification(led_color, led_pattern);
+    CHECK_TRUE(removed_notification);
 }
 
 TEST_ORDERED(LedManager, AddNotificationSetsLedGreenAlert, 1)
@@ -126,7 +130,8 @@ TEST_ORDERED(LedManager, AddNotificationSetsLedGreenAlert, 1)
 
     /* Clean up */
     /* Calls led_turn_off, since there are now no added notifications - led should be off */
-    led_manager_remove_notification(led_color, led_pattern);
+    bool removed_notification = led_manager_remove_notification(led_color, led_pattern);
+    CHECK_TRUE(removed_notification);
 }
 
 TEST_ORDERED(LedManager, PeriodicallySwitchBetweenThreeNotifications, 1)
@@ -186,12 +191,16 @@ TEST_ORDERED(LedManager, PeriodicallySwitchBetweenThreeNotifications, 1)
     /* Clean up */
     /* Currently displaying notification 0, this call removes notification 2. No extra calls to led expected - it should
      * keep displaying notification 0. */
-    led_manager_remove_notification(led_color_2, led_pattern_2);
+    bool removed_notification2 = led_manager_remove_notification(led_color_2, led_pattern_2);
     /* Currently displaying notification 0, this call removes notification 1. No extra calls to led expected - it should
      * keep displaying notification 0. It should stop the timer, since there is only 1 notification in total. */
-    led_manager_remove_notification(led_color_1, led_pattern_1);
+    bool removed_notification1 = led_manager_remove_notification(led_color_1, led_pattern_1);
     /* The last notification is removed. Should turn off the led. */
-    led_manager_remove_notification(led_color_0, led_pattern_0);
+    bool removed_notification0 = led_manager_remove_notification(led_color_0, led_pattern_0);
+
+    CHECK_TRUE(removed_notification2);
+    CHECK_TRUE(removed_notification1);
+    CHECK_TRUE(removed_notification0);
 }
 
 TEST_ORDERED(LedManager, RemoveOneOfSeveralNotifications, 1)
@@ -234,7 +243,7 @@ TEST_ORDERED(LedManager, RemoveOneOfSeveralNotifications, 1)
     /* Period for notification 2 expired, should call led_set to start displaying notification 0 */
     timer_cb(timer_cb_user_data);
     /* Frees led notification 1 memory */
-    led_manager_remove_notification(led_color_1, led_pattern_1);
+    bool removed_notification1 = led_manager_remove_notification(led_color_1, led_pattern_1);
     /* Period for notification 0 expired. Since notification 1 was removed, this should start displaying
      * notification 2. */
     timer_cb(timer_cb_user_data);
@@ -247,9 +256,13 @@ TEST_ORDERED(LedManager, RemoveOneOfSeveralNotifications, 1)
 
     /* Currently displaying notification 0, this call removes notification 2. No extra calls to led expected - it
      * should keep displaying notification 0. It should stop the timer, since there is only 1 notification in total. */
-    led_manager_remove_notification(led_color_2, led_pattern_2);
+    bool removed_notification2 = led_manager_remove_notification(led_color_2, led_pattern_2);
     /* The last notification is removed. Should turn off the led. */
-    led_manager_remove_notification(led_color_0, led_pattern_0);
+    bool removed_notification0 = led_manager_remove_notification(led_color_0, led_pattern_0);
+
+    CHECK_TRUE(removed_notification1);
+    CHECK_TRUE(removed_notification2);
+    CHECK_TRUE(removed_notification0);
 }
 
 TEST_ORDERED(LedManager, CurrentlyDisplayedNotificationIsRemoved, 1)
@@ -287,7 +300,7 @@ TEST_ORDERED(LedManager, CurrentlyDisplayedNotificationIsRemoved, 1)
     led_manager_add_notification(led_color_2, led_pattern_2);
     /* Notification 0 is being displayed, but is now being removed. This should remove notification 0, start displaying
      * notification 1, and restart the timer to ensure notification 1 is displayed for the whole period. */
-    led_manager_remove_notification(led_color_0, led_pattern_0);
+    bool removed_notification0 = led_manager_remove_notification(led_color_0, led_pattern_0);
     /* Period for notification 1 expired, should start displaying notification 2 */
     timer_cb(timer_cb_user_data);
     /* Period for notification 2 expired, should start displaying notification 1 */
@@ -298,7 +311,11 @@ TEST_ORDERED(LedManager, CurrentlyDisplayedNotificationIsRemoved, 1)
     /* Notification 2 is being disaplyed, but it is now being removed. This should start displaying notification 1 - the
      * last one left. It should also free notification 2 memory and stop the timer, since there is only one notification
      * left. */
-    led_manager_remove_notification(led_color_2, led_pattern_2);
+    bool removed_notification2 = led_manager_remove_notification(led_color_2, led_pattern_2);
     /* The last notification is removed. Should turn off the led. */
-    led_manager_remove_notification(led_color_1, led_pattern_1);
+    bool removed_notification1 = led_manager_remove_notification(led_color_1, led_pattern_1);
+
+    CHECK_TRUE(removed_notification0);
+    CHECK_TRUE(removed_notification2);
+    CHECK_TRUE(removed_notification1);
 }

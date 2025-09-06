@@ -259,7 +259,7 @@ void led_manager_add_notification(LedColor led_color, LedPattern led_pattern)
     }
 }
 
-void led_manager_remove_notification(LedColor led_color, LedPattern led_pattern)
+bool led_manager_remove_notification(LedColor led_color, LedPattern led_pattern)
 {
     if (num_notifications == 1) {
         remove_notification_from_list(led_color, led_pattern, free_led_notification);
@@ -292,4 +292,5 @@ void led_manager_remove_notification(LedColor led_color, LedPattern led_pattern)
             reset_iterator_and_iterate_until(displayed_notification);
         }
     }
+    return true;
 }
