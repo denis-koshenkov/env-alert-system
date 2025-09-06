@@ -235,6 +235,8 @@ void led_manager_add_notification(LedColor led_color, LedPattern led_pattern)
     led_notification->led_color = led_color;
     led_notification->led_pattern = led_pattern;
     add_notification_to_list(led_notification);
+    /* To ensure the if below covers all possibilities */
+    EAS_ASSERT(num_notifications > 0);
 
     if (num_notifications == 1) {
         /* This is the only notification - set the led immediately */
@@ -248,6 +250,12 @@ void led_manager_add_notification(LedColor led_color, LedPattern led_pattern)
         /* Ignore return value - we only need to advance the iterator */
         advance_notification_iterator();
         eas_timer_start(get_timer_instance());
+    } else {
+        /* There were already 2 or more notifications in the list before this one was added. The switching between
+         * different notifications was already ongoing. Since we added an element to the linked list of notifications,
+         * we need to reset the iterator, as per linked list docs. Set the iterator to point to the currently displayed
+         * notification - exactly as it was before adding this notification. */
+        reset_iterator_and_iterate_until(displayed_notification);
     }
 }
 
