@@ -251,3 +251,54 @@ TEST_ORDERED(LedManager, RemoveOneOfSeveralNotifications, 1)
     /* The last notification is removed. Should turn off the led. */
     led_manager_remove_notification(led_color_0, led_pattern_0);
 }
+
+TEST_ORDERED(LedManager, CurrentlyDisplayedNotificationIsRemoved, 1)
+{
+    LedColor led_color_0 = LED_COLOR_RED;
+    LedPattern led_pattern_0 = LED_PATTERN_STATIC;
+    LedColor led_color_1 = LED_COLOR_GREEN;
+    LedPattern led_pattern_1 = LED_PATTERN_ALERT;
+    LedColor led_color_2 = LED_COLOR_BLUE;
+    LedPattern led_pattern_2 = LED_PATTERN_STATIC;
+    mock().expectOneCall("led_notification_allocator_alloc").andReturnValue(&led_notification_0);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_0).withParameter("led_pattern", led_pattern_0);
+    mock().expectOneCall("led_notification_allocator_alloc").andReturnValue(&led_notification_1);
+    mock().expectOneCall("eas_timer_start").withParameter("self", timer);
+    mock().expectOneCall("led_notification_allocator_alloc").andReturnValue(&led_notification_2);
+    mock().expectOneCall("led_notification_allocator_free").withParameter("led_notification", &led_notification_0);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_1).withParameter("led_pattern", led_pattern_1);
+    mock().expectOneCall("eas_timer_start").withParameter("self", timer);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_2).withParameter("led_pattern", led_pattern_2);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_1).withParameter("led_pattern", led_pattern_1);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_2).withParameter("led_pattern", led_pattern_2);
+
+    mock().expectOneCall("led_notification_allocator_free").withParameter("led_notification", &led_notification_2);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_1).withParameter("led_pattern", led_pattern_1);
+    mock().expectOneCall("eas_timer_stop").withParameter("self", timer);
+
+    mock().expectOneCall("led_notification_allocator_free").withParameter("led_notification", &led_notification_1);
+    mock().expectOneCall("led_turn_off");
+
+    /* Calls led_set */
+    led_manager_add_notification(led_color_0, led_pattern_0);
+    /* Two notifications added - need to alternate between them. Starts the timer. */
+    led_manager_add_notification(led_color_1, led_pattern_1);
+    /* No expected calls to led or timer */
+    led_manager_add_notification(led_color_2, led_pattern_2);
+    /* Notification 0 is being displayed, but is now being removed. This should remove notification 0, start displaying
+     * notification 1, and restart the timer to ensure notification 1 is displayed for the whole period. */
+    led_manager_remove_notification(led_color_0, led_pattern_0);
+    /* Period for notification 1 expired, should start displaying notification 2 */
+    timer_cb(timer_cb_user_data);
+    /* Period for notification 2 expired, should start displaying notification 1 */
+    timer_cb(timer_cb_user_data);
+    /* Period for notification 1 expired, should start displaying notification 2 */
+    timer_cb(timer_cb_user_data);
+
+    /* Notification 2 is being disaplyed, but it is now being removed. This should start displaying notification 1 - the
+     * last one left. It should also free notification 2 memory and stop the timer, since there is only one notification
+     * left. */
+    led_manager_remove_notification(led_color_2, led_pattern_2);
+    /* The last notification is removed. Should turn off the led. */
+    led_manager_remove_notification(led_color_1, led_pattern_1);
+}

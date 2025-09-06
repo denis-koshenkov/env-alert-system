@@ -84,6 +84,11 @@ typedef bool (*LinkedListConditionCb)(void *element, void *user_data);
 /**
  * @brief Callback type to execute for each element before removing it.
  *
+ * At the time this callback is executed, the list is in a valid state. The element to be removed is still present in
+ * the list. Therefore, it is allowed to examine the contents of the whole list in the implementation of this callback -
+ * for example, using the iterator functions. However, it is not allowed to add elements to the list or remove elements
+ * from the list in the callback implementation.
+ *
  * @param element Element that is about to be removed.
  * @param user_data User data.
  */
@@ -181,6 +186,7 @@ void linked_list_remove_on_condition(LinkedList self, LinkedListConditionCb cb, 
  *
  * @note Fires an assert if @p condition_cb is NULL. Calling this function with @p condition_cb equal to NULL would be
  * equivalent to not calling this function at all.
+ * @note See @ref LinkedListPreRemoveCb for implementation guidelines of the @p pre_remove_cb.
  */
 size_t linked_list_remove_on_condition_with_limit(LinkedList self, size_t max_num_elements_to_remove,
                                                   LinkedListConditionCb condition_cb, void *condition_cb_user_data,
