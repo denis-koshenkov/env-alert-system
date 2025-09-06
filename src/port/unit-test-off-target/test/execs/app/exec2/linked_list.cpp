@@ -52,9 +52,8 @@ static void reset_expected_actual_id_elements()
 
 static void verify_expected_id_elements()
 {
-    bool expected_elements_match_actual = (memcmp(expected_elements_in_list, actual_elements_in_list,
-                                                  LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(uint8_t)) == 0);
-    CHECK_TRUE(expected_elements_match_actual);
+    MEMCMP_EQUAL(expected_elements_in_list, actual_elements_in_list,
+                 LINKED_LIST_TEST_MAX_NUM_ID_ELEMENTS * sizeof(uint8_t));
 }
 
 /** This function should be called in the order in which the elements are expected to be removed from the list. */

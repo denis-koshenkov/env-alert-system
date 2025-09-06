@@ -37,7 +37,7 @@ TEST(ValueHolder, GetWhatWeSet8bytes)
     value_holder_set(vh, &value_set);
     uint8_t value_get[8];
     value_holder_get(vh, &value_get);
-    CHECK(memcmp(value_set, value_get, 8) == 0);
+    MEMCMP_EQUAL(value_set, value_get, 8);
 }
 
 TEST(ValueHolder, SetRaisesAssertVhNullPointer)
