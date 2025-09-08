@@ -60,6 +60,33 @@
  */
 #define CONFIG_LED_MANAGER_NOTIFICATION_DURATION_SECONDS 5
 
+/**
+ * @brief Influences the period of time for which timer expiry callbacks are ignored after timer is started.
+ *
+ * Led manager uses a timer to switch between displaying notifications. In some cases, led manager needs to stop this
+ * timer.
+ *
+ * After the timer is stopped, it is possible that its expiration callback is still executed. Led manager needs to
+ * ignore that callback and not perform any actions, since that callback is from a timer that was already stopped.
+ *
+ * In order to achieve this, led manager ignores all timer callbacks that are executed before the expected expiry time
+ * of the last started timer. For example, a timer is started for 5 seconds. If a timer expiry callback is executed 100
+ * ms after the timer was started, that callback should be ignored, since we know for sure that this is not the expiry
+ * callback of the currently running timer.
+ *
+ * However, it is not wise to ignore all expiry callbacks that are executed before exactly 5 seconds pass. Depending on
+ * the timer implementation, it is possible that the timer expiry callback will be executed slightly earlier than the
+ * expected time.
+ *
+ * This config defines how much earlier timer callbacks are allowed to be executed compared to their expected time.
+ *
+ * For example, a 5 second timer is started when current time is 1000 ms. If this margin is 0, then timer expiry
+ * callbacks that are executed at time 6000 or later are accepted, all the ones that arrive earlier are ignored. If this
+ * margin is 10, then timer expiry callbacks that are executed at time 5990 or later are accepted, all the ones that
+ * arrive earlier are ignored.
+ */
+#define CONFIG_LED_MANAGER_IGNORE_TIMER_MARGIN_MS 10
+
 /* Configs for port-specific modules */
 
 /** Should correspond to the number of times <module_name>_create() will be called in the unit test program. */

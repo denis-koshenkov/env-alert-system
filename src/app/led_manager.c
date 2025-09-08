@@ -9,12 +9,26 @@
 #include "config.h"
 #include "led_notification_allocator.h"
 #include "eas_assert.h"
+#include "eas_time.h"
+#include "utils/util.h"
 
 #ifndef CONFIG_LED_MANAGER_NOTIFICATION_DURATION_SECONDS
 #define CONFIG_LED_MANAGER_NOTIFICATION_DURATION_SECONDS 5
 #endif
 
+#ifndef CONFIG_LED_MANAGER_IGNORE_TIMER_MARGIN_MS
+#define CONFIG_LED_MANAGER_IGNORE_TIMER_MARGIN_MS 10
+#endif
+
 #define LED_MANAGER_NOTIFICATION_DURATION_MS (CONFIG_LED_MANAGER_NOTIFICATION_DURATION_SECONDS * 1000)
+
+/** If the timer expiry callback is executed before LED_MANAGER_IGNORE_TIMER_PERIOD_MS pass since starting the timer,
+ * the timer expiry callback is ignored. */
+#define LED_MANAGER_IGNORE_TIMER_PERIOD_MS                                                                             \
+    (LED_MANAGER_NOTIFICATION_DURATION_MS - CONFIG_LED_MANAGER_IGNORE_TIMER_MARGIN_MS)
+
+/** Ensure LED_MANAGER_IGNORE_TIMER_PERIOD_MS is not negative */
+EAS_STATIC_ASSERT(CONFIG_LED_MANAGER_IGNORE_TIMER_MARGIN_MS <= LED_MANAGER_NOTIFICATION_DURATION_MS);
 
 static size_t num_notifications = 0;
 /** Points to the LedNotification that is currently being displayed. Should always point to a LedNotification element
@@ -23,6 +37,7 @@ static const LedNotification *displayed_notification = NULL;
 static void *iterator = NULL;
 static const LedNotification *removed_notification = NULL;
 static const LedNotification *next_notification_after_removed = NULL;
+static EasTime ignore_timer_before_time = 0;
 
 static LinkedList get_linked_list_instance()
 {
@@ -129,7 +144,10 @@ static void display_next_notification()
 
 static void notification_timer_cb(void *user_data)
 {
-    display_next_notification();
+    EasTime current_time = eas_time_get();
+    if (eas_time_is_equal_or_after(current_time, ignore_timer_before_time)) {
+        display_next_notification();
+    }
 }
 
 static EasTimer get_timer_instance()
@@ -249,6 +267,13 @@ static bool remove_notification_from_list(LedColor led_color, LedPattern led_pat
     }
 }
 
+static void start_notification_timer()
+{
+    eas_timer_start(get_timer_instance());
+    EasTime current_time = eas_time_get();
+    ignore_timer_before_time = eas_time_offset_into_future(current_time, LED_MANAGER_IGNORE_TIMER_PERIOD_MS);
+}
+
 void led_manager_add_notification(LedColor led_color, LedPattern led_pattern)
 {
     LedNotification *led_notification = led_notification_allocator_alloc();
@@ -269,7 +294,7 @@ void led_manager_add_notification(LedColor led_color, LedPattern led_pattern)
          * the led will display the second notification. */
         /* Ignore return value - we only need to advance the iterator */
         advance_notification_iterator();
-        eas_timer_start(get_timer_instance());
+        start_notification_timer();
     } else {
         /* There were already 2 or more notifications in the list before this one was added. The switching between
          * different notifications was already ongoing. Since we added an element to the linked list of notifications,
@@ -321,7 +346,7 @@ bool led_manager_remove_notification(LedColor led_color, LedPattern led_pattern)
             reset_iterator_and_iterate_until(next_notification_after_removed);
             display_notification(next_notification_after_removed);
             /* Restart the timer so that we display the notification for the full period. */
-            eas_timer_start(get_timer_instance());
+            start_notification_timer();
         } else {
             /* We removed a notification that was not being displayed. Since we removed an element from the list, we
              * need to reset the iterator and iterate until the currently displayed notification. This way, the next

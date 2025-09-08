@@ -8,6 +8,7 @@
 #include "eas_timer_defs.h"
 #include "linked_list_node_allocator.h"
 #include "fake_linked_list_node_allocator.h"
+#include "eas_time.h"
 
 /* Notification duration is defined in seconds in the config. The expected timer period is equal to the notification
  * duration, but it is defined in ms. Convert seconds to ms. */
@@ -45,6 +46,12 @@ TEST_GROUP(LedManager)
          * tests - they are testing the LedManager behavior, not the way it stores notifications internally. */
         UT_PTR_SET(linked_list_node_allocator_alloc, fake_linked_list_node_allocator_alloc);
         UT_PTR_SET(linked_list_node_allocator_free, fake_linked_list_node_allocator_free);
+
+        /* Led manager calls eas_time_is_equal_or_after inside each timer expiry callback to check if the callback should
+         * be accepted or ignore. By default, led manager accepts all callbacks and performs the requried action - hence
+         * we set the return value to true here. If a particular test needs to test that the led manager ignores the timer 
+         * expiry callback if false is returned, it should set the return value to false inside the test body. */
+        fake_eas_time_set_is_equal_or_after_return_value(true);
     }
 };
 // clang-format on
@@ -507,4 +514,56 @@ TEST_ORDERED(LedManager, AddOneRemoveOneAddTwoMore, 1)
     CHECK_TRUE(removed_notification0);
     CHECK_TRUE(removed_notification2);
     CHECK_TRUE(removed_notification1);
+}
+
+TEST_ORDERED(LedManager, TimerCbFiresWhenRestarted, 1)
+{
+    LedColor led_color_0 = LED_COLOR_BLUE;
+    LedPattern led_pattern_0 = LED_PATTERN_STATIC;
+    LedColor led_color_1 = LED_COLOR_RED;
+    LedPattern led_pattern_1 = LED_PATTERN_ALERT;
+    LedColor led_color_2 = LED_COLOR_GREEN;
+    LedPattern led_pattern_2 = LED_PATTERN_STATIC;
+    mock().expectOneCall("led_notification_allocator_alloc").andReturnValue(&led_notification_0);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_0).withParameter("led_pattern", led_pattern_0);
+    mock().expectOneCall("led_notification_allocator_alloc").andReturnValue(&led_notification_1);
+    mock().expectOneCall("eas_timer_start").withParameter("self", timer);
+    mock().expectOneCall("led_notification_allocator_alloc").andReturnValue(&led_notification_2);
+    mock().expectOneCall("led_notification_allocator_free").withParameter("led_notification", &led_notification_0);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_1).withParameter("led_pattern", led_pattern_1);
+    mock().expectOneCall("eas_timer_start").withParameter("self", timer);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_2).withParameter("led_pattern", led_pattern_2);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_1).withParameter("led_pattern", led_pattern_1);
+    mock().expectOneCall("led_notification_allocator_free").withParameter("led_notification", &led_notification_1);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_2).withParameter("led_pattern", led_pattern_2);
+    mock().expectOneCall("eas_timer_stop").withParameter("self", timer);
+    mock().expectOneCall("led_notification_allocator_free").withParameter("led_notification", &led_notification_2);
+    mock().expectOneCall("led_turn_off");
+
+    /* Allocates notification 0 and sets led to notification 0 */
+    led_manager_add_notification(led_color_0, led_pattern_0);
+    /* Allocates notification 1, starts notification timer, and records timer starting time */
+    led_manager_add_notification(led_color_1, led_pattern_1);
+    /* Allocates notification 2 */
+    led_manager_add_notification(led_color_2, led_pattern_2);
+    /* Frees notification 0, sets led to notification 1, restarts the timer (and records starting time) so that
+     * notification 1 is displayed for the full period */
+    bool removed_notification0 = led_manager_remove_notification(led_color_0, led_pattern_0);
+    /* This timer callback was scheduled before we restarted the timer, but it still got executed. Timer callback should
+     * ignore the callback since eas_time_is_equal_or_after returns false. */
+    fake_eas_time_set_is_equal_or_after_return_value(false);
+    timer_cb(timer_cb_user_data);
+    fake_eas_time_set_is_equal_or_after_return_value(true);
+    /* Gets time and sets led to notification 2 */
+    timer_cb(timer_cb_user_data);
+    /* Gets time and sets led to notification 1 */
+    timer_cb(timer_cb_user_data);
+    /* Frees notification 1, sets led to notification 2, and stops the timer */
+    bool removed_notification1 = led_manager_remove_notification(led_color_1, led_pattern_1);
+    /* Frees notification 2 and turns off the led */
+    bool removed_notification2 = led_manager_remove_notification(led_color_2, led_pattern_2);
+
+    CHECK_TRUE(removed_notification0);
+    CHECK_TRUE(removed_notification1);
+    CHECK_TRUE(removed_notification2);
 }
