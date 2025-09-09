@@ -8,11 +8,16 @@
 #include "eas_timer_defs.h"
 #include "linked_list_node_allocator.h"
 #include "fake_linked_list_node_allocator.h"
-#include "eas_time.h"
+#include "eas_current_time.h"
 
 /* Notification duration is defined in seconds in the config. The expected timer period is equal to the notification
  * duration, but it is defined in ms. Convert seconds to ms. */
 #define LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD (CONFIG_LED_MANAGER_NOTIFICATION_DURATION_SECONDS * 1000)
+
+/* If at least LED_MANAGER_TEST_IGNORE_TIMER_PERIOD_MS pass from the moment the timer is started, the expiry callback
+ * should be accepted. Otherwise, the expiry callback should be ignored. */
+#define LED_MANAGER_TEST_IGNORE_TIMER_PERIOD_MS                                                                        \
+    (LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD - CONFIG_LED_MANAGER_IGNORE_TIMER_MARGIN_MS)
 
 /* The implementation of eas_timer_create in EasTimer mock object populates these with the notification timer callback
  * and its user data. This is needed in the test so that we can call the callback to simulate the notification duration
@@ -27,6 +32,20 @@ static LedNotification led_notification_0;
 static LedNotification led_notification_1;
 static LedNotification led_notification_2;
 static LedNotification led_notification_3;
+
+static EasTime current_time = 0;
+
+void reset_current_time()
+{
+    current_time = 0;
+    fake_eas_current_time_set(current_time);
+}
+
+void advance_current_time_by(size_t offset_ms)
+{
+    current_time += offset_ms;
+    fake_eas_current_time_set(current_time);
+}
 
 // clang-format off
 TEST_GROUP(LedManager)
@@ -47,11 +66,8 @@ TEST_GROUP(LedManager)
         UT_PTR_SET(linked_list_node_allocator_alloc, fake_linked_list_node_allocator_alloc);
         UT_PTR_SET(linked_list_node_allocator_free, fake_linked_list_node_allocator_free);
 
-        /* Led manager calls eas_time_is_equal_or_after inside each timer expiry callback to check if the callback should
-         * be accepted or ignore. By default, led manager accepts all callbacks and performs the requried action - hence
-         * we set the return value to true here. If a particular test needs to test that the led manager ignores the timer 
-         * expiry callback if false is returned, it should set the return value to false inside the test body. */
-        fake_eas_time_set_is_equal_or_after_return_value(true);
+        /* Time starts from 0 at the beginning of each test. Each test can advance time however it needs. */
+        reset_current_time();
     }
 };
 // clang-format on
@@ -87,12 +103,16 @@ TEST_ORDERED(LedManager, PeriodicallySwitchBetweenTwoNotifications, 0)
     led_manager_add_notification(led_color_0, led_pattern_0);
     /* Two notifications added - need to alternate between them. Creates and starts a timer. */
     led_manager_add_notification(led_color_1, led_pattern_1);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 0 expired, should call led_set to start displaying notification 1 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 1 expired, should call led_set to start displaying notification 0 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 0 expired, should call led_set to start displaying notification 1 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 1 expired, should call led_set to start displaying notification 0 */
     timer_cb(timer_cb_user_data);
 
@@ -177,22 +197,31 @@ TEST_ORDERED(LedManager, PeriodicallySwitchBetweenThreeNotifications, 1)
     /* No expected calls to led or timer - this should just save notification 2 color and pattern internally to use
      * later. */
     led_manager_add_notification(led_color_2, led_pattern_2);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 0 expired, should call led_set to start displaying notification 1 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 1 expired, should call led_set to start displaying notification 2 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 2 expired, should call led_set to start displaying notification 0 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 0 expired, should call led_set to start displaying notification 1 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 1 expired, should call led_set to start displaying notification 2 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 2 expired, should call led_set to start displaying notification 0 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 0 expired, should call led_set to start displaying notification 1 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 1 expired, should call led_set to start displaying notification 2 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 2 expired, should call led_set to start displaying notification 0 */
     timer_cb(timer_cb_user_data);
 
@@ -237,6 +266,8 @@ TEST_ORDERED(LedManager, RemoveOneOfSeveralNotifications, 1)
     mock().expectOneCall("led_notification_allocator_free").withParameter("led_notification", &led_notification_0);
     mock().expectOneCall("led_turn_off");
 
+    /* Just so that one of the tests does not start time from 0 */
+    advance_current_time_by(10500);
     /* Calls led_set */
     led_manager_add_notification(led_color_0, led_pattern_0);
     /* Two notifications added - need to alternate between them. Starts the timer. */
@@ -244,21 +275,28 @@ TEST_ORDERED(LedManager, RemoveOneOfSeveralNotifications, 1)
     /* No expected calls to led or timer - this should just save notification 2 color and pattern internally to use
      * later. */
     led_manager_add_notification(led_color_2, led_pattern_2);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 0 expired, should call led_set to start displaying notification 1 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 1 expired, should call led_set to start displaying notification 2 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 2 expired, should call led_set to start displaying notification 0 */
     timer_cb(timer_cb_user_data);
     /* Frees led notification 1 memory */
     bool removed_notification1 = led_manager_remove_notification(led_color_1, led_pattern_1);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 0 expired. Since notification 1 was removed, this should start displaying
      * notification 2. */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 2 expired, should call led_set to start displaying notification 0 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 0 expired, should call led_set to start displaying notification 2 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 2 expired, should call led_set to start displaying notification 0 */
     timer_cb(timer_cb_user_data);
 
@@ -309,10 +347,13 @@ TEST_ORDERED(LedManager, CurrentlyDisplayedNotificationIsRemoved, 1)
     /* Notification 0 is being displayed, but is now being removed. This should remove notification 0, start displaying
      * notification 1, and restart the timer to ensure notification 1 is displayed for the whole period. */
     bool removed_notification0 = led_manager_remove_notification(led_color_0, led_pattern_0);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 1 expired, should start displaying notification 2 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 2 expired, should start displaying notification 1 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Period for notification 1 expired, should start displaying notification 2 */
     timer_cb(timer_cb_user_data);
 
@@ -477,10 +518,14 @@ TEST_ORDERED(LedManager, AddOneRemoveOneAddTwoMore, 1)
     led_manager_add_notification(led_color_0, led_pattern_0);
     /* Allocates notification 1 and starts notification timer */
     led_manager_add_notification(led_color_1, led_pattern_1);
+    advance_current_time_by(LED_MANAGER_TEST_IGNORE_TIMER_PERIOD_MS);
+    /* Callback should still be accepted if exactly timer ignore period elapsed since timer is started */
     /* Sets led to notification 1 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Sets led to notification 0 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Sets led to notification 1 */
     timer_cb(timer_cb_user_data);
     /* Frees notification 0 and stops the timer. Already dispalying notification 1, so led_set is not called. */
@@ -489,21 +534,28 @@ TEST_ORDERED(LedManager, AddOneRemoveOneAddTwoMore, 1)
     led_manager_add_notification(led_color_2, led_pattern_2);
     /* Allocates notification 3 */
     led_manager_add_notification(led_color_3, led_pattern_3);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Sets led to notification 2 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Sets led to notification 3 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Sets led to notification 1 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Sets led to notification 2 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Sets led to notification 3 */
     timer_cb(timer_cb_user_data);
     /* Frees notification 3, sets led to notification 1, and restarts the timer so that notification 1 is displayed for
      * the full period */
     bool removed_notification3 = led_manager_remove_notification(led_color_3, led_pattern_3);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Sets led to notification 2 */
     timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
     /* Sets led to notification 1 */
     timer_cb(timer_cb_user_data);
     /* Frees notification 2 and stops the timer */
@@ -534,7 +586,17 @@ TEST_ORDERED(LedManager, TimerCbFiresWhenRestarted, 1)
     mock().expectOneCall("eas_timer_start").withParameter("self", timer);
     mock().expectOneCall("led_set").withParameter("led_color", led_color_2).withParameter("led_pattern", led_pattern_2);
     mock().expectOneCall("led_set").withParameter("led_color", led_color_1).withParameter("led_pattern", led_pattern_1);
+    mock().expectOneCall("led_notification_allocator_alloc").andReturnValue(&led_notification_0);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_2).withParameter("led_pattern", led_pattern_2);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_0).withParameter("led_pattern", led_pattern_0);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_1).withParameter("led_pattern", led_pattern_1);
     mock().expectOneCall("led_notification_allocator_free").withParameter("led_notification", &led_notification_1);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_2).withParameter("led_pattern", led_pattern_2);
+    mock().expectOneCall("eas_timer_start").withParameter("self", timer);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_0).withParameter("led_pattern", led_pattern_0);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_2).withParameter("led_pattern", led_pattern_2);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_0).withParameter("led_pattern", led_pattern_0);
+    mock().expectOneCall("led_notification_allocator_free").withParameter("led_notification", &led_notification_0);
     mock().expectOneCall("led_set").withParameter("led_color", led_color_2).withParameter("led_pattern", led_pattern_2);
     mock().expectOneCall("eas_timer_stop").withParameter("self", timer);
     mock().expectOneCall("led_notification_allocator_free").withParameter("led_notification", &led_notification_2);
@@ -546,24 +608,61 @@ TEST_ORDERED(LedManager, TimerCbFiresWhenRestarted, 1)
     led_manager_add_notification(led_color_1, led_pattern_1);
     /* Allocates notification 2 */
     led_manager_add_notification(led_color_2, led_pattern_2);
-    /* Frees notification 0, sets led to notification 1, restarts the timer (and records starting time) so that
-     * notification 1 is displayed for the full period */
-    bool removed_notification0 = led_manager_remove_notification(led_color_0, led_pattern_0);
-    /* This timer callback was scheduled before we restarted the timer, but it still got executed. Timer callback should
-     * ignore the callback since eas_time_is_equal_or_after returns false. */
-    fake_eas_time_set_is_equal_or_after_return_value(false);
+    /* Frees notification 0, sets led to notification 1, restarts the timer so that notification 1 is displayed for the
+     * full period */
+    bool removed_notification0_1 = led_manager_remove_notification(led_color_0, led_pattern_0);
+    advance_current_time_by(1);
+    /* This timer callback was scheduled before we restarted the timer, but it still got executed. Only 1 ms passed
+     * since starting the timer, so this callback should be ignored. */
     timer_cb(timer_cb_user_data);
-    fake_eas_time_set_is_equal_or_after_return_value(true);
-    /* Gets time and sets led to notification 2 */
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
+    /* Sets led to notification 2 */
     timer_cb(timer_cb_user_data);
-    /* Gets time and sets led to notification 1 */
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
+    /* Sets led to notification 1 */
     timer_cb(timer_cb_user_data);
-    /* Frees notification 1, sets led to notification 2, and stops the timer */
+    /* Allocates notification 0 */
+    led_manager_add_notification(led_color_0, led_pattern_0);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
+    /* Sets led to notification 2 */
+    timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
+    /* Sets led to notification 0 */
+    timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
+    /* Sets led to notification 1 */
+    timer_cb(timer_cb_user_data);
+    /* Frees notification 1, sets led to notification 2, restarts the timer so that notification 2 is displayed for the
+     * full period */
     bool removed_notification1 = led_manager_remove_notification(led_color_1, led_pattern_1);
+    /* Here the unexpected timer callback fires 1 ms before the ignore timer period expires, so seconds after the timer
+     * was restarted. This is not a realistic scenario - if a callback fires before the expected timer period elapses,
+     * it would always be within milliseconds after the timer is restarted. The callback would be fired because it was
+     * already scheduled to be executed before the timer was restarted. However, this test is here to make sure that the
+     * led manager actually respects the ignore period that is calculated from
+     * CONFIG_LED_MANAGER_NOTIFICATION_DURATION_SECONDS and CONFIG_LED_MANAGER_IGNORE_TIMER_MARGIN_MS configs.
+     */
+    advance_current_time_by(LED_MANAGER_TEST_IGNORE_TIMER_PERIOD_MS - 1);
+    /* Should be ignored */
+    timer_cb(timer_cb_user_data);
+    /* Now, LED_MANAGER_TEST_IGNORE_TIMER_PERIOD_MS elapsed since starting the timer */
+    advance_current_time_by(1);
+    /* Should be accepted and set the led to notification 0 */
+    timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
+    /* Sets led to notification 2 */
+    timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
+    /* Sets led to notification 0 */
+    timer_cb(timer_cb_user_data);
+
+    /* Frees notification 0, sets led to notification 2, and stops the timer */
+    bool removed_notification0_2 = led_manager_remove_notification(led_color_0, led_pattern_0);
     /* Frees notification 2 and turns off the led */
     bool removed_notification2 = led_manager_remove_notification(led_color_2, led_pattern_2);
 
-    CHECK_TRUE(removed_notification0);
+    CHECK_TRUE(removed_notification0_1);
     CHECK_TRUE(removed_notification1);
+    CHECK_TRUE(removed_notification0_2);
     CHECK_TRUE(removed_notification2);
 }

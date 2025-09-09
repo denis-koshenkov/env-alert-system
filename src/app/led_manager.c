@@ -9,16 +9,9 @@
 #include "config.h"
 #include "led_notification_allocator.h"
 #include "eas_assert.h"
-#include "eas_time.h"
+#include "utils/eas_time.h"
+#include "eas_current_time.h"
 #include "utils/util.h"
-
-#ifndef CONFIG_LED_MANAGER_NOTIFICATION_DURATION_SECONDS
-#define CONFIG_LED_MANAGER_NOTIFICATION_DURATION_SECONDS 5
-#endif
-
-#ifndef CONFIG_LED_MANAGER_IGNORE_TIMER_MARGIN_MS
-#define CONFIG_LED_MANAGER_IGNORE_TIMER_MARGIN_MS 10
-#endif
 
 #define LED_MANAGER_NOTIFICATION_DURATION_MS (CONFIG_LED_MANAGER_NOTIFICATION_DURATION_SECONDS * 1000)
 
@@ -144,7 +137,7 @@ static void display_next_notification()
 
 static void notification_timer_cb(void *user_data)
 {
-    EasTime current_time = eas_time_get();
+    EasTime current_time = eas_current_time_get();
     if (eas_time_is_equal_or_after(current_time, ignore_timer_before_time)) {
         display_next_notification();
     }
@@ -270,7 +263,7 @@ static bool remove_notification_from_list(LedColor led_color, LedPattern led_pat
 static void start_notification_timer()
 {
     eas_timer_start(get_timer_instance());
-    EasTime current_time = eas_time_get();
+    EasTime current_time = eas_current_time_get();
     ignore_timer_before_time = eas_time_offset_into_future(current_time, LED_MANAGER_IGNORE_TIMER_PERIOD_MS);
 }
 

@@ -7,7 +7,7 @@ target_sources(port INTERFACE
     interfaces/eas_timer.cpp
     interfaces/hw_platform.c
     interfaces/virtual_led_mock.cpp
-    interfaces/eas_time.cpp
+    interfaces/eas_current_time.c
 )
 
 target_include_directories(port INTERFACE
