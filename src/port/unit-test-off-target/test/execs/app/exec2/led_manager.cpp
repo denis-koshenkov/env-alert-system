@@ -854,3 +854,56 @@ TEST_ORDERED(LedManager, SameColorPatternNotificationsMixedWithOtherColorPattern
     CHECK_TRUE(removed_notification1);
     CHECK_TRUE(removed_notification3);
 }
+
+TEST_ORDERED(LedManager, StoppedTimerCbFiresWhenStoppedAndImmediatelyStarted, 1)
+{
+    LedColor led_color_0 = LED_COLOR_RED;
+    LedPattern led_pattern_0 = LED_PATTERN_STATIC;
+    LedColor led_color_1 = LED_COLOR_BLUE;
+    LedPattern led_pattern_1 = LED_PATTERN_ALERT;
+    mock().expectOneCall("led_notification_allocator_alloc").andReturnValue(&led_notification_0);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_0).withParameter("led_pattern", led_pattern_0);
+    mock().expectOneCall("led_notification_allocator_alloc").andReturnValue(&led_notification_1);
+    mock().expectOneCall("eas_timer_start").withParameter("self", timer);
+    mock().expectOneCall("led_notification_allocator_free").withParameter("led_notification", &led_notification_0);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_1).withParameter("led_pattern", led_pattern_1);
+    mock().expectOneCall("eas_timer_stop").withParameter("self", timer);
+    mock().expectOneCall("led_notification_allocator_alloc").andReturnValue(&led_notification_0);
+    mock().expectOneCall("eas_timer_start").withParameter("self", timer);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_0).withParameter("led_pattern", led_pattern_0);
+    mock().expectOneCall("led_set").withParameter("led_color", led_color_1).withParameter("led_pattern", led_pattern_1);
+    mock().expectOneCall("led_notification_allocator_free").withParameter("led_notification", &led_notification_0);
+    mock().expectOneCall("eas_timer_stop").withParameter("self", timer);
+    mock().expectOneCall("led_notification_allocator_free").withParameter("led_notification", &led_notification_1);
+    mock().expectOneCall("led_turn_off");
+
+    /* Allocates notification 0 and sets led to notification 0 */
+    led_manager_add_notification(led_color_0, led_pattern_0);
+    /* Allocates notification 1 and starts notification timer */
+    led_manager_add_notification(led_color_1, led_pattern_1);
+    /* Timer period almost expired when we remove notification 0 */
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD - 1);
+    /* Frees notification 0, sets led to notification 1, and stops the timer */
+    bool removed_notification0_1 = led_manager_remove_notification(led_color_0, led_pattern_0);
+    /* Allocates notification 0 and starts the timer */
+    led_manager_add_notification(led_color_0, led_pattern_0);
+    advance_current_time_by(1);
+    /* The timer was stopped right before its expiry time, so its expiry callback still gets executed. The timer has
+     * already been started since, but we get the callback from the old timer run, the one that was stopped. This
+     * callback should be ignored. */
+    timer_cb(timer_cb_user_data);
+    advance_current_time_by(LED_MANAGER_TEST_EXPECTED_TIMER_PERIOD);
+    /* Sets led to notification 0 - this is the expiry callback of the current timer, not the old one */
+    timer_cb(timer_cb_user_data);
+    /* Sets led to notification 1 */
+    timer_cb(timer_cb_user_data);
+
+    /* Frees notification 0 and stops the timer */
+    bool removed_notification0_2 = led_manager_remove_notification(led_color_0, led_pattern_0);
+    /* Frees notification 1 and turns off the led */
+    bool removed_notification1 = led_manager_remove_notification(led_color_1, led_pattern_1);
+
+    CHECK_TRUE(removed_notification0_1);
+    CHECK_TRUE(removed_notification0_2);
+    CHECK_TRUE(removed_notification1);
+}
