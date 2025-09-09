@@ -287,6 +287,8 @@ static void stop_notification_timer()
 void led_manager_add_notification(LedColor led_color, LedPattern led_pattern)
 {
     LedNotification *led_notification = led_notification_allocator_alloc();
+    EAS_ASSERT(led_notification);
+
     led_notification->led_color = led_color;
     led_notification->led_pattern = led_pattern;
     add_notification_to_list(led_notification);

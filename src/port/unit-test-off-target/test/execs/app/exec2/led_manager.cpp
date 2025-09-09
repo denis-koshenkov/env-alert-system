@@ -1,6 +1,7 @@
 #include "CppUTest/TestHarness.h"
 #include "CppUTestExt/MockSupport.h"
 #include "CppUTestExt/OrderedTest.h"
+#include "CppUTestExt/TestAssertPlugin.h"
 
 #include "led_manager.h"
 #include "led_manager_private.h"
@@ -906,4 +907,12 @@ TEST_ORDERED(LedManager, StoppedTimerCbFiresWhenStoppedAndImmediatelyStarted, 1)
     CHECK_TRUE(removed_notification0_1);
     CHECK_TRUE(removed_notification0_2);
     CHECK_TRUE(removed_notification1);
+}
+
+TEST_ORDERED(LedManager, AddNotificationAssertsIfFailedToAlloc, 1)
+{
+    mock().expectOneCall("led_notification_allocator_alloc").andReturnValue((void *)NULL);
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("led_notification", "led_manager_add_notification");
+
+    led_manager_add_notification(LED_COLOR_BLUE, LED_PATTERN_ALERT);
 }
