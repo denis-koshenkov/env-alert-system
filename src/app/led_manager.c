@@ -322,20 +322,20 @@ bool led_manager_remove_notification(LedColor led_color, LedPattern led_pattern)
         return false;
     }
 
-    if (num_notifications == 1) {
-        bool is_removed = remove_notification_from_list(led_color, led_pattern, free_led_notification);
-        if (!is_removed) {
-            return false;
-        }
-        /* The last notification was removed. Turn off the led - no notifications to display. */
-        turn_off_led();
-    } else if (num_notifications == 2) {
-        bool is_removed =
-            remove_notification_from_list(led_color, led_pattern, find_next_notification_after_removed_and_free);
+    /* If there are 2 or more notifications, we need to save the removed notification and the one after it, so that we
+     * know which notification to display after removal. However, if there is only one notification, and it is being
+     * removed, this is not necessary, as all we need to do after it is removed is to turn off the led. */
+    LinkedListPreRemoveCb pre_remove_cb =
+        (num_notifications >= 2) ? find_next_notification_after_removed_and_free : free_led_notification;
+    bool is_removed = remove_notification_from_list(led_color, led_pattern, pre_remove_cb);
         if (!is_removed) {
             return false;
         }
 
+    if (num_notifications == 0) {
+        /* The last notification was removed. Turn off the led - no notifications to display. */
+        turn_off_led();
+    } else if (num_notifications == 1) {
         /* There were 2 notifications in the list, and now there is only one. If we were already displaying the
          * notification that is left, we do not need to do anything. However, if we were displaying the notification we
          * just removed, we need to set the led to the notification that is left. */
@@ -346,12 +346,6 @@ bool led_manager_remove_notification(LedColor led_color, LedPattern led_pattern)
         /* Since there is only one notification left, we need to stop switching between notification. */
         stop_notification_timer();
     } else {
-        bool is_removed =
-            remove_notification_from_list(led_color, led_pattern, find_next_notification_after_removed_and_free);
-        if (!is_removed) {
-            return false;
-        }
-
         if (displayed_notification == removed_notification) {
             /* We removed the notification that was being displayed. We need to start displaying the notification after
              * the one that was removed. */
