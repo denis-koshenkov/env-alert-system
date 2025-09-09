@@ -31,6 +31,7 @@ static void *iterator = NULL;
 static const LedNotification *removed_notification = NULL;
 static const LedNotification *next_notification_after_removed = NULL;
 static EasTime ignore_timer_before_time = 0;
+static bool is_timer_running = false;
 
 static LinkedList get_linked_list_instance()
 {
@@ -137,8 +138,17 @@ static void display_next_notification()
 
 static void notification_timer_cb(void *user_data)
 {
+    /* Timer expiry callbacks can still get executed after the timer has been stopped or restarted.
+     * is_timer_running variable ensures we ignore the callback if the timer is stopped. Whenever the timer is stopped,
+     * this variable is set to false. If this callback is executed and is_timer_running is false, then the timer is
+     * stopped and this callback should be ignored.
+     *
+     * If the timer is restarted very close to its expected expiration, the callback for the "old" timer run can still
+     * fire. In order to ignore such callbacks, we save the current time whenever timer is started and check the current
+     * time inside this callback. If the expected timer expiry period has not yet elapsed (with some margin), the
+     * callback is ignored. */
     EasTime current_time = eas_current_time_get();
-    if (eas_time_is_equal_or_after(current_time, ignore_timer_before_time)) {
+    if (is_timer_running && eas_time_is_equal_or_after(current_time, ignore_timer_before_time)) {
         display_next_notification();
     }
 }
@@ -265,6 +275,13 @@ static void start_notification_timer()
     eas_timer_start(get_timer_instance());
     EasTime current_time = eas_current_time_get();
     ignore_timer_before_time = eas_time_offset_into_future(current_time, LED_MANAGER_IGNORE_TIMER_PERIOD_MS);
+    is_timer_running = true;
+}
+
+static void stop_notification_timer()
+{
+    eas_timer_stop(get_timer_instance());
+    is_timer_running = false;
 }
 
 void led_manager_add_notification(LedColor led_color, LedPattern led_pattern)
@@ -325,7 +342,7 @@ bool led_manager_remove_notification(LedColor led_color, LedPattern led_pattern)
         }
 
         /* Since there is only one notification left, we need to stop switching between notification. */
-        eas_timer_stop(get_timer_instance());
+        stop_notification_timer();
     } else {
         bool is_removed =
             remove_notification_from_list(led_color, led_pattern, find_next_notification_after_removed_and_free);
