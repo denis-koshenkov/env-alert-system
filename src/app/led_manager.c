@@ -33,6 +33,11 @@ static const LedNotification *next_notification_after_removed = NULL;
 static EasTime ignore_timer_before_time = 0;
 static bool is_timer_running = false;
 
+/**
+ * @brief Get linked list instance of led notifications.
+ *
+ * @return LinkedList Linked list instance.
+ */
 static LinkedList get_linked_list_instance()
 {
     static LinkedList instance;
@@ -130,12 +135,25 @@ static void turn_off_led()
     hw_platform_get_led()->turn_off();
 }
 
+/**
+ * @brief Displays the next led notification in the list.
+ *
+ * If the current notification is the last one in the list, displays the first notification in the list.
+ */
 static void display_next_notification()
 {
     LedNotification *notification_to_display = advance_notification_iterator();
     display_notification(notification_to_display);
 }
 
+/**
+ * @brief Notification timer expiry callback.
+ *
+ * Switches notification display to the next notification, unless the callback is ignored because the timer was already
+ * stopped or restarted.
+ *
+ * @param user_data User data.
+ */
 static void notification_timer_cb(void *user_data)
 {
     /* Timer expiry callbacks can still get executed after the timer has been stopped or restarted.
@@ -153,6 +171,11 @@ static void notification_timer_cb(void *user_data)
     }
 }
 
+/**
+ * @brief Get notification timer instance. Used for periodically switching between displaying all added notifications.
+ *
+ * @return EasTimer Timer instance.
+ */
 static EasTimer get_timer_instance()
 {
     static EasTimer instance;
@@ -165,12 +188,33 @@ static EasTimer get_timer_instance()
     return instance;
 }
 
+/**
+ * @brief Add a led notification to the list of led notifications to be displayed.
+ *
+ * @param led_notification Led notification to add to the list.
+ *
+ * @note @p led_notification should not contain the address of a stack-allocated variable. It should point to memory
+ * that will be valid at least until the led notification is removed from the list.
+ */
 static void add_notification_to_list(LedNotification *led_notification)
 {
     linked_list_append(get_linked_list_instance(), led_notification);
     num_notifications++;
 }
 
+/**
+ * @brief Remove condition callback passed to linked list remove function.
+ *
+ * The return value of this function determines whether the notification is removed from the list.
+ *
+ * @param element Linked list element (led notification) for which this callback is called.
+ * @param user_data User data. This contains a pointer to the led notification that should be removed.
+ *
+ * @return true @p element and led notification in @p user_data have the same color and pattern, so @p element should be
+ * removed from the list.
+ * @return false @p element and led notification in @p user_data have different color or pattern, so @p element should
+ * not be removed from the list.
+ */
 static bool remove_condition_cb(void *element, void *user_data)
 {
     EAS_ASSERT(element);
@@ -270,6 +314,7 @@ static bool remove_notification_from_list(LedColor led_color, LedPattern led_pat
     }
 }
 
+/** Start notification timer. */
 static void start_notification_timer()
 {
     eas_timer_start(get_timer_instance());
@@ -278,6 +323,7 @@ static void start_notification_timer()
     is_timer_running = true;
 }
 
+/** Stop notification timer. */
 static void stop_notification_timer()
 {
     eas_timer_stop(get_timer_instance());
@@ -328,9 +374,9 @@ bool led_manager_remove_notification(LedColor led_color, LedPattern led_pattern)
     LinkedListPreRemoveCb pre_remove_cb =
         (num_notifications >= 2) ? find_next_notification_after_removed_and_free : free_led_notification;
     bool is_removed = remove_notification_from_list(led_color, led_pattern, pre_remove_cb);
-        if (!is_removed) {
-            return false;
-        }
+    if (!is_removed) {
+        return false;
+    }
 
     if (num_notifications == 0) {
         /* The last notification was removed. Turn off the led - no notifications to display. */
