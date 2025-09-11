@@ -1,8 +1,12 @@
 #include "led_notification_executor.h"
+#include "led_manager.h"
+#include "eas_assert.h"
 
 void led_notification_executor_execute(LedColor led_color, LedPattern led_pattern, bool should_be_displayed)
 {
-    /* Empty for now, because unit tests mock this interface instead of using the real one (this one). The
-     * implementation here should call LedManager functions add_notification and remove_notification, based on whether
-     * the notification should be displayed or not. */
+    if (should_be_displayed) {
+        led_manager_add_notification(led_color, led_pattern);
+    } else {
+        EAS_ASSERT(led_manager_remove_notification(led_color, led_pattern));
+    }
 }

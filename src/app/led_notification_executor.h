@@ -27,6 +27,11 @@ extern "C"
  * @note This interface does not provide any details on how exactly the led notification is displayed. The LedNotifier
  * only knows about the concept of "executing" the led notification - the exact details on how exactly the notification
  * is displayed are managed by other modules.
+ *
+ * @warning The implementation is allowed to assume that if @p should_be_displayed is false, then previously there was a
+ * call to this function with the same @p led_color and @p led_pattern, but with @p should_be_displayed as true. In
+ * general, only notifications that were previously requested to be displayed, should be requested to not be displayed
+ * anymore. If this is violated, this function raises an assert.
  */
 void led_notification_executor_execute(LedColor led_color, LedPattern led_pattern, bool should_be_displayed);
 
