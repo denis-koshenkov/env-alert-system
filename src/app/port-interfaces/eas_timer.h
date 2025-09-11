@@ -1,5 +1,5 @@
-#ifndef ENV_ALERT_SYSTEM_SRC_PORT_UNIT_TEST_OFF_TARGET_INTERFACES_EAS_TIMER_H
-#define ENV_ALERT_SYSTEM_SRC_PORT_UNIT_TEST_OFF_TARGET_INTERFACES_EAS_TIMER_H
+#ifndef ENV_ALERT_SYSTEM_SRC_APP_PORT_INTERFACES_EAS_TIMER_H
+#define ENV_ALERT_SYSTEM_SRC_APP_PORT_INTERFACES_EAS_TIMER_H
 
 #ifdef __cplusplus
 extern "C"
@@ -7,6 +7,7 @@ extern "C"
 #endif
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "eas_timer_defs.h"
 
@@ -26,4 +27,4 @@ void eas_timer_stop(EasTimer self);
 }
 #endif
 
-#endif /* ENV_ALERT_SYSTEM_SRC_PORT_UNIT_TEST_OFF_TARGET_INTERFACES_EAS_TIMER_H */
+#endif /* ENV_ALERT_SYSTEM_SRC_APP_PORT_INTERFACES_EAS_TIMER_H */

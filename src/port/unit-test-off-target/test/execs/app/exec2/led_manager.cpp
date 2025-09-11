@@ -9,7 +9,7 @@
 #include "eas_timer_defs.h"
 #include "linked_list_node_allocator.h"
 #include "fake_linked_list_node_allocator.h"
-#include "eas_current_time.h"
+#include "fake_eas_current_time.h"
 
 /* Notification duration is defined in seconds in the config. The expected timer period is equal to the notification
  * duration, but it is defined in ms. Convert seconds to ms. */
