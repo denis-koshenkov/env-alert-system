@@ -8,6 +8,11 @@ extern "C"
 
 #include "utils/eas_time_defs.h"
 
+/**
+ * @brief Get current time in ms.
+ *
+ * @return EasTime Time in ms since the device was booted.
+ */
 EasTime eas_current_time_get();
 
 #ifdef __cplusplus

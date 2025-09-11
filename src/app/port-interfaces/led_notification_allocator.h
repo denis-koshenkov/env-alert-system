@@ -8,8 +8,19 @@ extern "C"
 
 #include "led_manager_private.h"
 
+/**
+ * @brief Allocate memory for a led notification.
+ *
+ * @return LedNotification* If successful, points to allocated memory for led notification. If failed due to being out
+ * of memory, returns NULL.
+ */
 LedNotification *led_notification_allocator_alloc();
 
+/**
+ * @brief Free a previously allocated led notification.
+ *
+ * @param led_notification Led notification buffer previously returned by @ref led_notification_allocator_alloc.
+ */
 void led_notification_allocator_free(LedNotification *led_notification);
 
 #ifdef __cplusplus
