@@ -31,6 +31,11 @@
 /** Maximal number of alerts that can be registered in the system at the same time. */
 #define CONFIG_MAX_NUM_ALERTS 10
 
+/** Defines how many variable requirements the system should be able to store simultaneously. This is maximal number of
+ * allowed alerts times the maximal number of variable requirement per alert. */
+#define CONFIG_MAX_TOTAL_NUM_VARIABLE_REQUIREMENTS                                                                     \
+    (CONFIG_MAX_NUM_ALERTS * CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS)
+
 /** Defines how many AlertCondition instances the AlertConditions module creates. */
 #define CONFIG_ALERT_CONDITIONS_NUM_INSTANCES_TO_CREATE CONFIG_MAX_NUM_ALERTS
 
