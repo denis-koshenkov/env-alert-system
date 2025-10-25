@@ -110,20 +110,7 @@ AlertRaiser alert_raiser_create()
 void alert_raiser_set_alert(AlertRaiser self, uint8_t alert_id, uint32_t warmup_period_ms, uint32_t cooldown_period_ms)
 {
     EAS_ASSERT(self);
-
-    /* Stop any timers that are running for the old alert */
-    if (self->is_warmup_timer_running) {
-        stop_warmup_timer(self);
-    }
-    if (self->is_cooldown_timer_running) {
-        stop_cooldown_timer(self);
-    }
-
-    /* If the old alert is raised, silence it before setting the new alert */
-    if (self->is_alert_raised) {
-        alert_notifier_notify(self->alert_id, false);
-        self->is_alert_raised = false;
-    }
+    EAS_ASSERT(!self->is_alert_set);
 
     if (warmup_period_ms > 0) {
         eas_timer_set_period(self->warmup_timer, warmup_period_ms);
@@ -140,6 +127,20 @@ void alert_raiser_set_alert(AlertRaiser self, uint8_t alert_id, uint32_t warmup_
 
 void alert_raiser_unset_alert(AlertRaiser self)
 {
+    /* Stop any timers that are currently running */
+    if (self->is_warmup_timer_running) {
+        stop_warmup_timer(self);
+    }
+    if (self->is_cooldown_timer_running) {
+        stop_cooldown_timer(self);
+    }
+
+    /* Silence the alert if it is currently raised */
+    if (self->is_alert_raised) {
+        alert_notifier_notify(self->alert_id, false);
+        self->is_alert_raised = false;
+    }
+
     self->is_alert_set = false;
 }
 
