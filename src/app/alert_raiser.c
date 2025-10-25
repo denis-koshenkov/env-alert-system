@@ -140,7 +140,7 @@ void alert_raiser_set_alert(AlertRaiser self, uint8_t alert_id, uint32_t warmup_
 
 bool alert_raiser_is_alert_set(AlertRaiser self)
 {
-    return false;
+    return self->is_alert_set;
 }
 
 void alert_raiser_set_alert_condition_result(AlertRaiser self, bool alert_condition_result)
