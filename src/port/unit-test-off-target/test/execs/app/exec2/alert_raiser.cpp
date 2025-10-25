@@ -874,6 +874,35 @@ TEST(AlertRaiser, IsAlertSetTrueAfterAlertIsSet)
     CHECK_TRUE(is_alert_set);
 }
 
+TEST(AlertRaiser, IsAlertSetFalseAfterAlertIsSetAndUnset)
+{
+    uint8_t alert_id = 0;
+    uint32_t warmup_period_ms = 0;
+    uint32_t cooldown_period_ms = 0;
+    /* alert_raiser_create */
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .withParameter("periodic", false)
+        .ignoreOtherParameters()
+        .andReturnValue(warmup_timer);
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .withParameter("periodic", false)
+        .ignoreOtherParameters()
+        .andReturnValue(cooldown_timer);
+
+    AlertRaiser alert_raiser = alert_raiser_create();
+    alert_raiser_set_alert(alert_raiser, alert_id, warmup_period_ms, cooldown_period_ms);
+    bool is_alert_set_after_set = alert_raiser_is_alert_set(alert_raiser);
+    alert_raiser_unset_alert(alert_raiser);
+    bool is_alert_set_after_unset = alert_raiser_is_alert_set(alert_raiser);
+
+    CHECK_TRUE(is_alert_set_after_set);
+    CHECK_FALSE(is_alert_set_after_unset);
+}
+
 TEST(AlertRaiser, SetAlertAssertsIfInstanceNull)
 {
     uint8_t alert_id = 0;

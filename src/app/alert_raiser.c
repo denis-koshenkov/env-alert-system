@@ -138,6 +138,11 @@ void alert_raiser_set_alert(AlertRaiser self, uint8_t alert_id, uint32_t warmup_
     self->is_alert_set = true;
 }
 
+void alert_raiser_unset_alert(AlertRaiser self)
+{
+    self->is_alert_set = false;
+}
+
 bool alert_raiser_is_alert_set(AlertRaiser self)
 {
     return self->is_alert_set;
