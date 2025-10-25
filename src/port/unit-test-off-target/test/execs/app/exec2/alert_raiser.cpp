@@ -1100,6 +1100,55 @@ TEST(AlertRaiser, SetAlertAssertsIfInstanceNull)
     alert_raiser_set_alert(NULL, alert_id, warmup_period_ms, cooldown_period_ms);
 }
 
+TEST(AlertRaiser, UnsetAlertAssertsIfInstanceNull)
+{
+    uint8_t alert_id = 6;
+    uint32_t warmup_period_ms = 0;
+    uint32_t cooldown_period_ms = 0;
+
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .withParameter("periodic", false)
+        .ignoreOtherParameters()
+        .andReturnValue(warmup_timer);
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .withParameter("periodic", false)
+        .ignoreOtherParameters()
+        .andReturnValue(cooldown_timer);
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "alert_raiser_unset_alert");
+
+    AlertRaiser alert_raiser = alert_raiser_create();
+    alert_raiser_set_alert(alert_raiser, alert_id, warmup_period_ms, cooldown_period_ms);
+    alert_raiser_unset_alert(NULL);
+}
+
+TEST(AlertRaiser, IsAlertSetAssertsIfInstanceNull)
+{
+    uint8_t alert_id = 9;
+    uint32_t warmup_period_ms = 0;
+    uint32_t cooldown_period_ms = 0;
+
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .withParameter("periodic", false)
+        .ignoreOtherParameters()
+        .andReturnValue(warmup_timer);
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .withParameter("periodic", false)
+        .ignoreOtherParameters()
+        .andReturnValue(cooldown_timer);
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "alert_raiser_is_alert_set");
+
+    AlertRaiser alert_raiser = alert_raiser_create();
+    bool unused = alert_raiser_is_alert_set(NULL);
+}
+
 TEST(AlertRaiser, SetAlertConditionResultAssertsIfInstanceNull)
 {
     uint8_t alert_id = 57;

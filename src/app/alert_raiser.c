@@ -126,6 +126,8 @@ void alert_raiser_set_alert(AlertRaiser self, uint8_t alert_id, uint32_t warmup_
 
 void alert_raiser_unset_alert(AlertRaiser self)
 {
+    EAS_ASSERT(self);
+
     /* Stop any timers that are currently running */
     if (self->is_warmup_timer_running) {
         stop_warmup_timer(self);
@@ -145,6 +147,7 @@ void alert_raiser_unset_alert(AlertRaiser self)
 
 bool alert_raiser_is_alert_set(AlertRaiser self)
 {
+    EAS_ASSERT(self);
     return self->is_alert_set;
 }
 
