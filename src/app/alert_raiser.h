@@ -97,6 +97,8 @@ AlertRaiser alert_raiser_create();
  */
 void alert_raiser_set_alert(AlertRaiser self, uint8_t alert_id, uint32_t warmup_period_ms, uint32_t cooldown_period_ms);
 
+bool alert_raiser_is_alert_set(AlertRaiser self);
+
 /**
  * @brief Set alert condition result for the alert.
  *

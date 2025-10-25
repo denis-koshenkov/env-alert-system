@@ -829,6 +829,26 @@ TEST(AlertRaiser, AlertIsInitiallySilenced)
     alert_raiser_set_alert_condition_result(alert_raiser, false);
 }
 
+TEST(AlertRaiser, IsAlertSetIsInitiallyFalse)
+{
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .withParameter("periodic", false)
+        .ignoreOtherParameters()
+        .andReturnValue(warmup_timer);
+    mock()
+        .expectOneCall("eas_timer_create")
+        .withParameter("period_ms", 0)
+        .withParameter("periodic", false)
+        .ignoreOtherParameters()
+        .andReturnValue(cooldown_timer);
+
+    AlertRaiser alert_raiser = alert_raiser_create();
+    bool is_alert_set = alert_raiser_is_alert_set(alert_raiser);
+    CHECK_FALSE(is_alert_set);
+}
+
 TEST(AlertRaiser, SetAlertAssertsIfInstanceNull)
 {
     uint8_t alert_id = 0;
