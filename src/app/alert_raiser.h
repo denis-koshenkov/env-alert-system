@@ -45,10 +45,10 @@ extern "C"
  * period, and cooldown period. The alert raiser should always be notified as soon as the condition result of the alert
  * changes by calling @ref alert_raiser_set_alert_condition_result.
  *
- * It is possible to reuse an alert raiser instance for another alert. @ref alert_raiser_set_alert can be called at any
- * time to set a new alert for the alert raiser instance. Note that if @ref alert_raiser_set_alert is called when the
- * current alert for this alert raiser is raised, the alert raiser first silences the current alert, and only then
- * updates its internal state to represent the new alert.
+ * It is possible to reuse an alert raiser instance for another alert. If an alert is currently set, @ref
+ * alert_raiser_unset_alert should be called to unset the current alert. After that, @ref alert_raiser_set_alert can be
+ * called to set a new alert for the alert raiser instance. Note that if @ref alert_raiser_unset_alert is
+ * called when the alert for this alert raiser is raised, the alert raiser first silences the alert before unsetting it.
  *
  * Whenever an alert is set by calling @ref alert_raiser_set_alert, it is initially considered to be
  * silenced, and its alert condition is considered to be false. If the alert condition is true at the moment when @ref
@@ -87,18 +87,36 @@ AlertRaiser alert_raiser_create();
 /**
  * @brief Set alert.
  *
- * If an alert was previously set for this alert raiser instance, and it is in the raised state when this function is
- * called to set a new alert, the implementation first silences the old alert, and then sets the new alert.
- *
  * @param self Alert raiser instance created by @ref alert_raiser_create.
  * @param alert_id Alert id of the alert.
  * @param warmup_period_ms Warmup period of the alert in milliseconds.
  * @param cooldown_period_ms Cooldown period of the alert in milliseconds.
+ *
+ * @warning If this function is called when an alert is already set, this function fires an assert. Call @ref
+ * alert_raiser_unset_alert first to unset the old alert, and then call this function to set the new one.
  */
 void alert_raiser_set_alert(AlertRaiser self, uint8_t alert_id, uint32_t warmup_period_ms, uint32_t cooldown_period_ms);
 
+/**
+ * @brief Unset alert.
+ *
+ * If an alert was previously set for this alert raiser instance, and it is in the raised state when this function is
+ * called, the implementation first silences the alert, and only then unsets it.
+ *
+ * If no alert is currently set, this function does nothing.
+ *
+ * @param self Alert raiser instance created by @ref alert_raiser_create.
+ */
 void alert_raiser_unset_alert(AlertRaiser self);
 
+/**
+ * @brief Check whether an alert is currently set for this alert raiser instance.
+ *
+ * @param self Alert raiser instance created by @ref alert_raiser_create.
+ *
+ * @return true There is currently an alert set for this alert raiser instance.
+ * @return false No alert is currently set for this alert raiser instance.
+ */
 bool alert_raiser_is_alert_set(AlertRaiser self);
 
 /**
@@ -107,10 +125,9 @@ bool alert_raiser_is_alert_set(AlertRaiser self);
  * @param self Alert raiser instance created by @ref alert_raiser_create.
  * @param alert_condition_result The alert condition result.
  *
- * @note Fires an assert if @ref alert_raiser_set_alert has not yet been called for this alert raiser instance. In that
- * case, the alert raiser does not know the id, warmup period, and cooldown period of the alert to raise/silence, so it
- * cannot raise/silence any alert. This function should only be called after an alert is set by calling @ref
- * alert_raiser_set_alert.
+ * @note Fires an assert if there is currently no alert set. In that case, the alert raiser does not know the id, warmup
+ * period, and cooldown period of the alert to raise/silence, so it cannot raise/silence any alert. This function should
+ * only be called after an alert is set by calling @ref alert_raiser_set_alert.
  */
 void alert_raiser_set_alert_condition_result(AlertRaiser self, bool alert_condition_result);
 

@@ -148,13 +148,14 @@ void alert_raiser_unset_alert(AlertRaiser self)
 bool alert_raiser_is_alert_set(AlertRaiser self)
 {
     EAS_ASSERT(self);
+
     return self->is_alert_set;
 }
 
 void alert_raiser_set_alert_condition_result(AlertRaiser self, bool alert_condition_result)
 {
     EAS_ASSERT(self);
-    /* If an alert has not been set yet, we do not know for which alert this condition result is updated. An alert
+    /* If an alert has not been set, we do not know for which alert this condition result is updated. An alert
      * should always be set prior to calling this function. */
     EAS_ASSERT(self->is_alert_set);
 
