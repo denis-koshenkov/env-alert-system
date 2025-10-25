@@ -19,7 +19,6 @@ struct AlertRaiserStruct {
     bool is_cooldown_timer_running;
     uint8_t alert_id;
     bool is_alert_raised;
-    /* True if alert_raiser_set_alert has been called at least once for this instance, false otherwise. */
     bool is_alert_set;
 };
 
