@@ -40,3 +40,4 @@ target_include_directories(eas_app INTERFACE
 )
 
 add_subdirectory(utils)
+add_subdirectory(middleware)

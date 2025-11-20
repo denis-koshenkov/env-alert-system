@@ -26,7 +26,15 @@
 #define CONFIG_VARIABLE_REQUIREMENT_MAX_SIZE 24
 
 /** Maximal allowed number of variable requirements in one alert condition. */
-#define CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS 10
+#define CONFIG_MAX_NUM_VARIABLE_REQUIREMENTS_IN_ALERT_CONDITION 10
+
+/** Maximal allowed number of variable requirements in one alert condition. */
+#define CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS CONFIG_MAX_NUM_VARIABLE_REQUIREMENTS_IN_ALERT_CONDITION
+
+/** Message transceiver converts "add alert" message payload to structured data. This defines how many variable
+ * conditions can be stored in the alert condition of the alert to be added. */
+#define CONFIG_MSG_TRANSCEIVER_MAX_NUM_VARIABLE_REQUIREMENTS_IN_ALERT_CONDITION                                        \
+    CONFIG_MAX_NUM_VARIABLE_REQUIREMENTS_IN_ALERT_CONDITION
 
 /** Maximal number of alerts that can be registered in the system at the same time. */
 #define CONFIG_MAX_NUM_ALERTS 10
