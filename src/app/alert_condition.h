@@ -96,6 +96,9 @@ AlertCondition alert_condition_create();
 /**
  * @brief Add a variable requirement to the alert condition.
  *
+ * Raises an assert if CONFIG_ALERT_CONDITION_MAX_NUM_VARIABLE_REQUIREMENTS variable requirements are already added to
+ * the alert condition.
+ *
  * @param self Alert condition instance returned by @ref alert_condition_create.
  * @param variable_requirement Variable requirement to add to the condition.
  */
