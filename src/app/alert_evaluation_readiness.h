@@ -10,6 +10,16 @@ extern "C"
 
 bool alert_evaluation_readiness_is_ready();
 
+void alert_evaluation_readiness_notify_received_temperature_sample();
+
+void alert_evaluation_readiness_notify_received_pressure_sample();
+
+void alert_evaluation_readiness_notify_received_humidity_sample();
+
+void alert_evaluation_readiness_notify_received_light_intensity_sample();
+
+void alert_evaluation_readiness_reset();
+
 #ifdef __cplusplus
 }
 #endif
