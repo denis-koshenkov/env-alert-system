@@ -16,6 +16,7 @@
 #include "pressure_requirement_list.h"
 #include "humidity_requirement_list.h"
 #include "light_intensity_requirement_list.h"
+#include "alert_evaluation_readiness.h"
 
 /**
  * @brief Map LED color from message transceiver to led color from LED HAL module.
@@ -151,6 +152,9 @@ void alert_adder_add_alert(const MsgTransceiverAlert *alert)
         }
     }
 
-    /* TODO: evaluate alert condition for the first time, if we received a sample for each of the variables from
-     * hardware. */
+    /* If alert condition is satisfied, the alert should be raised immediately */
+    if (alert_evaluation_readiness_is_ready()) {
+        bool eval_result = alert_condition_evaluate(alert_condition);
+        alert_raiser_set_alert_condition_result(alert_raiser, eval_result);
+    }
 }
