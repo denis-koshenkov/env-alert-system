@@ -24,6 +24,7 @@ target_sources(app_test_exec2 PRIVATE
     led_notifier.cpp
     led_manager.cpp
     eas_time.cpp
+    alert_evaluation_readiness.cpp
 
     mocks/mock_value_holder.cpp
     mocks/mock_current_temperature.cpp
