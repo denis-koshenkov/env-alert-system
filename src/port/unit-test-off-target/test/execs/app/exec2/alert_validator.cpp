@@ -16,3 +16,4 @@ TEST_C_WRAPPER(AlertValidator, AllNotificationsDisabledInvalid);
 TEST_C_WRAPPER(AlertValidator, ConnectivityNotificationValid);
 TEST_C_WRAPPER(AlertValidator, LedNotificationValid);
 TEST_C_WRAPPER(AlertValidator, AllNotificationsEnabledValid);
+TEST_C_WRAPPER(AlertValidator, GarbageColorPatternLedNotificationDisabledValid);
