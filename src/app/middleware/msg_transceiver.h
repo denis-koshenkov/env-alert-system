@@ -10,6 +10,8 @@ extern "C"
 #include <stdbool.h>
 #include <stddef.h>
 
+#include "config.h"
+
 #ifndef CONFIG_MSG_TRANSCEIVER_MAX_NUM_VARIABLE_REQUIREMENTS_IN_ALERT_CONDITION
 #define CONFIG_MSG_TRANSCEIVER_MAX_NUM_VARIABLE_REQUIREMENTS_IN_ALERT_CONDITION 1
 #endif

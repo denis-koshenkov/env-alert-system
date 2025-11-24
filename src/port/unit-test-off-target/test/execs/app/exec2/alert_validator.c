@@ -1,9 +1,11 @@
 #include "CppUTest/TestHarness_c.h"
 
+#include "config.h"
 #include "alert_validator.h"
 
 static void populate_valid_alert(MsgTransceiverAlert *alert)
 {
+    alert->alert_id = 0;
     alert->led_color = MSG_TRANSCEIVER_LED_COLOR_RED;
     alert->led_pattern = MSG_TRANSCEIVER_LED_PATTERN_STATIC;
     alert->notification_type.connectivity = 1;
@@ -147,6 +149,25 @@ TEST_C(AlertValidator, GarbageColorPatternLedNotificationDisabledValid)
     alert.notification_type.led = 0;
     alert.led_color = MSG_TRANSCEIVER_LED_COLOR_INVALID;
     alert.led_pattern = MSG_TRANSCEIVER_LED_PATTERN_INVALID;
+    bool is_valid_alert = alert_validator_is_alert_valid(&alert);
+    CHECK_C(is_valid_alert);
+}
+
+TEST_C(AlertValidator, InvalidAlertIdInvalid)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    uint8_t invalid_alert_id = CONFIG_ALERT_VALIDATOR_MAX_ALLOWED_ALERT_ID + 1;
+    alert.alert_id = invalid_alert_id;
+    bool is_valid_alert = alert_validator_is_alert_valid(&alert);
+    CHECK_C(!is_valid_alert);
+}
+
+TEST_C(AlertValidator, MaxAllowedAlertIdValid)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    alert.alert_id = CONFIG_ALERT_VALIDATOR_MAX_ALLOWED_ALERT_ID;
     bool is_valid_alert = alert_validator_is_alert_valid(&alert);
     CHECK_C(is_valid_alert);
 }

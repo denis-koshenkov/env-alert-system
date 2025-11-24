@@ -1,4 +1,22 @@
 #include "alert_validator.h"
+#include "config.h"
+
+#ifndef CONFIG_ALERT_VALIDATOR_MAX_ALLOWED_ALERT_ID
+#define CONFIG_ALERT_VALIDATOR_MAX_ALLOWED_ALERT_ID 0
+#endif
+
+/**
+ * @brief Check whether alert id is valid.
+ *
+ * @param alert_id Alert id.
+ *
+ * @return true Alert id is valid.
+ * @return false Alert id is invalid.
+ */
+static bool is_alert_id_valid(uint8_t alert_id)
+{
+    return (alert_id <= CONFIG_ALERT_VALIDATOR_MAX_ALLOWED_ALERT_ID);
+}
 
 /**
  * @brief Check whether LED color of alert notification is valid.
@@ -49,7 +67,8 @@ bool alert_validator_is_alert_valid(const MsgTransceiverAlert *alert)
                                     (is_led_color_valid(alert->led_color) && is_led_pattern_valid(alert->led_pattern)));
     // clang-format off
     return (
-        led_color_pattern_valid
+        is_alert_id_valid(alert->alert_id)
+        && led_color_pattern_valid
         && is_notification_type_valid(alert->notification_type)
     );
     // clang-format on

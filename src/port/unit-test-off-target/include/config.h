@@ -50,6 +50,9 @@
 /** Defines how many AlertRaiser instances the AlertRaisers module creates. */
 #define CONFIG_ALERT_RAISERS_NUM_INSTANCES_TO_CREATE CONFIG_MAX_NUM_ALERTS
 
+/** Defines the highest valid alert ID. */
+#define CONFIG_ALERT_VALIDATOR_MAX_ALLOWED_ALERT_ID (CONFIG_MAX_NUM_ALERTS - 1)
+
 /**
  * @brief Defines the valid alert ids for which a connectivity notification can be sent.
  *
