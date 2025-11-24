@@ -10,7 +10,7 @@ extern "C"
 
 #include "msg_transceiver.h"
 
-bool alert_validator_is_valid_alert(const MsgTransceiverAlert *alert);
+bool alert_validator_is_alert_valid(const MsgTransceiverAlert *alert);
 
 #ifdef __cplusplus
 }

@@ -12,3 +12,7 @@ TEST_C_WRAPPER(AlertValidator, LedPattern0xFFInvalid);
 TEST_C_WRAPPER(AlertValidator, LedPatternInvalidInvalid);
 TEST_C_WRAPPER(AlertValidator, LedPatternStaticValid);
 TEST_C_WRAPPER(AlertValidator, LedPatternAlertValid);
+TEST_C_WRAPPER(AlertValidator, AllNotificationsDisabledInvalid);
+TEST_C_WRAPPER(AlertValidator, ConnectivityNotificationValid);
+TEST_C_WRAPPER(AlertValidator, LedNotificationValid);
+TEST_C_WRAPPER(AlertValidator, AllNotificationsEnabledValid);
