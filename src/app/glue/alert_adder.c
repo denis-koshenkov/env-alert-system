@@ -21,11 +21,11 @@
 /**
  * @brief Map LED color from message transceiver to led color from LED HAL module.
  *
- * @param led_color Message transceiver led color.
+ * @param led_color Message transceiver led color. Use one of the values from @ref MsgTransceiverLedColor.
  *
  * @return LedColor Corresponding HAL LED color. If @p led_color is invalid, an assert is raised.
  */
-static LedColor map_msg_transceiver_led_color_to_led_color(MsgTransceiverLedColor led_color)
+static LedColor map_msg_transceiver_led_color_to_led_color(uint8_t led_color)
 {
     switch (led_color) {
     case MSG_TRANSCEIVER_LED_COLOR_RED:
@@ -43,11 +43,11 @@ static LedColor map_msg_transceiver_led_color_to_led_color(MsgTransceiverLedColo
 /**
  * @brief Map LED pattern from message transceiver to led pattern from LED HAL module.
  *
- * @param led_pattern Message transceiver led pattern.
+ * @param led_pattern Message transceiver led pattern. Use one of the values from @ref MsgTransceiverLedPattern.
  *
  * @return LedPattern Corresponding HAL LED pattern. If @p led_pattern is invalid, an assert is raised.
  */
-static LedPattern map_msg_transceiver_led_pattern_to_led_pattern(MsgTransceiverLedPattern led_pattern)
+static LedPattern map_msg_transceiver_led_pattern_to_led_pattern(uint8_t led_pattern)
 {
     switch (led_pattern) {
     case MSG_TRANSCEIVER_LED_PATTERN_STATIC:

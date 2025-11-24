@@ -8,6 +8,7 @@ extern "C"
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 #ifndef CONFIG_MSG_TRANSCEIVER_MAX_NUM_VARIABLE_REQUIREMENTS_IN_ALERT_CONDITION
 #define CONFIG_MSG_TRANSCEIVER_MAX_NUM_VARIABLE_REQUIREMENTS_IN_ALERT_CONDITION 1
@@ -24,6 +25,7 @@ typedef enum MsgTransceiverLedColor {
     MSG_TRANSCEIVER_LED_COLOR_RED,
     MSG_TRANSCEIVER_LED_COLOR_GREEN,
     MSG_TRANSCEIVER_LED_COLOR_BLUE,
+    MSG_TRANSCEIVER_LED_COLOR_INVALID,
 } MsgTransceiverLedColor;
 
 typedef enum MsgTransceiverLedPattern {
@@ -93,10 +95,12 @@ typedef struct MsgTransceiverAlert {
     uint32_t warmup_period;
     uint32_t cooldown_period;
     NotificationType notification_type;
-    /**< Only applicable if notification_type.led is true */
-    MsgTransceiverLedColor led_color;
-    /**< Only applicable if notification_type.led is true */
-    MsgTransceiverLedPattern led_pattern;
+    /**< Should contain values of type enum MsgTransceiverLedColor. This field is only applicable if
+     * notification_type.led is true. */
+    uint8_t led_color;
+    /**< Should contain values of type enum MsgTransceiverLedPattern. This field is only applicable if
+     * notification_type.led is true. */
+    uint8_t led_pattern;
     MsgTransceiverAlertCondition alert_condition;
 } MsgTransceiverAlert;
 
