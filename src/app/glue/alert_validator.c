@@ -28,7 +28,13 @@ static bool is_alert_id_valid(uint8_t alert_id)
  */
 static bool is_led_color_valid(uint8_t led_color)
 {
-    return (led_color < MSG_TRANSCEIVER_LED_COLOR_INVALID);
+    // clang-format off
+    return (
+        (led_color == MSG_TRANSCEIVER_LED_COLOR_RED)
+        || (led_color == MSG_TRANSCEIVER_LED_COLOR_GREEN)
+        || (led_color == MSG_TRANSCEIVER_LED_COLOR_BLUE)
+    );
+    // clang-format on
 }
 
 /**
@@ -41,7 +47,12 @@ static bool is_led_color_valid(uint8_t led_color)
  */
 static bool is_led_pattern_valid(uint8_t led_pattern)
 {
-    return (led_pattern < MSG_TRANSCEIVER_LED_PATTERN_INVALID);
+    // clang-format off
+    return (
+        (led_pattern == MSG_TRANSCEIVER_LED_PATTERN_STATIC)
+        || (led_pattern == MSG_TRANSCEIVER_LED_PATTERN_ALERT)
+    );
+    // clang-format on
 }
 
 /**
@@ -59,6 +70,34 @@ static bool is_notification_type_valid(NotificationType notification_type)
     return !((notification_type.connectivity == 0) && (notification_type.led == 0));
 }
 
+/**
+ * @brief Check whether variable identifier is valid.
+ *
+ * @param variable_identifier Variable identifier. Use values from enum @ref MsgTransceiverVariableIdentifier.
+ *
+ * @return true Variable identifier is valid.
+ * @return false Variable identifier is invalid.
+ */
+static bool is_valid_variable_identifier(uint8_t variable_identifier)
+{
+    // clang-format off
+    return (
+        (variable_identifier == MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_TEMPERATURE)
+        || (variable_identifier == MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_PRESSURE)
+        || (variable_identifier == MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_HUMIDITY)
+        || (variable_identifier == MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_LIGHT_INTENSITY)
+    );
+    // clang-format on
+}
+
+static bool is_alert_condition_valid(const MsgTransceiverAlertCondition *const alert_condition)
+{
+    bool valid_num_variable_requirements = (alert_condition->num_variable_requirements != 0);
+    bool valid_variable_identifier =
+        is_valid_variable_identifier(alert_condition->variable_requirements[0].variable_identifier);
+    return (valid_num_variable_requirements && valid_variable_identifier);
+}
+
 bool alert_validator_is_alert_valid(const MsgTransceiverAlert *alert)
 {
     /* LED color and pattern are allowed to have invalid values if led notification is disabled, since these values will
@@ -70,6 +109,7 @@ bool alert_validator_is_alert_valid(const MsgTransceiverAlert *alert)
         is_alert_id_valid(alert->alert_id)
         && led_color_pattern_valid
         && is_notification_type_valid(alert->notification_type)
+        && is_alert_condition_valid(&(alert->alert_condition))
     );
     // clang-format on
 }
