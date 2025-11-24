@@ -16,6 +16,7 @@
 static void populate_valid_alert(MsgTransceiverAlert *alert)
 {
     alert->led_color = MSG_TRANSCEIVER_LED_COLOR_RED;
+    alert->led_pattern = MSG_TRANSCEIVER_LED_PATTERN_STATIC;
 }
 
 TEST_C(AlertValidator, LedColor0xFFInvalid)
@@ -59,6 +60,42 @@ TEST_C(AlertValidator, LedColorBlueValid)
     MsgTransceiverAlert alert;
     populate_valid_alert(&alert);
     alert.led_color = MSG_TRANSCEIVER_LED_COLOR_BLUE;
+    bool is_valid_alert = alert_validator_is_valid_alert(&alert);
+    CHECK_C(is_valid_alert);
+}
+
+TEST_C(AlertValidator, LedPattern0xFFInvalid)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    alert.led_pattern = 0xFF;
+    bool is_valid_alert = alert_validator_is_valid_alert(&alert);
+    CHECK_C(!is_valid_alert);
+}
+
+TEST_C(AlertValidator, LedPatternInvalidInvalid)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    alert.led_pattern = MSG_TRANSCEIVER_LED_PATTERN_INVALID;
+    bool is_valid_alert = alert_validator_is_valid_alert(&alert);
+    CHECK_C(!is_valid_alert);
+}
+
+TEST_C(AlertValidator, LedPatternStaticValid)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    alert.led_pattern = MSG_TRANSCEIVER_LED_PATTERN_STATIC;
+    bool is_valid_alert = alert_validator_is_valid_alert(&alert);
+    CHECK_C(is_valid_alert);
+}
+
+TEST_C(AlertValidator, LedPatternAlertValid)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    alert.led_pattern = MSG_TRANSCEIVER_LED_PATTERN_ALERT;
     bool is_valid_alert = alert_validator_is_valid_alert(&alert);
     CHECK_C(is_valid_alert);
 }

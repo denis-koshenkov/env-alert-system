@@ -8,3 +8,7 @@ TEST_C_WRAPPER(AlertValidator, LedColorInvalidInvalid);
 TEST_C_WRAPPER(AlertValidator, LedColorRedValid);
 TEST_C_WRAPPER(AlertValidator, LedColorGreenValid);
 TEST_C_WRAPPER(AlertValidator, LedColorBlueValid);
+TEST_C_WRAPPER(AlertValidator, LedPattern0xFFInvalid);
+TEST_C_WRAPPER(AlertValidator, LedPatternInvalidInvalid);
+TEST_C_WRAPPER(AlertValidator, LedPatternStaticValid);
+TEST_C_WRAPPER(AlertValidator, LedPatternAlertValid);

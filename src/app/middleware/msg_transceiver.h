@@ -31,6 +31,7 @@ typedef enum MsgTransceiverLedColor {
 typedef enum MsgTransceiverLedPattern {
     MSG_TRANSCEIVER_LED_PATTERN_STATIC,
     MSG_TRANSCEIVER_LED_PATTERN_ALERT,
+    MSG_TRANSCEIVER_LED_PATTERN_INVALID,
 } MsgTransceiverLedPattern;
 
 typedef enum MsgTransceiverVariableIdentifier {
