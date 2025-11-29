@@ -1,4 +1,5 @@
 #include "CppUTest/TestHarness_c.h"
+#include "CppUTestExt/TestAssertPlugin_c.h"
 
 #include "config.h"
 #include "alert_validator.h"
@@ -533,4 +534,10 @@ TEST_C(AlertValidator, HumidityConstraintValueAboveAllowedRangeThirdRequirement)
 
     bool is_valid_alert = alert_validator_is_alert_valid(&alert);
     CHECK_C(!is_valid_alert);
+}
+
+TEST_C(AlertValidator, isAlertValidRaisesAssertAlertNull)
+{
+    TEST_ASSERT_PLUGIN_C_EXPECT_ASSERTION("alert", "alert_validator_is_alert_valid");
+    bool is_valid_alert = alert_validator_is_alert_valid(NULL);
 }

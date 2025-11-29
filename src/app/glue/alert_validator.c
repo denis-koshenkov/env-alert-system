@@ -1,5 +1,6 @@
 #include "alert_validator.h"
 #include "config.h"
+#include "eas_assert.h"
 
 #ifndef CONFIG_ALERT_VALIDATOR_MAX_ALLOWED_ALERT_ID
 #define CONFIG_ALERT_VALIDATOR_MAX_ALLOWED_ALERT_ID 0
@@ -186,6 +187,8 @@ static bool is_alert_condition_valid(const MsgTransceiverAlertCondition *const a
 
 bool alert_validator_is_alert_valid(const MsgTransceiverAlert *alert)
 {
+    EAS_ASSERT(alert);
+
     /* LED color and pattern are allowed to have invalid values if led notification is disabled, since these values will
      * not be used. */
     bool led_color_pattern_valid = ((alert->notification_type.led == 0) ||

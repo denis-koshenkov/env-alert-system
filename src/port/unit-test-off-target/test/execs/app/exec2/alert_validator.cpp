@@ -47,3 +47,4 @@ TEST_C_WRAPPER(AlertValidator, LightIntensityConstraintValueWithinAllowedRange1)
 TEST_C_WRAPPER(AlertValidator, LightIntensityConstraintValueWithinAllowedRange2);
 TEST_C_WRAPPER(AlertValidator, LightIntensityConstraintValueWithinAllowedRange3);
 TEST_C_WRAPPER(AlertValidator, HumidityConstraintValueAboveAllowedRangeThirdRequirement);
+TEST_C_WRAPPER(AlertValidator, isAlertValidRaisesAssertAlertNull);
