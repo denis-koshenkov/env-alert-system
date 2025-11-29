@@ -521,3 +521,16 @@ TEST_C(AlertValidator, LightIntensityConstraintValueWithinAllowedRange3)
     bool is_valid_alert = alert_validator_is_alert_valid(&alert);
     CHECK_C(is_valid_alert);
 }
+
+TEST_C(AlertValidator, HumidityConstraintValueAboveAllowedRangeThirdRequirement)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    add_valid_variable_requirement(&(alert.alert_condition));
+    add_valid_variable_requirement(&(alert.alert_condition));
+    alert.alert_condition.variable_requirements[2].variable_identifier = MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_HUMIDITY;
+    alert.alert_condition.variable_requirements[2].constraint_value.humidity = 2222;
+
+    bool is_valid_alert = alert_validator_is_alert_valid(&alert);
+    CHECK_C(!is_valid_alert);
+}

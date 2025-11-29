@@ -159,9 +159,7 @@ static bool is_alert_condition_valid(const MsgTransceiverAlertCondition *const a
 
     bool all_variable_identifiers_valid = true;
     bool all_operators_valid = true;
-    bool all_constraint_values_valid =
-        is_valid_constraint_value(alert_condition->variable_requirements[0].variable_identifier,
-                                  alert_condition->variable_requirements[0].constraint_value);
+    bool all_constraint_values_valid = true;
     for (size_t i = 0; i < alert_condition->num_variable_requirements; i++) {
         if (!is_valid_variable_identifier(alert_condition->variable_requirements[i].variable_identifier)) {
             all_variable_identifiers_valid = false;
@@ -169,6 +167,11 @@ static bool is_alert_condition_valid(const MsgTransceiverAlertCondition *const a
         }
         if (!is_valid_operator(alert_condition->variable_requirements[i].operator)) {
             all_operators_valid = false;
+            break;
+        }
+        if (!is_valid_constraint_value(alert_condition->variable_requirements[i].variable_identifier,
+                                       alert_condition->variable_requirements[i].constraint_value)) {
+            all_constraint_values_valid = false;
             break;
         }
     }
