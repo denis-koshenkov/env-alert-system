@@ -19,7 +19,7 @@ extern "C"
  *   - 100.0% RH → 1000
  *   - 95.5% RH → 955
  *
- * The allowed range of values is 0<= humidity <= 1000 which corresponds to 0.0% to 100.0%. Percentage points can only
+ * The allowed range of values is 0 <= humidity <= 1000 which corresponds to 0.0% to 100.0%. Percentage points can only
  * be between 0 and 100.
  */
 typedef uint16_t Humidity;

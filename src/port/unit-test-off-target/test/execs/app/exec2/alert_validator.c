@@ -440,3 +440,36 @@ TEST_C(AlertValidator, PressureConstraintValueWithinAllowedRange2)
     bool is_valid_alert = alert_validator_is_alert_valid(&alert);
     CHECK_C(is_valid_alert);
 }
+
+TEST_C(AlertValidator, HumidityConstraintValueAboveAllowedRange)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    alert.alert_condition.variable_requirements[0].variable_identifier = MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_HUMIDITY;
+    alert.alert_condition.variable_requirements[0].constraint_value.humidity = 1001;
+
+    bool is_valid_alert = alert_validator_is_alert_valid(&alert);
+    CHECK_C(!is_valid_alert);
+}
+
+TEST_C(AlertValidator, HumidityConstraintValueWithinAllowedRange1)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    alert.alert_condition.variable_requirements[0].variable_identifier = MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_HUMIDITY;
+    alert.alert_condition.variable_requirements[0].constraint_value.humidity = 1000;
+
+    bool is_valid_alert = alert_validator_is_alert_valid(&alert);
+    CHECK_C(is_valid_alert);
+}
+
+TEST_C(AlertValidator, HumidityConstraintValueWithinAllowedRange2)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    alert.alert_condition.variable_requirements[0].variable_identifier = MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_HUMIDITY;
+    alert.alert_condition.variable_requirements[0].constraint_value.humidity = 555;
+
+    bool is_valid_alert = alert_validator_is_alert_valid(&alert);
+    CHECK_C(is_valid_alert);
+}

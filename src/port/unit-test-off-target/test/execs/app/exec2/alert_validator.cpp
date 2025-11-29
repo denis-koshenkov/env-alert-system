@@ -39,3 +39,6 @@ TEST_C_WRAPPER(AlertValidator, TemperatureConstraintValueWithinAllowedRange);
 TEST_C_WRAPPER(AlertValidator, PressureConstraintValueAboveAllowedRange);
 TEST_C_WRAPPER(AlertValidator, PressureConstraintValueWithinAllowedRange1);
 TEST_C_WRAPPER(AlertValidator, PressureConstraintValueWithinAllowedRange2);
+TEST_C_WRAPPER(AlertValidator, HumidityConstraintValueAboveAllowedRange);
+TEST_C_WRAPPER(AlertValidator, HumidityConstraintValueWithinAllowedRange1);
+TEST_C_WRAPPER(AlertValidator, HumidityConstraintValueWithinAllowedRange2);
