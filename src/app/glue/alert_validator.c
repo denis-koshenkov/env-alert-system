@@ -7,6 +7,7 @@
 
 #define ALERT_VALIDATOR_MIN_TEMPERATURE_CONSTRAINT_VALUE -500 // -50.0 degrees Celsius
 #define ALERT_VALIDATOR_MAX_TEMPERATURE_CONSTRAINT_VALUE 700  // 70.0 degrees Celsius
+#define ALERT_VALIDATOR_MAX_PRESSURE_CONSTRAINT_VALUE 15000   // 1500.0 hPa
 
 /**
  * @brief Check whether alert id is valid.
@@ -107,10 +108,39 @@ static bool is_valid_operator(uint8_t operator)
            (operator == MSG_TRANSCEIVER_REQUIREMENT_OPERATOR_LEQ);
 }
 
+/**
+ * @brief Check that constraint value is within range.
+ *
+ * @param variable_identifier Variable identifier.
+ * @param constraint_value Constraint value to validate.
+ *
+ * @return true Constraint value is within allowed range for the variable.
+ * @return false Constraint value is outside of the allowed range for the variable.
+ */
 static bool is_valid_constraint_value(uint8_t variable_identifier, ConstraintValue constraint_value)
 {
-    return (constraint_value.temperature >= ALERT_VALIDATOR_MIN_TEMPERATURE_CONSTRAINT_VALUE) &&
-           (constraint_value.temperature <= ALERT_VALIDATOR_MAX_TEMPERATURE_CONSTRAINT_VALUE);
+    bool is_valid = false;
+    switch (variable_identifier) {
+    case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_TEMPERATURE:
+        is_valid = (constraint_value.temperature >= ALERT_VALIDATOR_MIN_TEMPERATURE_CONSTRAINT_VALUE) &&
+                   (constraint_value.temperature <= ALERT_VALIDATOR_MAX_TEMPERATURE_CONSTRAINT_VALUE);
+        break;
+    case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_PRESSURE:
+        is_valid = (constraint_value.pressure <= ALERT_VALIDATOR_MAX_PRESSURE_CONSTRAINT_VALUE);
+        break;
+    case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_HUMIDITY:
+        is_valid = true;
+        break;
+    case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_LIGHT_INTENSITY:
+        is_valid = true;
+        break;
+    default:
+        /* Invalid variable identifier */
+        is_valid = false;
+        break;
+    }
+
+    return is_valid;
 }
 
 /**

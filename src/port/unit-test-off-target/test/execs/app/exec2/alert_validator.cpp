@@ -36,3 +36,6 @@ TEST_C_WRAPPER(AlertValidator, LastRequirementIsNotLastInOredRequirementInvalid)
 TEST_C_WRAPPER(AlertValidator, TemperatureConstraintValueBelowAllowedRange);
 TEST_C_WRAPPER(AlertValidator, TemperatureConstraintValueAboveAllowedRange);
 TEST_C_WRAPPER(AlertValidator, TemperatureConstraintValueWithinAllowedRange);
+TEST_C_WRAPPER(AlertValidator, PressureConstraintValueAboveAllowedRange);
+TEST_C_WRAPPER(AlertValidator, PressureConstraintValueWithinAllowedRange1);
+TEST_C_WRAPPER(AlertValidator, PressureConstraintValueWithinAllowedRange2);
