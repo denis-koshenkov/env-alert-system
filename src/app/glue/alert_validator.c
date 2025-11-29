@@ -156,6 +156,8 @@ static bool is_valid_constraint_value(uint8_t variable_identifier, ConstraintVal
  */
 static bool is_alert_condition_valid(const MsgTransceiverAlertCondition *const alert_condition)
 {
+    EAS_ASSERT(alert_condition);
+
     bool valid_num_variable_requirements = (alert_condition->num_variable_requirements != 0);
 
     bool all_variable_identifiers_valid = true;
@@ -185,7 +187,7 @@ static bool is_alert_condition_valid(const MsgTransceiverAlertCondition *const a
             all_constraint_values_valid && last_requirement_is_last_in_ored_requirement);
 }
 
-bool alert_validator_is_alert_valid(const MsgTransceiverAlert *alert)
+bool alert_validator_is_alert_valid(const MsgTransceiverAlert *const alert)
 {
     EAS_ASSERT(alert);
 
