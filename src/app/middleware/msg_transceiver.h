@@ -49,7 +49,7 @@ typedef enum MsgTransceiverRequirementOperator {
 typedef int16_t MsgTransceiverTemperature;
 typedef uint16_t MsgTransceiverPressure;
 typedef uint16_t MsgTransceiverHumidity;
-typedef uint16_t MsgTransceiverLightIntensity;
+typedef uint32_t MsgTransceiverLightIntensity;
 
 typedef union ConstraintValue {
     MsgTransceiverTemperature temperature;

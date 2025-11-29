@@ -5,10 +5,11 @@
 #define CONFIG_ALERT_VALIDATOR_MAX_ALLOWED_ALERT_ID 0
 #endif
 
-#define ALERT_VALIDATOR_MIN_TEMPERATURE_CONSTRAINT_VALUE -500 // -50.0 degrees Celsius
-#define ALERT_VALIDATOR_MAX_TEMPERATURE_CONSTRAINT_VALUE 700  // 70.0 degrees Celsius
-#define ALERT_VALIDATOR_MAX_PRESSURE_CONSTRAINT_VALUE 15000   // 1500.0 hPa
-#define ALERT_VALIDATOR_MAX_HUMIDITY_CONSTRAINT_VALUE 1000    // 100.0 %
+#define ALERT_VALIDATOR_MIN_TEMPERATURE_CONSTRAINT_VALUE -500       // -50.0 degrees Celsius
+#define ALERT_VALIDATOR_MAX_TEMPERATURE_CONSTRAINT_VALUE 700        // 70.0 degrees Celsius
+#define ALERT_VALIDATOR_MAX_PRESSURE_CONSTRAINT_VALUE 15000         // 1500.0 hPa
+#define ALERT_VALIDATOR_MAX_HUMIDITY_CONSTRAINT_VALUE 1000          // 100.0 %
+#define ALERT_VALIDATOR_MAX_LIGHT_INTENSITY_CONSTRAINT_VALUE 130000 // 130,000 lux
 
 /**
  * @brief Check whether alert id is valid.
@@ -133,7 +134,7 @@ static bool is_valid_constraint_value(uint8_t variable_identifier, ConstraintVal
         is_valid = (constraint_value.humidity <= ALERT_VALIDATOR_MAX_HUMIDITY_CONSTRAINT_VALUE);
         break;
     case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_LIGHT_INTENSITY:
-        is_valid = true;
+        is_valid = (constraint_value.light_intensity <= ALERT_VALIDATOR_MAX_LIGHT_INTENSITY_CONSTRAINT_VALUE);
         break;
     default:
         /* Invalid variable identifier */

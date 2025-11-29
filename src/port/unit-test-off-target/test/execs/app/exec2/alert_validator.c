@@ -473,3 +473,51 @@ TEST_C(AlertValidator, HumidityConstraintValueWithinAllowedRange2)
     bool is_valid_alert = alert_validator_is_alert_valid(&alert);
     CHECK_C(is_valid_alert);
 }
+
+TEST_C(AlertValidator, LightIntensityConstraintValueAboveAllowedRange)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    alert.alert_condition.variable_requirements[0].variable_identifier =
+        MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_LIGHT_INTENSITY;
+    alert.alert_condition.variable_requirements[0].constraint_value.light_intensity = 130001;
+
+    bool is_valid_alert = alert_validator_is_alert_valid(&alert);
+    CHECK_C(!is_valid_alert);
+}
+
+TEST_C(AlertValidator, LightIntensityConstraintValueWithinAllowedRange1)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    alert.alert_condition.variable_requirements[0].variable_identifier =
+        MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_LIGHT_INTENSITY;
+    alert.alert_condition.variable_requirements[0].constraint_value.light_intensity = 130000;
+
+    bool is_valid_alert = alert_validator_is_alert_valid(&alert);
+    CHECK_C(is_valid_alert);
+}
+
+TEST_C(AlertValidator, LightIntensityConstraintValueWithinAllowedRange2)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    alert.alert_condition.variable_requirements[0].variable_identifier =
+        MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_LIGHT_INTENSITY;
+    alert.alert_condition.variable_requirements[0].constraint_value.light_intensity = 50453;
+
+    bool is_valid_alert = alert_validator_is_alert_valid(&alert);
+    CHECK_C(is_valid_alert);
+}
+
+TEST_C(AlertValidator, LightIntensityConstraintValueWithinAllowedRange3)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    alert.alert_condition.variable_requirements[0].variable_identifier =
+        MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_LIGHT_INTENSITY;
+    alert.alert_condition.variable_requirements[0].constraint_value.light_intensity = 0;
+
+    bool is_valid_alert = alert_validator_is_alert_valid(&alert);
+    CHECK_C(is_valid_alert);
+}

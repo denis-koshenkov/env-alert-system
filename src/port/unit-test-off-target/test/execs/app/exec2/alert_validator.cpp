@@ -42,3 +42,7 @@ TEST_C_WRAPPER(AlertValidator, PressureConstraintValueWithinAllowedRange2);
 TEST_C_WRAPPER(AlertValidator, HumidityConstraintValueAboveAllowedRange);
 TEST_C_WRAPPER(AlertValidator, HumidityConstraintValueWithinAllowedRange1);
 TEST_C_WRAPPER(AlertValidator, HumidityConstraintValueWithinAllowedRange2);
+TEST_C_WRAPPER(AlertValidator, LightIntensityConstraintValueAboveAllowedRange);
+TEST_C_WRAPPER(AlertValidator, LightIntensityConstraintValueWithinAllowedRange1);
+TEST_C_WRAPPER(AlertValidator, LightIntensityConstraintValueWithinAllowedRange2);
+TEST_C_WRAPPER(AlertValidator, LightIntensityConstraintValueWithinAllowedRange3);
