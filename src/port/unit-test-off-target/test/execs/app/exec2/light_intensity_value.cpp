@@ -6,9 +6,9 @@
 
 TEST_GROUP(LightIntensityValue){};
 
-TEST(LightIntensityValue, createCallsValueHolderCreateWithSize2)
+TEST(LightIntensityValue, createCallsValueHolderCreateWithCorrectSize)
 {
-    mock().expectOneCall("value_holder_create").withParameter("value_size", 2).andReturnValue((void *)NULL);
+    mock().expectOneCall("value_holder_create").withParameter("value_size", 4).andReturnValue((void *)NULL);
 
     LightIntensityValue liv = light_intensity_value_create();
 }
@@ -30,7 +30,7 @@ TEST(LightIntensityValue, setPassesPointerToArgumentToValueHolderSet)
     mock().setData("value_holder_value_size", (unsigned int)sizeof(LightIntensity));
 
     LightIntensity light_intensity = 11122;
-    mock().expectOneCall("value_holder_create").withParameter("value_size", 2).andReturnValue((void *)NULL);
+    mock().expectOneCall("value_holder_create").withParameter("value_size", 4).andReturnValue((void *)NULL);
     mock()
         .expectOneCall("value_holder_set")
         .withMemoryBufferParameter("value", (const uint8_t *)&light_intensity, sizeof(LightIntensity))
@@ -43,7 +43,7 @@ TEST(LightIntensityValue, setPassesPointerToArgumentToValueHolderSet)
 TEST(LightIntensityValue, getReturnsValueReceivedFromValueHolderGet)
 {
     LightIntensity l = 65;
-    mock().expectOneCall("value_holder_create").withParameter("value_size", 2).andReturnValue((void *)NULL);
+    mock().expectOneCall("value_holder_create").withParameter("value_size", 4).andReturnValue((void *)NULL);
     mock()
         .expectOneCall("value_holder_get")
         .withOutputParameterReturning("value", &l, sizeof(LightIntensity))
@@ -67,7 +67,7 @@ TEST(LightIntensityValue, getCallsValueHolderGetUsingInstanceReturnedByCreate)
 TEST(LightIntensityValue, isValueChangedReturnsValueReceivedFromValueHolderValueFalse)
 {
     bool is_value_changed_from_value_holder = false;
-    mock().expectOneCall("value_holder_create").withParameter("value_size", 2).andReturnValue((void *)NULL);
+    mock().expectOneCall("value_holder_create").withParameter("value_size", 4).andReturnValue((void *)NULL);
     mock()
         .expectOneCall("value_holder_is_value_changed")
         .ignoreOtherParameters()
@@ -81,7 +81,7 @@ TEST(LightIntensityValue, isValueChangedReturnsValueReceivedFromValueHolderValue
 TEST(LightIntensityValue, isValueChangedReturnsValueReceivedFromValueHolderValueTrue)
 {
     bool is_value_changed_from_value_holder = true;
-    mock().expectOneCall("value_holder_create").withParameter("value_size", 2).andReturnValue((void *)NULL);
+    mock().expectOneCall("value_holder_create").withParameter("value_size", 4).andReturnValue((void *)NULL);
     mock()
         .expectOneCall("value_holder_is_value_changed")
         .ignoreOtherParameters()

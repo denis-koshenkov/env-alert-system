@@ -17,10 +17,11 @@ extern "C"
  *   - 0 lx → 0
  *   - 100 lx → 100
  *   - 12345 lx → 12345
+ *   - 100000 lx → 100000
  *
- * Light intensity values range allowed by representation (in lx): 0 to 65535.
+ * Light intensity values range allowed by representation (in lx): 0 to 4294967295.
  */
-typedef uint16_t LightIntensity;
+typedef uint32_t LightIntensity;
 
 #ifdef __cplusplus
 }
