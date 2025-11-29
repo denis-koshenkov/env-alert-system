@@ -27,3 +27,7 @@ TEST_C_WRAPPER(AlertValidator, VariableIdentifierPressureValid);
 TEST_C_WRAPPER(AlertValidator, VariableIdentifierHumidityValid);
 TEST_C_WRAPPER(AlertValidator, VariableIdentifierLightIntensityValid);
 TEST_C_WRAPPER(AlertValidator, InvalidVariableIdentifierSecondRequirement);
+TEST_C_WRAPPER(AlertValidator, InvalidRequirementOperator);
+TEST_C_WRAPPER(AlertValidator, RequirementOperatorGeqValid);
+TEST_C_WRAPPER(AlertValidator, RequirementOperatorLeqValid);
+TEST_C_WRAPPER(AlertValidator, InvalidRequirementOperatorSecondRequirement);

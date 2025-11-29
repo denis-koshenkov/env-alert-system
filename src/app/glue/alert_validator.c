@@ -90,19 +90,30 @@ static bool is_valid_variable_identifier(uint8_t variable_identifier)
     // clang-format on
 }
 
+static bool is_valid_operator(uint8_t operator)
+{
+    return (operator == MSG_TRANSCEIVER_REQUIREMENT_OPERATOR_GEQ) ||
+           (operator == MSG_TRANSCEIVER_REQUIREMENT_OPERATOR_LEQ);
+}
+
 static bool is_alert_condition_valid(const MsgTransceiverAlertCondition *const alert_condition)
 {
     bool valid_num_variable_requirements = (alert_condition->num_variable_requirements != 0);
 
     bool all_variable_identifiers_valid = true;
+    bool all_operators_valid = true;
     for (size_t i = 0; i < alert_condition->num_variable_requirements; i++) {
         if (!is_valid_variable_identifier(alert_condition->variable_requirements[i].variable_identifier)) {
             all_variable_identifiers_valid = false;
             break;
         }
+        if (!is_valid_operator(alert_condition->variable_requirements[i].operator)) {
+            all_operators_valid = false;
+            break;
+        }
     }
 
-    return (valid_num_variable_requirements && all_variable_identifiers_valid);
+    return (valid_num_variable_requirements && all_variable_identifiers_valid && all_operators_valid);
 }
 
 bool alert_validator_is_alert_valid(const MsgTransceiverAlert *alert)

@@ -302,3 +302,47 @@ TEST_C(AlertValidator, InvalidVariableIdentifierSecondRequirement)
     bool is_valid_alert = alert_validator_is_alert_valid(&alert);
     CHECK_C(!is_valid_alert);
 }
+
+TEST_C(AlertValidator, InvalidRequirementOperator)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    /* Invalid operator */
+    alert.alert_condition.variable_requirements[0].operator = 55;
+
+    bool is_valid_alert = alert_validator_is_alert_valid(&alert);
+    CHECK_C(!is_valid_alert);
+}
+
+TEST_C(AlertValidator, RequirementOperatorGeqValid)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    alert.alert_condition.variable_requirements[0].operator = MSG_TRANSCEIVER_REQUIREMENT_OPERATOR_GEQ;
+
+    bool is_valid_alert = alert_validator_is_alert_valid(&alert);
+    CHECK_C(is_valid_alert);
+}
+
+TEST_C(AlertValidator, RequirementOperatorLeqValid)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    alert.alert_condition.variable_requirements[0].operator = MSG_TRANSCEIVER_REQUIREMENT_OPERATOR_LEQ;
+
+    bool is_valid_alert = alert_validator_is_alert_valid(&alert);
+    CHECK_C(is_valid_alert);
+}
+
+TEST_C(AlertValidator, InvalidRequirementOperatorSecondRequirement)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    add_valid_variable_requirement(&(alert.alert_condition));
+    /* Invalid variable identifier */
+    alert.alert_condition.variable_requirements[1].operator = 0xFF;
+    CHECK_EQUAL_C_ULONG(2, alert.alert_condition.num_variable_requirements);
+
+    bool is_valid_alert = alert_validator_is_alert_valid(&alert);
+    CHECK_C(!is_valid_alert);
+}
