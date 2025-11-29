@@ -5,6 +5,9 @@
 #define CONFIG_ALERT_VALIDATOR_MAX_ALLOWED_ALERT_ID 0
 #endif
 
+#define ALERT_VALIDATOR_MIN_TEMPERATURE_CONSTRAINT_VALUE -500 // -50.0 degrees Celsius
+#define ALERT_VALIDATOR_MAX_TEMPERATURE_CONSTRAINT_VALUE 700  // 70.0 degrees Celsius
+
 /**
  * @brief Check whether alert id is valid.
  *
@@ -104,6 +107,12 @@ static bool is_valid_operator(uint8_t operator)
            (operator == MSG_TRANSCEIVER_REQUIREMENT_OPERATOR_LEQ);
 }
 
+static bool is_valid_constraint_value(uint8_t variable_identifier, ConstraintValue constraint_value)
+{
+    return (constraint_value.temperature >= ALERT_VALIDATOR_MIN_TEMPERATURE_CONSTRAINT_VALUE) &&
+           (constraint_value.temperature <= ALERT_VALIDATOR_MAX_TEMPERATURE_CONSTRAINT_VALUE);
+}
+
 /**
  * @brief Check whether alert condition is valid.
  *
@@ -118,6 +127,9 @@ static bool is_alert_condition_valid(const MsgTransceiverAlertCondition *const a
 
     bool all_variable_identifiers_valid = true;
     bool all_operators_valid = true;
+    bool all_constraint_values_valid =
+        is_valid_constraint_value(alert_condition->variable_requirements[0].variable_identifier,
+                                  alert_condition->variable_requirements[0].constraint_value);
     for (size_t i = 0; i < alert_condition->num_variable_requirements; i++) {
         if (!is_valid_variable_identifier(alert_condition->variable_requirements[i].variable_identifier)) {
             all_variable_identifiers_valid = false;
@@ -134,7 +146,7 @@ static bool is_alert_condition_valid(const MsgTransceiverAlertCondition *const a
         (alert_condition->variable_requirements[last_requirement_index].is_last_in_ored_requirement == true);
 
     return (valid_num_variable_requirements && all_variable_identifiers_valid && all_operators_valid &&
-            last_requirement_is_last_in_ored_requirement);
+            all_constraint_values_valid && last_requirement_is_last_in_ored_requirement);
 }
 
 bool alert_validator_is_alert_valid(const MsgTransceiverAlert *alert)

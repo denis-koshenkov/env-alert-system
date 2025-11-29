@@ -17,8 +17,7 @@ static void populate_valid_variable_requirement(MsgTransceiverVariableRequiremen
 {
     requirement->variable_identifier = MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_TEMPERATURE;
     requirement->operator = MSG_TRANSCEIVER_REQUIREMENT_OPERATOR_GEQ;
-    /* TODO: come up with a valid temperature value here */
-    requirement->constraint_value.temperature = 0;
+    requirement->constraint_value.temperature = 200; // 20.0 degrees Celsius
     requirement->is_last_in_ored_requirement = true;
 }
 
@@ -371,4 +370,40 @@ TEST_C(AlertValidator, LastRequirementIsNotLastInOredRequirementInvalid)
 
     bool is_valid_alert = alert_validator_is_alert_valid(&alert);
     CHECK_C(!is_valid_alert);
+}
+
+TEST_C(AlertValidator, TemperatureConstraintValueBelowAllowedRange)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    alert.alert_condition.variable_requirements[0].variable_identifier =
+        MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_TEMPERATURE;
+    alert.alert_condition.variable_requirements[0].constraint_value.temperature = -510;
+
+    bool is_valid_alert = alert_validator_is_alert_valid(&alert);
+    CHECK_C(!is_valid_alert);
+}
+
+TEST_C(AlertValidator, TemperatureConstraintValueAboveAllowedRange)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    alert.alert_condition.variable_requirements[0].variable_identifier =
+        MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_TEMPERATURE;
+    alert.alert_condition.variable_requirements[0].constraint_value.temperature = 701;
+
+    bool is_valid_alert = alert_validator_is_alert_valid(&alert);
+    CHECK_C(!is_valid_alert);
+}
+
+TEST_C(AlertValidator, TemperatureConstraintValueWithinAllowedRange)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    alert.alert_condition.variable_requirements[0].variable_identifier =
+        MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_TEMPERATURE;
+    alert.alert_condition.variable_requirements[0].constraint_value.temperature = -500;
+
+    bool is_valid_alert = alert_validator_is_alert_valid(&alert);
+    CHECK_C(is_valid_alert);
 }

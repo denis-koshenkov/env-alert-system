@@ -33,3 +33,6 @@ TEST_C_WRAPPER(AlertValidator, RequirementOperatorLeqValid);
 TEST_C_WRAPPER(AlertValidator, InvalidRequirementOperatorSecondRequirement);
 TEST_C_WRAPPER(AlertValidator, LastRequirementIsLastInOredRequirementValid);
 TEST_C_WRAPPER(AlertValidator, LastRequirementIsNotLastInOredRequirementInvalid);
+TEST_C_WRAPPER(AlertValidator, TemperatureConstraintValueBelowAllowedRange);
+TEST_C_WRAPPER(AlertValidator, TemperatureConstraintValueAboveAllowedRange);
+TEST_C_WRAPPER(AlertValidator, TemperatureConstraintValueWithinAllowedRange);
