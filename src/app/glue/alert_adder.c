@@ -17,6 +17,7 @@
 #include "humidity_requirement_list.h"
 #include "light_intensity_requirement_list.h"
 #include "alert_evaluation_readiness.h"
+#include "alert_validator.h"
 
 /**
  * @brief Map LED color from message transceiver to led color from LED HAL module.
@@ -82,13 +83,14 @@ map_msg_transceiver_operator_to_variable_requirement_operator(MsgTransceiverRequ
     }
 }
 
-void alert_adder_add_alert(const MsgTransceiverAlert *alert)
+void alert_adder_add_alert(const MsgTransceiverAlert *const alert)
 {
     EAS_ASSERT(alert);
 
-    /* TODO: validate alert. Decide if we do it here or in msg_transceiver. Probably here, because msg_transceiver is
-     * responsible only for delivering the message, not for application-specific details on what the payload should look
-     * like. */
+    /* Do not add an invalid alert */
+    if (!alert_validator_is_alert_valid(alert)) {
+        return;
+    }
 
     AlertRaiser alert_raiser = alert_raisers_get_alert_raiser(alert->alert_id);
     if (alert_raiser_is_alert_set(alert_raiser)) {

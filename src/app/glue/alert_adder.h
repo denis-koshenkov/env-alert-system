@@ -10,7 +10,7 @@ extern "C"
 
 #include "msg_transceiver.h"
 
-void alert_adder_add_alert(const MsgTransceiverAlert *alert);
+void alert_adder_add_alert(const MsgTransceiverAlert *const alert);
 
 #ifdef __cplusplus
 }
