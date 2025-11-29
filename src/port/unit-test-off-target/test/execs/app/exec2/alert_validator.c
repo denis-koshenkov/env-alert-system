@@ -346,3 +346,29 @@ TEST_C(AlertValidator, InvalidRequirementOperatorSecondRequirement)
     bool is_valid_alert = alert_validator_is_alert_valid(&alert);
     CHECK_C(!is_valid_alert);
 }
+
+TEST_C(AlertValidator, LastRequirementIsLastInOredRequirementValid)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    add_valid_variable_requirement(&(alert.alert_condition));
+    add_valid_variable_requirement(&(alert.alert_condition));
+    alert.alert_condition.variable_requirements[2].is_last_in_ored_requirement = true;
+    CHECK_EQUAL_C_ULONG(3, alert.alert_condition.num_variable_requirements);
+
+    bool is_valid_alert = alert_validator_is_alert_valid(&alert);
+    CHECK_C(is_valid_alert);
+}
+
+TEST_C(AlertValidator, LastRequirementIsNotLastInOredRequirementInvalid)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    add_valid_variable_requirement(&(alert.alert_condition));
+    add_valid_variable_requirement(&(alert.alert_condition));
+    alert.alert_condition.variable_requirements[2].is_last_in_ored_requirement = false;
+    CHECK_EQUAL_C_ULONG(3, alert.alert_condition.num_variable_requirements);
+
+    bool is_valid_alert = alert_validator_is_alert_valid(&alert);
+    CHECK_C(!is_valid_alert);
+}

@@ -90,12 +90,28 @@ static bool is_valid_variable_identifier(uint8_t variable_identifier)
     // clang-format on
 }
 
+/**
+ * @brief Check whether variable requirement operator is valid.
+ *
+ * @param operator Operator. Use values from enum @ref MsgTransceiverRequirementOperator.
+ *
+ * @return true Operator is valid.
+ * @return false Operator is invalid.
+ */
 static bool is_valid_operator(uint8_t operator)
 {
     return (operator == MSG_TRANSCEIVER_REQUIREMENT_OPERATOR_GEQ) ||
            (operator == MSG_TRANSCEIVER_REQUIREMENT_OPERATOR_LEQ);
 }
 
+/**
+ * @brief Check whether alert condition is valid.
+ *
+ * @param alert_condition Alert condition.
+ *
+ * @return true Alert condition is valid.
+ * @return false Alert condition is invalid.
+ */
 static bool is_alert_condition_valid(const MsgTransceiverAlertCondition *const alert_condition)
 {
     bool valid_num_variable_requirements = (alert_condition->num_variable_requirements != 0);
@@ -113,7 +129,12 @@ static bool is_alert_condition_valid(const MsgTransceiverAlertCondition *const a
         }
     }
 
-    return (valid_num_variable_requirements && all_variable_identifiers_valid && all_operators_valid);
+    size_t last_requirement_index = alert_condition->num_variable_requirements - 1;
+    bool last_requirement_is_last_in_ored_requirement =
+        (alert_condition->variable_requirements[last_requirement_index].is_last_in_ored_requirement == true);
+
+    return (valid_num_variable_requirements && all_variable_identifiers_valid && all_operators_valid &&
+            last_requirement_is_last_in_ored_requirement);
 }
 
 bool alert_validator_is_alert_valid(const MsgTransceiverAlert *alert)

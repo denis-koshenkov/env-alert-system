@@ -31,3 +31,5 @@ TEST_C_WRAPPER(AlertValidator, InvalidRequirementOperator);
 TEST_C_WRAPPER(AlertValidator, RequirementOperatorGeqValid);
 TEST_C_WRAPPER(AlertValidator, RequirementOperatorLeqValid);
 TEST_C_WRAPPER(AlertValidator, InvalidRequirementOperatorSecondRequirement);
+TEST_C_WRAPPER(AlertValidator, LastRequirementIsLastInOredRequirementValid);
+TEST_C_WRAPPER(AlertValidator, LastRequirementIsNotLastInOredRequirementInvalid);
