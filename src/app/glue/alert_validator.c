@@ -93,9 +93,16 @@ static bool is_valid_variable_identifier(uint8_t variable_identifier)
 static bool is_alert_condition_valid(const MsgTransceiverAlertCondition *const alert_condition)
 {
     bool valid_num_variable_requirements = (alert_condition->num_variable_requirements != 0);
-    bool valid_variable_identifier =
-        is_valid_variable_identifier(alert_condition->variable_requirements[0].variable_identifier);
-    return (valid_num_variable_requirements && valid_variable_identifier);
+
+    bool all_variable_identifiers_valid = true;
+    for (size_t i = 0; i < alert_condition->num_variable_requirements; i++) {
+        if (!is_valid_variable_identifier(alert_condition->variable_requirements[i].variable_identifier)) {
+            all_variable_identifiers_valid = false;
+            break;
+        }
+    }
+
+    return (valid_num_variable_requirements && all_variable_identifiers_valid);
 }
 
 bool alert_validator_is_alert_valid(const MsgTransceiverAlert *alert)

@@ -3,19 +3,59 @@
 #include "config.h"
 #include "alert_validator.h"
 
-static void populate_valid_alert_condition(MsgTransceiverAlertCondition *const alert_condition)
+/**
+ * @brief Populate @p requirement with a valid variable requirement.
+ *
+ * is_last_in_ored_requirement is set to true, because it is possible that every variable requirement in an alert
+ * condition is a last one in an ORed requirement. It is not possible, however, that every variable requirement is NOT
+ * the last one in an ORed requirement - the very last variable requirement in an alert condition must always have this
+ * field set to true.
+ *
+ * @param requirement Variable requirement to populate.
+ */
+static void populate_valid_variable_requirement(MsgTransceiverVariableRequirement *const requirement)
 {
-    /* Just one variable requirement for simplicity */
-    alert_condition->num_variable_requirements = 1;
-    alert_condition->variable_requirements[0].variable_identifier = MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_TEMPERATURE;
-    alert_condition->variable_requirements[0].operator = MSG_TRANSCEIVER_REQUIREMENT_OPERATOR_GEQ;
+    requirement->variable_identifier = MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_TEMPERATURE;
+    requirement->operator = MSG_TRANSCEIVER_REQUIREMENT_OPERATOR_GEQ;
     /* TODO: come up with a valid temperature value here */
-    alert_condition->variable_requirements[0].constraint_value.temperature = 0;
-    /* Since this is the only variable requirement, it is also the last one in the only ORed requirement */
-    alert_condition->variable_requirements[0].is_last_in_ored_requirement = true;
+    requirement->constraint_value.temperature = 0;
+    requirement->is_last_in_ored_requirement = true;
 }
 
-static void populate_valid_alert(MsgTransceiverAlert *alert)
+/**
+ * @brief Add a valid variable requirement to the alert condition.
+ *
+ * Adds a valid variable requirement at index alert_condition->num_variable_requirements and increments the
+ * alert_condition->num_variable_requirements variable.
+ *
+ * @param alert_condition Alert condition to add the requirement to.
+ */
+static void add_valid_variable_requirement(MsgTransceiverAlertCondition *const alert_condition)
+{
+    populate_valid_variable_requirement(
+        &(alert_condition->variable_requirements[alert_condition->num_variable_requirements]));
+    alert_condition->num_variable_requirements++;
+}
+
+/**
+ * @brief Populate @p alert_condition with a valid alert condition that contains one variable requirement.
+ *
+ * @param alert_condition Alert condition to populate.
+ */
+static void populate_valid_alert_condition(MsgTransceiverAlertCondition *const alert_condition)
+{
+    /* Add just one variable requirement for simplicity. Tests that need more variable requirements can call
+     * add_valid_variable_requirement themselves. */
+    alert_condition->num_variable_requirements = 0;
+    add_valid_variable_requirement(alert_condition);
+}
+
+/**
+ * @brief Populates @p alert with a valid alert that contains one variable requirement.
+ *
+ * @param alert Alert to populate.
+ */
+static void populate_valid_alert(MsgTransceiverAlert *const alert)
 {
     alert->alert_id = 0;
     alert->led_color = MSG_TRANSCEIVER_LED_COLOR_RED;
@@ -248,4 +288,17 @@ TEST_C(AlertValidator, VariableIdentifierLightIntensityValid)
         MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_LIGHT_INTENSITY;
     bool is_valid_alert = alert_validator_is_alert_valid(&alert);
     CHECK_C(is_valid_alert);
+}
+
+TEST_C(AlertValidator, InvalidVariableIdentifierSecondRequirement)
+{
+    MsgTransceiverAlert alert;
+    populate_valid_alert(&alert);
+    add_valid_variable_requirement(&(alert.alert_condition));
+    /* Invalid variable identifier */
+    alert.alert_condition.variable_requirements[1].variable_identifier = 100;
+    CHECK_EQUAL_C_ULONG(2, alert.alert_condition.num_variable_requirements);
+
+    bool is_valid_alert = alert_validator_is_alert_valid(&alert);
+    CHECK_C(!is_valid_alert);
 }

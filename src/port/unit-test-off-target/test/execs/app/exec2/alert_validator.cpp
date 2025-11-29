@@ -26,3 +26,4 @@ TEST_C_WRAPPER(AlertValidator, VariableIdentifierTemperatureValid);
 TEST_C_WRAPPER(AlertValidator, VariableIdentifierPressureValid);
 TEST_C_WRAPPER(AlertValidator, VariableIdentifierHumidityValid);
 TEST_C_WRAPPER(AlertValidator, VariableIdentifierLightIntensityValid);
+TEST_C_WRAPPER(AlertValidator, InvalidVariableIdentifierSecondRequirement);
