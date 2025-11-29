@@ -13,19 +13,6 @@
 #define ALERT_VALIDATOR_MAX_LIGHT_INTENSITY_CONSTRAINT_VALUE 130000 // 130,000 lux
 
 /**
- * @brief Check whether alert id is valid.
- *
- * @param alert_id Alert id.
- *
- * @return true Alert id is valid.
- * @return false Alert id is invalid.
- */
-static bool is_alert_id_valid(uint8_t alert_id)
-{
-    return (alert_id <= CONFIG_ALERT_VALIDATOR_MAX_ALLOWED_ALERT_ID);
-}
-
-/**
  * @brief Check whether LED color of alert notification is valid.
  *
  * @param led_color Led color.
@@ -187,6 +174,11 @@ static bool is_alert_condition_valid(const MsgTransceiverAlertCondition *const a
             all_constraint_values_valid && last_requirement_is_last_in_ored_requirement);
 }
 
+bool alert_validator_is_alert_id_valid(uint8_t alert_id)
+{
+    return (alert_id <= CONFIG_ALERT_VALIDATOR_MAX_ALLOWED_ALERT_ID);
+}
+
 bool alert_validator_is_alert_valid(const MsgTransceiverAlert *const alert)
 {
     EAS_ASSERT(alert);
@@ -197,7 +189,7 @@ bool alert_validator_is_alert_valid(const MsgTransceiverAlert *const alert)
                                     (is_led_color_valid(alert->led_color) && is_led_pattern_valid(alert->led_pattern)));
     // clang-format off
     return (
-        is_alert_id_valid(alert->alert_id)
+        alert_validator_is_alert_id_valid(alert->alert_id)
         && led_color_pattern_valid
         && is_notification_type_valid(alert->notification_type)
         && is_alert_condition_valid(&(alert->alert_condition))
