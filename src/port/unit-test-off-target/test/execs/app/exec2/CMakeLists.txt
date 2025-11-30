@@ -27,6 +27,8 @@ target_sources(app_test_exec2 PRIVATE
     alert_evaluation_readiness.cpp
     alert_validator.cpp
     alert_validator.c
+    msg_transceiver.c
+    msg_transceiver.cpp
 
     mocks/mock_value_holder.cpp
     mocks/mock_current_temperature.cpp

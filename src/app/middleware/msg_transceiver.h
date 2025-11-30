@@ -109,8 +109,22 @@ typedef struct MsgTransceiverAlert {
  * @brief Defines callback type to execute when a "add alert" message is received.
  *
  * @param alert Alert to add.
+ * @param user_data User data.
  */
-typedef void (*MsgTransceiverAddAlertCb)(const MsgTransceiverAlert *alert);
+typedef void (*MsgTransceiverAddAlertCb)(const MsgTransceiverAlert *const alert, void *user_data);
+
+/**
+ * @brief Defines callback type to execute when a message has been sent.
+ *
+ * @param result True if message was sent successfully, false if failed to send message.
+ * @param user_data User data.
+ */
+typedef void (*MsgTransceiverMessageSentCb)(bool result, void *user_data);
+
+void msg_transceiver_init();
+void msg_transceiver_send_alert_status_change_message(uint8_t alert_id, bool is_raised, MsgTransceiverMessageSentCb cb,
+                                                      void *user_data);
+void msg_transceiver_deinit();
 
 #ifdef __cplusplus
 }
