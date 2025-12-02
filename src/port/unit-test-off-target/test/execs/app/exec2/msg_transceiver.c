@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "CppUTest/TestHarness_c.h"
 #include "CppUTestExt/MockSupport_c.h"
 #include "CppUTestExt/TestAssertPlugin_c.h"
@@ -19,6 +21,10 @@ static void *message_sent_cb_user_data = NULL;
 static bool remove_alert_cb_called = false;
 static uint8_t remove_alert_cb_alert_id = false;
 static void *remove_alert_cb_user_data = NULL;
+/* Populated from inside add_alert_cb */
+static bool add_alert_cb_called = false;
+static MsgTransceiverAlert add_alert_cb_alert;
+static void *add_alert_cb_user_data = NULL;
 
 static void message_sent_cb(bool result, void *user_data)
 {
@@ -34,6 +40,13 @@ static void remove_alert_cb(uint8_t alert_id, void *user_data)
     remove_alert_cb_user_data = user_data;
 }
 
+static void add_alert_cb(const MsgTransceiverAlert *const alert, void *user_data)
+{
+    add_alert_cb_called = true;
+    memcpy(&add_alert_cb_alert, alert, sizeof(MsgTransceiverAlert));
+    add_alert_cb_user_data = user_data;
+}
+
 TEST_GROUP_C_SETUP(MsgTransceiver)
 {
     transmit_complete_cb = NULL;
@@ -46,6 +59,10 @@ TEST_GROUP_C_SETUP(MsgTransceiver)
     remove_alert_cb_called = false;
     remove_alert_cb_alert_id = 0xFF;
     remove_alert_cb_user_data = NULL;
+    add_alert_cb_called = false;
+    /* Some tests test for 0 values, so the tests are more reliable if the alert memory is initially set to 0xFF*/
+    memset(&add_alert_cb_alert, 0xFF, sizeof(MsgTransceiverAlert));
+    add_alert_cb_user_data = NULL;
 
     mock_c()->strictOrder();
 
@@ -258,4 +275,39 @@ TEST_C(MsgTransceiver, RemoveAlertCbExecutedWithUserData)
     CHECK_C(remove_alert_cb_called);
     CHECK_EQUAL_C_UINT(10, remove_alert_cb_alert_id);
     CHECK_EQUAL_C_POINTER(user_data, remove_alert_cb_user_data);
+}
+
+TEST_C(MsgTransceiver, AddAlert0)
+{
+    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
+    /* Mock receiving a "add alert" message */
+    uint8_t add_alert_bytes[17] = {
+        0x2,                /* message id */
+        0x0,                /* alert id */
+        0x0, 0x0, 0x0, 0x0, /* Warmup period - 0 ms */
+        0x0, 0x0, 0x0, 0x0, /* Cooldown period - 0 ms */
+        0x1,                /* notification type - connectivity enabled, LED disabled */
+        0x1,                /* Number of ORed requirements */
+        0x1,                /* Number of variable requirements in the first ORed requirement */
+        /* Start of variable requirement 0 */
+        0x0,     /* Temperature variable identifier */
+        0x0,     /* Operator - greater than or equal to */
+        0x0, 0x0 /* Constraint value - 0 degrees Celsius */
+    };
+    receive_cb(add_alert_bytes, 17, receive_cb_user_data);
+
+    CHECK_C(add_alert_cb_called);
+    /* Validate constructed alert */
+    const MsgTransceiverAlert *const alert = &add_alert_cb_alert;
+    CHECK_EQUAL_C_ULONG(0, alert->alert_id);
+    CHECK_EQUAL_C_ULONG(0, alert->warmup_period);
+    CHECK_EQUAL_C_ULONG(0, alert->cooldown_period);
+    CHECK_C(alert->notification_type.connectivity);
+    CHECK_C(!(alert->notification_type.led));
+    CHECK_EQUAL_C_ULONG(1, alert->alert_condition.num_variable_requirements);
+    const MsgTransceiverVariableRequirement *requirement = &(alert->alert_condition.variable_requirements[0]);
+    CHECK_EQUAL_C_ULONG(0, requirement->variable_identifier);
+    CHECK_EQUAL_C_ULONG(0, requirement->operator);
+    CHECK_EQUAL_C_LONG(0, requirement->constraint_value.temperature);
+    CHECK_C(requirement->is_last_in_ored_requirement);
 }

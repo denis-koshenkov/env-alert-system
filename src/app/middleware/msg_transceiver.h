@@ -134,6 +134,14 @@ void msg_transceiver_send_alert_status_change_message(uint8_t alert_id, bool is_
                                                       void *user_data);
 
 /**
+ * @brief Set callback to execute whenever a "add alert" message is received.
+ *
+ * @param cb Callback to execute.
+ * @param user_data User data to pass to @p cb as a parameter.
+ */
+void msg_transceiver_set_add_alert_cb(MsgTransceiverAddAlertCb cb, void *user_data);
+
+/**
  * @brief Set callback to execute whenever a "remove alert" message is received.
  *
  * @param cb Callback to execute.
