@@ -106,6 +106,14 @@ typedef struct MsgTransceiverAlert {
 } MsgTransceiverAlert;
 
 /**
+ * @brief Defines callback type to execute when a message has been sent.
+ *
+ * @param result True if message was sent successfully, false if failed to send message.
+ * @param user_data User data.
+ */
+typedef void (*MsgTransceiverMessageSentCb)(bool result, void *user_data);
+
+/**
  * @brief Defines callback type to execute when a "add alert" message is received.
  *
  * @param alert Alert to add.
@@ -114,16 +122,25 @@ typedef struct MsgTransceiverAlert {
 typedef void (*MsgTransceiverAddAlertCb)(const MsgTransceiverAlert *const alert, void *user_data);
 
 /**
- * @brief Defines callback type to execute when a message has been sent.
+ * @brief Defines callback type to execute when a "remove alert" message is received.
  *
- * @param result True if message was sent successfully, false if failed to send message.
+ * @param alert_id Id of alert to remove.
  * @param user_data User data.
  */
-typedef void (*MsgTransceiverMessageSentCb)(bool result, void *user_data);
+typedef void (*MsgTransceiverRemoveAlertCb)(uint8_t alert_id, void *user_data);
 
 void msg_transceiver_init();
 void msg_transceiver_send_alert_status_change_message(uint8_t alert_id, bool is_raised, MsgTransceiverMessageSentCb cb,
                                                       void *user_data);
+
+/**
+ * @brief Set callback to execute whenever a "remove alert" message is received.
+ *
+ * @param cb Callback to execute.
+ * @param user_data User data to pass to @p cb as a parameter.
+ */
+void msg_transceiver_set_remove_alert_cb(MsgTransceiverRemoveAlertCb cb, void *user_data);
+
 void msg_transceiver_deinit();
 
 #ifdef __cplusplus

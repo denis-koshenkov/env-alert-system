@@ -11,3 +11,8 @@ TEST_C_WRAPPER(MsgTransceiver, Alert0Raised);
 TEST_C_WRAPPER(MsgTransceiver, Alert1Silenced);
 TEST_C_WRAPPER(MsgTransceiver, Alert8RaisedFailed);
 TEST_C_WRAPPER(MsgTransceiver, MessageSentCbCalledWithUserData);
+TEST_C_WRAPPER(MsgTransceiver, RemoveAlert0);
+TEST_C_WRAPPER(MsgTransceiver, RemoveAlert1);
+TEST_C_WRAPPER(MsgTransceiver, ReceiveCbCalledWithNumBytes0);
+TEST_C_WRAPPER(MsgTransceiver, RemoveAlertMessageWithNoAlertId);
+TEST_C_WRAPPER(MsgTransceiver, RemoveAlertMessageTooManyBytes);
