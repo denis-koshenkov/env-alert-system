@@ -7,3 +7,7 @@ TEST_GROUP_C_WRAPPER(MsgTransceiver)
 };
 
 TEST_C_WRAPPER(MsgTransceiver, Alert0Silenced);
+TEST_C_WRAPPER(MsgTransceiver, Alert0Raised);
+TEST_C_WRAPPER(MsgTransceiver, Alert1Silenced);
+TEST_C_WRAPPER(MsgTransceiver, Alert8RaisedFailed);
+TEST_C_WRAPPER(MsgTransceiver, MessageSentCbCalledWithUserData);
