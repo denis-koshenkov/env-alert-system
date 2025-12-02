@@ -6,6 +6,7 @@
 
 static MsgTransceiverMessageSentCb message_sent_cb = NULL;
 static MsgTransceiverRemoveAlertCb remove_alert_cb = NULL;
+static void *remove_alert_cb_user_data = NULL;
 
 static void transmit_complete_cb(bool result, void *user_data)
 {
@@ -20,7 +21,7 @@ static void transmit_complete_cb(bool result, void *user_data)
  * @param bytes Received bytes excluding the first message id byte.
  * @param num_bytes Number of bytes in the @p bytes array.
  */
-static void handle_remove_alert_message(uint8_t *bytes, size_t num_bytes)
+static void handle_remove_alert_message(const uint8_t *const bytes, size_t num_bytes)
 {
     EAS_ASSERT(bytes);
 
@@ -31,7 +32,7 @@ static void handle_remove_alert_message(uint8_t *bytes, size_t num_bytes)
 
     uint8_t alert_id = bytes[0];
     if (remove_alert_cb) {
-        remove_alert_cb(alert_id, NULL);
+        remove_alert_cb(alert_id, remove_alert_cb_user_data);
     }
 }
 
@@ -66,6 +67,7 @@ void msg_transceiver_send_alert_status_change_message(uint8_t alert_id, bool is_
 void msg_transceiver_set_remove_alert_cb(MsgTransceiverRemoveAlertCb cb, void *user_data)
 {
     remove_alert_cb = cb;
+    remove_alert_cb_user_data = user_data;
 }
 
 void msg_transceiver_deinit()

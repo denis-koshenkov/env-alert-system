@@ -245,3 +245,17 @@ TEST_C(MsgTransceiver, ReceiveCbBytesNullPointerAssert)
      * pointer check in this test. */
     receive_cb(NULL, 5, receive_cb_user_data);
 }
+
+TEST_C(MsgTransceiver, RemoveAlertCbExecutedWithUserData)
+{
+    void *user_data = (void *)0xAB;
+    msg_transceiver_set_remove_alert_cb(remove_alert_cb, user_data);
+    /* Mock receiving a "remove alert" message. 0x1 - message id, 10 - alert id */
+    uint8_t remove_alert_bytes[2] = {0x1, 10};
+    receive_cb(remove_alert_bytes, 2, receive_cb_user_data);
+
+    /* remove_alert_cb should have been called with alert_id 0 and user_data NULL */
+    CHECK_C(remove_alert_cb_called);
+    CHECK_EQUAL_C_UINT(10, remove_alert_cb_alert_id);
+    CHECK_EQUAL_C_POINTER(user_data, remove_alert_cb_user_data);
+}
