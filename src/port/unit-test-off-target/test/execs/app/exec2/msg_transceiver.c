@@ -1,5 +1,6 @@
 #include "CppUTest/TestHarness_c.h"
 #include "CppUTestExt/MockSupport_c.h"
+#include "CppUTestExt/TestAssertPlugin_c.h"
 
 #include "msg_transceiver.h"
 #include "hal/transceiver.h"
@@ -58,12 +59,21 @@ TEST_GROUP_C_SETUP(MsgTransceiver)
      * simulate receiving bytes by calling this callback. */
     mock_c()->setPointerData("receiveCb", (void **)&receive_cb);
     mock_c()->setPointerData("receiveCbUserData", (void **)&receive_cb_user_data);
+
+    /* msg_transceiver_init */
+    mock_c()->expectOneCall("transceiver_set_receive_cb")->ignoreOtherParameters();
+    msg_transceiver_init();
+}
+
+TEST_GROUP_C_TEARDOWN(MsgTransceiver)
+{
+    /* msg_transceiver_deinit */
+    mock_c()->expectOneCall("transceiver_unset_receive_cb");
+    msg_transceiver_deinit();
 }
 
 TEST_C(MsgTransceiver, Alert0Silenced)
 {
-    /* msg_transceiver_init */
-    mock_c()->expectOneCall("transceiver_set_receive_cb")->ignoreOtherParameters();
     size_t expected_num_bytes = 3;
     uint8_t expected_payload[] = {0x0, 0x0, 0x0};
     /* msg_transceiver_send_alert_status_change_message */
@@ -72,10 +82,7 @@ TEST_C(MsgTransceiver, Alert0Silenced)
         ->withMemoryBufferParameter("bytes", expected_payload, expected_num_bytes)
         ->withUnsignedLongIntParameters("num_bytes", expected_num_bytes)
         ->ignoreOtherParameters();
-    /* msg_transceiver_deinit */
-    mock_c()->expectOneCall("transceiver_unset_receive_cb");
 
-    msg_transceiver_init();
     msg_transceiver_send_alert_status_change_message(0, false, message_sent_cb, NULL);
     /* Mock transmission success */
     transmit_complete_cb(true, transmit_complete_cb_user_data);
@@ -83,14 +90,10 @@ TEST_C(MsgTransceiver, Alert0Silenced)
     /* message_sent_cb should have been called with result == true */
     CHECK_C(message_sent_cb_called);
     CHECK_C(message_sent_cb_result);
-
-    msg_transceiver_deinit();
 }
 
 TEST_C(MsgTransceiver, Alert0Raised)
 {
-    /* msg_transceiver_init */
-    mock_c()->expectOneCall("transceiver_set_receive_cb")->ignoreOtherParameters();
     size_t expected_num_bytes = 3;
     uint8_t expected_payload[] = {0x0, 0x0, 0x1};
     /* msg_transceiver_send_alert_status_change_message */
@@ -99,10 +102,7 @@ TEST_C(MsgTransceiver, Alert0Raised)
         ->withMemoryBufferParameter("bytes", expected_payload, expected_num_bytes)
         ->withUnsignedLongIntParameters("num_bytes", expected_num_bytes)
         ->ignoreOtherParameters();
-    /* msg_transceiver_deinit */
-    mock_c()->expectOneCall("transceiver_unset_receive_cb");
 
-    msg_transceiver_init();
     msg_transceiver_send_alert_status_change_message(0, true, message_sent_cb, NULL);
     /* Mock transmission success */
     transmit_complete_cb(true, transmit_complete_cb_user_data);
@@ -110,14 +110,10 @@ TEST_C(MsgTransceiver, Alert0Raised)
     /* message_sent_cb should have been called with result == true */
     CHECK_C(message_sent_cb_called);
     CHECK_C(message_sent_cb_result);
-
-    msg_transceiver_deinit();
 }
 
 TEST_C(MsgTransceiver, Alert1Silenced)
 {
-    /* msg_transceiver_init */
-    mock_c()->expectOneCall("transceiver_set_receive_cb")->ignoreOtherParameters();
     size_t expected_num_bytes = 3;
     uint8_t expected_payload[] = {0x0, 0x1, 0x0};
     /* msg_transceiver_send_alert_status_change_message */
@@ -126,10 +122,7 @@ TEST_C(MsgTransceiver, Alert1Silenced)
         ->withMemoryBufferParameter("bytes", expected_payload, expected_num_bytes)
         ->withUnsignedLongIntParameters("num_bytes", expected_num_bytes)
         ->ignoreOtherParameters();
-    /* msg_transceiver_deinit */
-    mock_c()->expectOneCall("transceiver_unset_receive_cb");
 
-    msg_transceiver_init();
     msg_transceiver_send_alert_status_change_message(1, false, message_sent_cb, NULL);
     /* Mock transmission success */
     transmit_complete_cb(true, transmit_complete_cb_user_data);
@@ -137,14 +130,10 @@ TEST_C(MsgTransceiver, Alert1Silenced)
     /* message_sent_cb should have been called with result == true */
     CHECK_C(message_sent_cb_called);
     CHECK_C(message_sent_cb_result);
-
-    msg_transceiver_deinit();
 }
 
 TEST_C(MsgTransceiver, Alert8RaisedFailed)
 {
-    /* msg_transceiver_init */
-    mock_c()->expectOneCall("transceiver_set_receive_cb")->ignoreOtherParameters();
     size_t expected_num_bytes = 3;
     uint8_t expected_payload[] = {0x0, 0x8, 0x1};
     /* msg_transceiver_send_alert_status_change_message */
@@ -153,10 +142,7 @@ TEST_C(MsgTransceiver, Alert8RaisedFailed)
         ->withMemoryBufferParameter("bytes", expected_payload, expected_num_bytes)
         ->withUnsignedLongIntParameters("num_bytes", expected_num_bytes)
         ->ignoreOtherParameters();
-    /* msg_transceiver_deinit */
-    mock_c()->expectOneCall("transceiver_unset_receive_cb");
 
-    msg_transceiver_init();
     msg_transceiver_send_alert_status_change_message(8, true, message_sent_cb, NULL);
     /* Mock transmission failure */
     transmit_complete_cb(false, transmit_complete_cb_user_data);
@@ -164,16 +150,11 @@ TEST_C(MsgTransceiver, Alert8RaisedFailed)
     /* message_sent_cb should have been called with result == false */
     CHECK_C(message_sent_cb_called);
     CHECK_C(!message_sent_cb_result);
-
-    msg_transceiver_deinit();
 }
 
 TEST_C(MsgTransceiver, MessageSentCbCalledWithUserData)
 {
     void *user_data = (void *)0x42;
-
-    /* msg_transceiver_init */
-    mock_c()->expectOneCall("transceiver_set_receive_cb")->ignoreOtherParameters();
     size_t expected_num_bytes = 3;
     uint8_t expected_payload[] = {0x0, 20, 0x0};
     /* msg_transceiver_send_alert_status_change_message */
@@ -182,10 +163,7 @@ TEST_C(MsgTransceiver, MessageSentCbCalledWithUserData)
         ->withMemoryBufferParameter("bytes", expected_payload, expected_num_bytes)
         ->withUnsignedLongIntParameters("num_bytes", expected_num_bytes)
         ->ignoreOtherParameters();
-    /* msg_transceiver_deinit */
-    mock_c()->expectOneCall("transceiver_unset_receive_cb");
 
-    msg_transceiver_init();
     msg_transceiver_send_alert_status_change_message(20, false, message_sent_cb, user_data);
     /* Mock transmission success */
     transmit_complete_cb(true, transmit_complete_cb_user_data);
@@ -193,18 +171,10 @@ TEST_C(MsgTransceiver, MessageSentCbCalledWithUserData)
     CHECK_C(message_sent_cb_called);
     CHECK_C(message_sent_cb_result);
     CHECK_EQUAL_C_POINTER(user_data, message_sent_cb_user_data);
-
-    msg_transceiver_deinit();
 }
 
 TEST_C(MsgTransceiver, RemoveAlert0)
 {
-    /* msg_transceiver_init */
-    mock_c()->expectOneCall("transceiver_set_receive_cb")->ignoreOtherParameters();
-    /* msg_transceiver_deinit */
-    mock_c()->expectOneCall("transceiver_unset_receive_cb");
-
-    msg_transceiver_init();
     msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
     /* Mock receiving a "remove alert" message. 0x1 - message id, 0 - alert id */
     uint8_t remove_alert_bytes[2] = {0x1, 0};
@@ -214,18 +184,10 @@ TEST_C(MsgTransceiver, RemoveAlert0)
     CHECK_C(remove_alert_cb_called);
     CHECK_EQUAL_C_UINT(0, remove_alert_cb_alert_id);
     CHECK_EQUAL_C_POINTER(NULL, remove_alert_cb_user_data);
-
-    msg_transceiver_deinit();
 }
 
 TEST_C(MsgTransceiver, RemoveAlert1)
 {
-    /* msg_transceiver_init */
-    mock_c()->expectOneCall("transceiver_set_receive_cb")->ignoreOtherParameters();
-    /* msg_transceiver_deinit */
-    mock_c()->expectOneCall("transceiver_unset_receive_cb");
-
-    msg_transceiver_init();
     msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
     /* Mock receiving a "remove alert" message. 0x1 - message id, 1 - alert id */
     uint8_t remove_alert_bytes[2] = {0x1, 1};
@@ -235,18 +197,10 @@ TEST_C(MsgTransceiver, RemoveAlert1)
     CHECK_C(remove_alert_cb_called);
     CHECK_EQUAL_C_UINT(1, remove_alert_cb_alert_id);
     CHECK_EQUAL_C_POINTER(NULL, remove_alert_cb_user_data);
-
-    msg_transceiver_deinit();
 }
 
 TEST_C(MsgTransceiver, ReceiveCbCalledWithNumBytes0)
 {
-    /* msg_transceiver_init */
-    mock_c()->expectOneCall("transceiver_set_receive_cb")->ignoreOtherParameters();
-    /* msg_transceiver_deinit */
-    mock_c()->expectOneCall("transceiver_unset_receive_cb");
-
-    msg_transceiver_init();
     msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
     /* Not giving a NULL pointer as receive_bytes, because there is a separate check for that - we want to specifically
      * test the check for number of bytes in this test. */
@@ -256,18 +210,10 @@ TEST_C(MsgTransceiver, ReceiveCbCalledWithNumBytes0)
     /* No callbacks should be called as a result of receiving 0 bytes. Also checking that that the program does not
      * crash. */
     CHECK_C(!remove_alert_cb_called);
-
-    msg_transceiver_deinit();
 }
 
 TEST_C(MsgTransceiver, RemoveAlertMessageWithNoAlertId)
 {
-    /* msg_transceiver_init */
-    mock_c()->expectOneCall("transceiver_set_receive_cb")->ignoreOtherParameters();
-    /* msg_transceiver_deinit */
-    mock_c()->expectOneCall("transceiver_unset_receive_cb");
-
-    msg_transceiver_init();
     msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
     /* 0x1 is the message id for "remove alert" message. The payload should also contain the second byte - alert id, but
      * it does not. */
@@ -276,18 +222,10 @@ TEST_C(MsgTransceiver, RemoveAlertMessageWithNoAlertId)
 
     /* No callbacks should be called - message payload structure is invalid. */
     CHECK_C(!remove_alert_cb_called);
-
-    msg_transceiver_deinit();
 }
 
 TEST_C(MsgTransceiver, RemoveAlertMessageTooManyBytes)
 {
-    /* msg_transceiver_init */
-    mock_c()->expectOneCall("transceiver_set_receive_cb")->ignoreOtherParameters();
-    /* msg_transceiver_deinit */
-    mock_c()->expectOneCall("transceiver_unset_receive_cb");
-
-    msg_transceiver_init();
     msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
     /* "Remove alert" message should have only two bytes - message id and alert id. Here it has three bytes, so message
      * should be ignored. */
@@ -296,6 +234,14 @@ TEST_C(MsgTransceiver, RemoveAlertMessageTooManyBytes)
 
     /* No callbacks should be called - message payload structure is invalid. */
     CHECK_C(!remove_alert_cb_called);
+}
 
-    msg_transceiver_deinit();
+TEST_C(MsgTransceiver, ReceiveCbBytesNullPointerAssert)
+{
+    TEST_ASSERT_PLUGIN_C_EXPECT_ASSERTION("bytes", "receive_cb");
+
+    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
+    /* Not giving 0 as num_bytes, because there is a separate check for that - we want to specifically test the NULL
+     * pointer check in this test. */
+    receive_cb(NULL, 5, receive_cb_user_data);
 }

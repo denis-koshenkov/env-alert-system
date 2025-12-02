@@ -1,5 +1,6 @@
 #include "msg_transceiver.h"
 #include "hal/transceiver.h"
+#include "eas_assert.h"
 
 #define MSG_TRANSCEIVER_MESSAGE_ID_ALERT_STATUS_CHANGE 0
 
@@ -21,6 +22,8 @@ static void transmit_complete_cb(bool result, void *user_data)
  */
 static void handle_remove_alert_message(uint8_t *bytes, size_t num_bytes)
 {
+    EAS_ASSERT(bytes);
+
     /* There should be exactly one byte in the payload - alert id */
     if (num_bytes != 1) {
         return;
@@ -34,9 +37,11 @@ static void handle_remove_alert_message(uint8_t *bytes, size_t num_bytes)
 
 static void receive_cb(uint8_t *bytes, size_t num_bytes, void *user_data)
 {
+    EAS_ASSERT(bytes);
     if (num_bytes == 0) {
         return;
     }
+
     handle_remove_alert_message(&bytes[1], num_bytes - 1);
 }
 
