@@ -39,6 +39,88 @@ static void handle_remove_alert_message(const uint8_t *const bytes, size_t num_b
     }
 }
 
+static bool parse_alert_id(const uint8_t *const bytes, size_t num_bytes, size_t *const index, uint8_t *const alert_id)
+{
+    /* TODO: verify that index is allowed to be accessed given num_bytes. Return false if not. */
+    *alert_id = bytes[(*index)++];
+    return true;
+}
+
+static bool parse_warmup_period(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
+                                uint32_t *const warmup_period)
+{
+    /* TODO: verify that there are still 4 bytes available given index and num_bytes. Return false if not. */
+    /* Convert 4 bytes in little endian to uint32_t value */
+    *warmup_period = ((uint32_t)bytes[*index]) | (((uint32_t)(bytes[*index + 1])) << 8) |
+                     (((uint32_t)(bytes[*index + 2])) << 16) | (((uint32_t)(bytes[*index + 3])) << 24);
+    *index += 4;
+    return true;
+}
+
+static bool parse_cooldown_period(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
+                                  uint32_t *const cooldown_period)
+{
+    /* TODO: verify that there are still 4 bytes available given index and num_bytes. Return false if not. */
+    /* Convert 4 bytes in little endian to uint32_t value */
+    *cooldown_period = ((uint32_t)(bytes[*index])) | (((uint32_t)(bytes[*index + 1])) << 8) |
+                       (((uint32_t)(bytes[*index + 2])) << 16) | (((uint32_t)(bytes[*index + 3])) << 24);
+    *index += 4;
+    return true;
+}
+
+static bool parse_notification_type(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
+                                    NotificationType *const notification_type)
+{
+    /* TODO: verify that there are still enough bytes available given index and num_bytes. Return false if not. */
+    notification_type->connectivity = (bytes[*index] & ((uint8_t)0x1U)) ? 1 : 0;
+    notification_type->led = (bytes[*index] & ((uint8_t)0x2U)) ? 1 : 0;
+    (*index)++;
+    return true;
+}
+
+static bool parse_led_color(const uint8_t *const bytes, size_t num_bytes, size_t *const index, uint8_t *const led_color)
+{
+    /* TODO: verify that there are still enough bytes available given index and num_bytes. Return false if not. */
+    *led_color = MSG_TRANSCEIVER_LED_COLOR_RED;
+    (*index)++;
+    return true;
+}
+
+static bool parse_led_pattern(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
+                              uint8_t *const led_pattern)
+{
+    /* TODO: verify that there are still enough bytes available given index and num_bytes. Return false if not. */
+    *led_pattern = MSG_TRANSCEIVER_LED_PATTERN_STATIC;
+    (*index)++;
+    return true;
+}
+
+static bool parse_variable_requirement(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
+                                       MsgTransceiverVariableRequirement *const requirement)
+{
+    /* TODO: verify that there are still enough bytes available given index and num_bytes. Return false if not. */
+    requirement->variable_identifier = bytes[(*index)++];
+    requirement->operator = bytes[(*index)++];
+    switch (requirement->variable_identifier) {
+    case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_TEMPERATURE:
+        /* Store the two bytes in a variable */
+        uint16_t value_unsigned = ((uint16_t)(bytes[*index])) | (((uint16_t)(bytes[*index + 1])) << 8);
+        /* Interpret the two bytes as a two-byte signed integer */
+        int16_t *value_signed_p = (int16_t *)&value_unsigned;
+        /* Assign the two-byte signed integer as the temperature constraint value */
+        requirement->constraint_value.temperature = *value_signed_p;
+        *index += 2;
+        break;
+    case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_PRESSURE:
+        requirement->constraint_value.pressure = ((uint16_t)(bytes[*index])) | (((uint16_t)(bytes[*index + 1])) << 8);
+        *index += 2;
+        break;
+    default:
+        break;
+    }
+    return true;
+}
+
 /**
  * @brief Handle receiving a "add alert" message.
  *
@@ -48,16 +130,23 @@ static void handle_remove_alert_message(const uint8_t *const bytes, size_t num_b
 static void handle_add_alert_message(const uint8_t *const bytes, size_t num_bytes)
 {
     MsgTransceiverAlert alert;
-    alert.alert_id = 0;
-    alert.warmup_period = 0;
-    alert.cooldown_period = 0;
-    alert.notification_type.connectivity = 1;
-    alert.notification_type.led = 0;
+    size_t index = 0;
+    /* TODO: return and do nothing if any of the parsing functions fail, they are all returning true for now. */
+    parse_alert_id(bytes, num_bytes, &index, &alert.alert_id);
+    parse_warmup_period(bytes, num_bytes, &index, &alert.warmup_period);
+    parse_cooldown_period(bytes, num_bytes, &index, &alert.cooldown_period);
+    parse_notification_type(bytes, num_bytes, &index, &alert.notification_type);
+    if (alert.notification_type.led) {
+        parse_led_color(bytes, num_bytes, &index, &alert.led_color);
+        parse_led_pattern(bytes, num_bytes, &index, &alert.led_pattern);
+    }
     alert.alert_condition.num_variable_requirements = 1;
+
+    /* Skip the number of ORed requirements (1 byte), and the number of requirements in the ORed requirement (1 byte) */
+    index += 2;
+
     MsgTransceiverVariableRequirement *requirement = &(alert.alert_condition.variable_requirements[0]);
-    requirement->variable_identifier = MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_TEMPERATURE;
-    requirement->operator = MSG_TRANSCEIVER_REQUIREMENT_OPERATOR_GEQ;
-    requirement->constraint_value.temperature = 0;
+    parse_variable_requirement(bytes, num_bytes, &index, requirement);
     requirement->is_last_in_ored_requirement = true;
     if (add_alert_cb) {
         add_alert_cb(&alert, NULL);

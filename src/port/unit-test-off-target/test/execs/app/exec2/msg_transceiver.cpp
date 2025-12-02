@@ -20,3 +20,4 @@ TEST_C_WRAPPER(MsgTransceiver, RemoveAlertMessageTooManyBytes);
 TEST_C_WRAPPER(MsgTransceiver, ReceiveCbBytesNullPointerAssert);
 TEST_C_WRAPPER(MsgTransceiver, RemoveAlertCbExecutedWithUserData);
 TEST_C_WRAPPER(MsgTransceiver, AddAlert0);
+TEST_C_WRAPPER(MsgTransceiver, AddAlert1);
