@@ -81,8 +81,7 @@ static bool parse_notification_type(const uint8_t *const bytes, size_t num_bytes
 static bool parse_led_color(const uint8_t *const bytes, size_t num_bytes, size_t *const index, uint8_t *const led_color)
 {
     /* TODO: verify that there are still enough bytes available given index and num_bytes. Return false if not. */
-    *led_color = MSG_TRANSCEIVER_LED_COLOR_RED;
-    (*index)++;
+    *led_color = bytes[(*index)++];
     return true;
 }
 
@@ -90,8 +89,7 @@ static bool parse_led_pattern(const uint8_t *const bytes, size_t num_bytes, size
                               uint8_t *const led_pattern)
 {
     /* TODO: verify that there are still enough bytes available given index and num_bytes. Return false if not. */
-    *led_pattern = MSG_TRANSCEIVER_LED_PATTERN_STATIC;
-    (*index)++;
+    *led_pattern = bytes[(*index)++];
     return true;
 }
 
@@ -113,6 +111,14 @@ static bool parse_variable_requirement(const uint8_t *const bytes, size_t num_by
         break;
     case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_PRESSURE:
         requirement->constraint_value.pressure = ((uint16_t)(bytes[*index])) | (((uint16_t)(bytes[*index + 1])) << 8);
+        *index += 2;
+        break;
+    case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_HUMIDITY:
+        requirement->constraint_value.humidity = 1000;
+        *index += 2;
+        break;
+    case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_LIGHT_INTENSITY:
+        requirement->constraint_value.light_intensity = 1;
         *index += 2;
         break;
     default:
@@ -140,14 +146,19 @@ static void handle_add_alert_message(const uint8_t *const bytes, size_t num_byte
         parse_led_color(bytes, num_bytes, &index, &alert.led_color);
         parse_led_pattern(bytes, num_bytes, &index, &alert.led_pattern);
     }
-    alert.alert_condition.num_variable_requirements = 1;
 
-    /* Skip the number of ORed requirements (1 byte), and the number of requirements in the ORed requirement (1 byte) */
-    index += 2;
+    /* Skip the number of ORed requirements (1 byte) */
+    index += 1;
 
-    MsgTransceiverVariableRequirement *requirement = &(alert.alert_condition.variable_requirements[0]);
-    parse_variable_requirement(bytes, num_bytes, &index, requirement);
-    requirement->is_last_in_ored_requirement = true;
+    /* Get the number of variable requirements in the only ORed requirement */
+    alert.alert_condition.num_variable_requirements = bytes[index++];
+
+    for (size_t i = 0; i < alert.alert_condition.num_variable_requirements; i++) {
+        MsgTransceiverVariableRequirement *requirement = &(alert.alert_condition.variable_requirements[i]);
+        parse_variable_requirement(bytes, num_bytes, &index, requirement);
+        requirement->is_last_in_ored_requirement = (i == alert.alert_condition.num_variable_requirements - 1);
+    }
+
     if (add_alert_cb) {
         add_alert_cb(&alert, NULL);
     }
