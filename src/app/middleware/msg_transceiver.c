@@ -46,13 +46,37 @@ static bool parse_alert_id(const uint8_t *const bytes, size_t num_bytes, size_t 
     return true;
 }
 
+/**
+ * @brief Convert four bytes in little endian to an integer of type uint32_t.
+ *
+ * @param bytes The four bytes at this address are used for conversion.
+ *
+ * @return uint32_t Resulting integer.
+ */
+static uint32_t four_little_endian_bytes_to_uint32(const uint8_t *const bytes)
+{
+    return (((uint32_t)bytes[0]) | (((uint32_t)(bytes[1])) << 8) | (((uint32_t)(bytes[2])) << 16) |
+            (((uint32_t)(bytes[3])) << 24));
+}
+
+/**
+ * @brief Convert two bytes in little endian to an integer of type uint16_t.
+ *
+ * @param bytes The two bytes at this address are used for conversion.
+ *
+ * @return uint16_t Resulting integer.
+ */
+static uint16_t two_little_endian_bytes_to_uint16(const uint8_t *const bytes)
+{
+    return (((uint16_t)(bytes[0])) | (((uint16_t)(bytes[1])) << 8));
+}
+
 static bool parse_warmup_period(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
                                 uint32_t *const warmup_period)
 {
     /* TODO: verify that there are still 4 bytes available given index and num_bytes. Return false if not. */
     /* Convert 4 bytes in little endian to uint32_t value */
-    *warmup_period = ((uint32_t)bytes[*index]) | (((uint32_t)(bytes[*index + 1])) << 8) |
-                     (((uint32_t)(bytes[*index + 2])) << 16) | (((uint32_t)(bytes[*index + 3])) << 24);
+    *warmup_period = four_little_endian_bytes_to_uint32(&bytes[*index]);
     *index += 4;
     return true;
 }
@@ -62,8 +86,7 @@ static bool parse_cooldown_period(const uint8_t *const bytes, size_t num_bytes, 
 {
     /* TODO: verify that there are still 4 bytes available given index and num_bytes. Return false if not. */
     /* Convert 4 bytes in little endian to uint32_t value */
-    *cooldown_period = ((uint32_t)(bytes[*index])) | (((uint32_t)(bytes[*index + 1])) << 8) |
-                       (((uint32_t)(bytes[*index + 2])) << 16) | (((uint32_t)(bytes[*index + 3])) << 24);
+    *cooldown_period = four_little_endian_bytes_to_uint32(&bytes[*index]);
     *index += 4;
     return true;
 }
@@ -102,7 +125,7 @@ static bool parse_variable_requirement(const uint8_t *const bytes, size_t num_by
     switch (requirement->variable_identifier) {
     case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_TEMPERATURE:
         /* Store the two bytes in a variable */
-        uint16_t value_unsigned = ((uint16_t)(bytes[*index])) | (((uint16_t)(bytes[*index + 1])) << 8);
+        uint16_t value_unsigned = two_little_endian_bytes_to_uint16(&bytes[*index]);
         /* Interpret the two bytes as a two-byte signed integer */
         int16_t *value_signed_p = (int16_t *)&value_unsigned;
         /* Assign the two-byte signed integer as the temperature constraint value */
@@ -110,21 +133,34 @@ static bool parse_variable_requirement(const uint8_t *const bytes, size_t num_by
         *index += 2;
         break;
     case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_PRESSURE:
-        requirement->constraint_value.pressure = ((uint16_t)(bytes[*index])) | (((uint16_t)(bytes[*index + 1])) << 8);
+        requirement->constraint_value.pressure = two_little_endian_bytes_to_uint16(&bytes[*index]);
         *index += 2;
         break;
     case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_HUMIDITY:
-        requirement->constraint_value.humidity = 1000;
+        requirement->constraint_value.humidity = two_little_endian_bytes_to_uint16(&bytes[*index]);
         *index += 2;
         break;
     case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_LIGHT_INTENSITY:
-        requirement->constraint_value.light_intensity = 1;
-        *index += 2;
+        requirement->constraint_value.light_intensity = four_little_endian_bytes_to_uint32(&bytes[*index]);
+        *index += 4;
         break;
     default:
         break;
     }
     return true;
+}
+
+static bool parse_ored_requirement(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
+                                   MsgTransceiverAlertCondition *const alert_condition)
+{
+    size_t num_variable_requirements_in_ored_requirement = bytes[(*index)++];
+    for (size_t i = 0; i < num_variable_requirements_in_ored_requirement; i++) {
+        MsgTransceiverVariableRequirement *const requirement =
+            &(alert_condition->variable_requirements[alert_condition->num_variable_requirements]);
+        parse_variable_requirement(bytes, num_bytes, index, requirement);
+        requirement->is_last_in_ored_requirement = (i == (num_variable_requirements_in_ored_requirement - 1));
+        alert_condition->num_variable_requirements++;
+    }
 }
 
 /**
@@ -147,16 +183,12 @@ static void handle_add_alert_message(const uint8_t *const bytes, size_t num_byte
         parse_led_pattern(bytes, num_bytes, &index, &alert.led_pattern);
     }
 
-    /* Skip the number of ORed requirements (1 byte) */
-    index += 1;
-
-    /* Get the number of variable requirements in the only ORed requirement */
-    alert.alert_condition.num_variable_requirements = bytes[index++];
-
-    for (size_t i = 0; i < alert.alert_condition.num_variable_requirements; i++) {
-        MsgTransceiverVariableRequirement *requirement = &(alert.alert_condition.variable_requirements[i]);
-        parse_variable_requirement(bytes, num_bytes, &index, requirement);
-        requirement->is_last_in_ored_requirement = (i == alert.alert_condition.num_variable_requirements - 1);
+    // TODO: validate that this is a valid byte to access given num_bytes and index
+    size_t num_ored_requirements = bytes[index++];
+    /* parse_ored_requirement will increment this field whenever it adds a variable requirement to alert condition */
+    alert.alert_condition.num_variable_requirements = 0;
+    for (size_t i = 0; i < num_ored_requirements; i++) {
+        parse_ored_requirement(bytes, num_bytes, &index, &alert.alert_condition);
     }
 
     if (add_alert_cb) {

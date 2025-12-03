@@ -398,3 +398,82 @@ TEST_C(MsgTransceiver, AddAlert2)
     CHECK_EQUAL_C_ULONG(1, requirement1->constraint_value.light_intensity);
     CHECK_C(requirement1->is_last_in_ored_requirement);
 }
+
+TEST_C(MsgTransceiver, AddAlert3)
+{
+    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
+    /* Mock receiving a "add alert" message */
+    uint8_t add_alert_bytes[36] = {
+        0x2,                 /* message id */
+        0x3,                 /* alert id */
+        0xA, 0x0, 0x0, 0x0,  /* Warmup period - 10 ms */
+        0x14, 0x0, 0x0, 0x0, /* Cooldown period - 20 ms */
+        0x0,                 /* notification type - connectivity disabled, LED disabled */
+        0x2,                 /* Number of ORed requirements */
+
+        /* Start of first ORed requirement */
+        0x2, /* Number of variable requirements in the first ORed requirement */
+
+        /* Start of variable requirement 0 */
+        0x0,       /* Temperature variable identifier */
+        0x0,       /* Operator - greater than or equal to */
+        0xCD, 0x0, /* Constraint value 205 -> 20.5 degrees Celsius */
+        /* Start of variable requirement 1 */
+        0x1,        /* Pressure variable identifier */
+        0x0,        /* Operator - greater than or equal to */
+        0x67, 0x2B, /* Constraint value 11111 -> 1111.1 hPa */
+
+        /* Start of second ORed requirement */
+        0x3, /* Number of variable requirements in the second ORed requirement */
+
+        /* Start of variable requirement 0 */
+        0x3,                  /* Light intensity variable identifier */
+        0x1,                  /* Operator - less than or equal to */
+        0xA0, 0x86, 0x1, 0x0, /* Constraint value 100000 -> 100,000 lx */
+        /* Start of variable requirement 1 */
+        0x2,       /* Humidity variable identifier */
+        0x1,       /* Operator - less than or equal to */
+        0xA4, 0x1, /* Constraint value 420 -> 42.0 % RH */
+        /* Start of variable requirement 2 */
+        0x0,        /* Temperature variable identifier */
+        0x1,        /* Operator - less than or equal to */
+        0xD3, 0xFE, /* Constraint value -301 -> -30.1 degrees Celsius */
+
+    };
+    receive_cb(add_alert_bytes, 17, receive_cb_user_data);
+
+    CHECK_C(add_alert_cb_called);
+    /* Validate constructed alert */
+    const MsgTransceiverAlert *const alert = &add_alert_cb_alert;
+    CHECK_EQUAL_C_UBYTE(3, alert->alert_id);
+    CHECK_EQUAL_C_ULONG(10, alert->warmup_period);
+    CHECK_EQUAL_C_ULONG(20, alert->cooldown_period);
+    CHECK_C(!(alert->notification_type.connectivity));
+    CHECK_C(!(alert->notification_type.led));
+    CHECK_EQUAL_C_UBYTE(5, alert->alert_condition.num_variable_requirements);
+    const MsgTransceiverVariableRequirement *requirement0 = &(alert->alert_condition.variable_requirements[0]);
+    CHECK_EQUAL_C_UBYTE(MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_TEMPERATURE, requirement0->variable_identifier);
+    CHECK_EQUAL_C_UBYTE(MSG_TRANSCEIVER_REQUIREMENT_OPERATOR_GEQ, requirement0->operator);
+    CHECK_EQUAL_C_ULONG(205, requirement0->constraint_value.temperature);
+    CHECK_C(!requirement0->is_last_in_ored_requirement);
+    const MsgTransceiverVariableRequirement *requirement1 = &(alert->alert_condition.variable_requirements[1]);
+    CHECK_EQUAL_C_UBYTE(MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_PRESSURE, requirement1->variable_identifier);
+    CHECK_EQUAL_C_UBYTE(MSG_TRANSCEIVER_REQUIREMENT_OPERATOR_GEQ, requirement1->operator);
+    CHECK_EQUAL_C_ULONG(11111, requirement1->constraint_value.pressure);
+    CHECK_C(requirement1->is_last_in_ored_requirement);
+    const MsgTransceiverVariableRequirement *requirement2 = &(alert->alert_condition.variable_requirements[2]);
+    CHECK_EQUAL_C_UBYTE(MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_LIGHT_INTENSITY, requirement2->variable_identifier);
+    CHECK_EQUAL_C_UBYTE(MSG_TRANSCEIVER_REQUIREMENT_OPERATOR_LEQ, requirement2->operator);
+    CHECK_EQUAL_C_ULONG(100000, requirement2->constraint_value.light_intensity);
+    CHECK_C(!requirement2->is_last_in_ored_requirement);
+    const MsgTransceiverVariableRequirement *requirement3 = &(alert->alert_condition.variable_requirements[3]);
+    CHECK_EQUAL_C_UBYTE(MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_HUMIDITY, requirement3->variable_identifier);
+    CHECK_EQUAL_C_UBYTE(MSG_TRANSCEIVER_REQUIREMENT_OPERATOR_LEQ, requirement3->operator);
+    CHECK_EQUAL_C_ULONG(420, requirement3->constraint_value.humidity);
+    CHECK_C(!requirement3->is_last_in_ored_requirement);
+    const MsgTransceiverVariableRequirement *requirement4 = &(alert->alert_condition.variable_requirements[4]);
+    CHECK_EQUAL_C_UBYTE(MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_TEMPERATURE, requirement4->variable_identifier);
+    CHECK_EQUAL_C_UBYTE(MSG_TRANSCEIVER_REQUIREMENT_OPERATOR_LEQ, requirement4->operator);
+    CHECK_EQUAL_C_ULONG(-301, requirement4->constraint_value.temperature);
+    CHECK_C(requirement4->is_last_in_ored_requirement);
+}

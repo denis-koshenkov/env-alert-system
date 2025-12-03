@@ -22,3 +22,4 @@ TEST_C_WRAPPER(MsgTransceiver, RemoveAlertCbExecutedWithUserData);
 TEST_C_WRAPPER(MsgTransceiver, AddAlert0);
 TEST_C_WRAPPER(MsgTransceiver, AddAlert1);
 TEST_C_WRAPPER(MsgTransceiver, AddAlert2);
+TEST_C_WRAPPER(MsgTransceiver, AddAlert3);
