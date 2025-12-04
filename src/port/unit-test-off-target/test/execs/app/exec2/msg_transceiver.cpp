@@ -56,3 +56,4 @@ TEST_C_WRAPPER(MsgTransceiver, AddAlertMessage20ValidBytesLightIntensity);
 TEST_C_WRAPPER(MsgTransceiver, AddAlertInvalidNotificationType);
 TEST_C_WRAPPER(MsgTransceiver, AddAlertInvalidVariableIdentifier);
 TEST_C_WRAPPER(MsgTransceiver, AddAlertNumBytesTooLarge);
+TEST_C_WRAPPER(MsgTransceiver, DeinitClearsRemoveAlertCb);

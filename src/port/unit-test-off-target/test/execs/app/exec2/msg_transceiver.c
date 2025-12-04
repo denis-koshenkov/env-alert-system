@@ -77,15 +77,19 @@ TEST_GROUP_C_SETUP(MsgTransceiver)
     mock_c()->setPointerData("receiveCb", (void **)&receive_cb);
     mock_c()->setPointerData("receiveCbUserData", (void **)&receive_cb_user_data);
 
-    /* msg_transceiver_init */
+    /* Expected to be called in msg_transceiver_init */
     mock_c()->expectOneCall("transceiver_set_receive_cb")->ignoreOtherParameters();
+
     msg_transceiver_init();
+    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
+    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
 }
 
 TEST_GROUP_C_TEARDOWN(MsgTransceiver)
 {
-    /* msg_transceiver_deinit */
+    /* Expected to be called in msg_transceiver_deinit */
     mock_c()->expectOneCall("transceiver_unset_receive_cb");
+
     msg_transceiver_deinit();
 }
 
@@ -192,7 +196,6 @@ TEST_C(MsgTransceiver, MessageSentCbCalledWithUserData)
 
 TEST_C(MsgTransceiver, RemoveAlert0)
 {
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
     /* Mock receiving a "remove alert" message. 0x1 - message id, 0 - alert id */
     uint8_t remove_alert_bytes[2] = {0x1, 0};
     receive_cb(remove_alert_bytes, 2, receive_cb_user_data);
@@ -205,7 +208,6 @@ TEST_C(MsgTransceiver, RemoveAlert0)
 
 TEST_C(MsgTransceiver, RemoveAlert1)
 {
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
     /* Mock receiving a "remove alert" message. 0x1 - message id, 1 - alert id */
     uint8_t remove_alert_bytes[2] = {0x1, 1};
     receive_cb(remove_alert_bytes, 2, receive_cb_user_data);
@@ -218,7 +220,6 @@ TEST_C(MsgTransceiver, RemoveAlert1)
 
 TEST_C(MsgTransceiver, ReceiveCbCalledWithNumBytes0)
 {
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
     /* Not giving a NULL pointer as receive_bytes, because there is a separate check for that - we want to specifically
      * test the check for number of bytes in this test. */
     uint8_t receive_bytes[1] = {0xAA};
@@ -231,7 +232,6 @@ TEST_C(MsgTransceiver, ReceiveCbCalledWithNumBytes0)
 
 TEST_C(MsgTransceiver, RemoveAlertMessageWithNoAlertId)
 {
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
     /* 0x1 is the message id for "remove alert" message. The payload should also contain the second byte - alert id, but
      * it does not. */
     uint8_t receive_bytes[1] = {0x1};
@@ -243,7 +243,6 @@ TEST_C(MsgTransceiver, RemoveAlertMessageWithNoAlertId)
 
 TEST_C(MsgTransceiver, RemoveAlertMessageTooManyBytes)
 {
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
     /* "Remove alert" message should have only two bytes - message id and alert id. Here it has three bytes, so message
      * should be ignored. */
     uint8_t receive_bytes[3] = {0x1, 5, 0xFF};
@@ -257,7 +256,6 @@ TEST_C(MsgTransceiver, ReceiveCbBytesNullPointerAssert)
 {
     TEST_ASSERT_PLUGIN_C_EXPECT_ASSERTION("bytes", "receive_cb");
 
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
     /* Not giving 0 as num_bytes, because there is a separate check for that - we want to specifically test the NULL
      * pointer check in this test. */
     receive_cb(NULL, 5, receive_cb_user_data);
@@ -279,7 +277,6 @@ TEST_C(MsgTransceiver, RemoveAlertCbExecutedWithUserData)
 
 TEST_C(MsgTransceiver, AddAlert0)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
     /* Mock receiving a "add alert" message */
     uint8_t add_alert_bytes[17] = {
         0x2,                /* message id */
@@ -314,7 +311,6 @@ TEST_C(MsgTransceiver, AddAlert0)
 
 TEST_C(MsgTransceiver, AddAlert1)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
     /* Mock receiving a "add alert" message */
     uint8_t add_alert_bytes[19] = {
         0x2,                 /* message id */
@@ -353,7 +349,6 @@ TEST_C(MsgTransceiver, AddAlert1)
 
 TEST_C(MsgTransceiver, AddAlert2)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
     /* Mock receiving a "add alert" message */
     uint8_t add_alert_bytes[25] = {
         0x2,                  /* message id */
@@ -401,7 +396,6 @@ TEST_C(MsgTransceiver, AddAlert2)
 
 TEST_C(MsgTransceiver, AddAlert3)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
     /* Mock receiving a "add alert" message */
     uint8_t add_alert_bytes[36] = {
         0x2,                 /* message id */
@@ -480,9 +474,6 @@ TEST_C(MsgTransceiver, AddAlert3)
 
 TEST_C(MsgTransceiver, InvalidMessageId)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     /* Mock receiving a "add alert" message */
     uint8_t bytes[5] = {
         0xA0,                  /* invalid message id */
@@ -496,9 +487,6 @@ TEST_C(MsgTransceiver, InvalidMessageId)
 
 TEST_C(MsgTransceiver, AddAlertMessageOnlyMessageId)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[1] = {
         0x2, /* message id */
     };
@@ -510,9 +498,6 @@ TEST_C(MsgTransceiver, AddAlertMessageOnlyMessageId)
 
 TEST_C(MsgTransceiver, AddAlertMessage2ValidBytes)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[2] = {
         0x2, /* message id */
         0x1, /* alert id */
@@ -525,9 +510,6 @@ TEST_C(MsgTransceiver, AddAlertMessage2ValidBytes)
 
 TEST_C(MsgTransceiver, AddAlertMessage3ValidBytes)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[3] = {
         0x2, /* message id */
         0x2, /* alert id */
@@ -541,9 +523,6 @@ TEST_C(MsgTransceiver, AddAlertMessage3ValidBytes)
 
 TEST_C(MsgTransceiver, AddAlertMessage4ValidBytes)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[4] = {
         0x2,     /* message id */
         0x2,     /* alert id */
@@ -557,9 +536,6 @@ TEST_C(MsgTransceiver, AddAlertMessage4ValidBytes)
 
 TEST_C(MsgTransceiver, AddAlertMessage5ValidBytes)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[5] = {
         0x2,          /* message id */
         0x2,          /* alert id */
@@ -573,9 +549,6 @@ TEST_C(MsgTransceiver, AddAlertMessage5ValidBytes)
 
 TEST_C(MsgTransceiver, AddAlertMessage6ValidBytes)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[6] = {
         0x2,               /* message id */
         0x2,               /* alert id */
@@ -589,9 +562,6 @@ TEST_C(MsgTransceiver, AddAlertMessage6ValidBytes)
 
 TEST_C(MsgTransceiver, AddAlertMessage7ValidBytes)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[7] = {
         0x2,                 /* message id */
         0x2,                 /* alert id */
@@ -606,9 +576,6 @@ TEST_C(MsgTransceiver, AddAlertMessage7ValidBytes)
 
 TEST_C(MsgTransceiver, AddAlertMessage8ValidBytes)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[8] = {
         0x2,                  /* message id */
         0x2,                  /* alert id */
@@ -623,9 +590,6 @@ TEST_C(MsgTransceiver, AddAlertMessage8ValidBytes)
 
 TEST_C(MsgTransceiver, AddAlertMessage9ValidBytes)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[9] = {
         0x2,                  /* message id */
         0x2,                  /* alert id */
@@ -640,9 +604,6 @@ TEST_C(MsgTransceiver, AddAlertMessage9ValidBytes)
 
 TEST_C(MsgTransceiver, AddAlertMessage10ValidBytes)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[10] = {
         0x2,                  /* message id */
         0x2,                  /* alert id */
@@ -657,9 +618,6 @@ TEST_C(MsgTransceiver, AddAlertMessage10ValidBytes)
 
 TEST_C(MsgTransceiver, AddAlertMessage11ValidBytes)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[11] = {
         0x2,                  /* message id */
         0x2,                  /* alert id */
@@ -675,9 +633,6 @@ TEST_C(MsgTransceiver, AddAlertMessage11ValidBytes)
 
 TEST_C(MsgTransceiver, AddAlertMessage12ValidBytes)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[12] = {
         0x2,                  /* message id */
         0x2,                  /* alert id */
@@ -694,9 +649,6 @@ TEST_C(MsgTransceiver, AddAlertMessage12ValidBytes)
 
 TEST_C(MsgTransceiver, AddAlertMessage13ValidBytes)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[13] = {
         0x2,                  /* message id */
         0x2,                  /* alert id */
@@ -714,9 +666,6 @@ TEST_C(MsgTransceiver, AddAlertMessage13ValidBytes)
 
 TEST_C(MsgTransceiver, AddAlertMessage14ValidBytes)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[14] = {
         0x2,                  /* message id */
         0x2,                  /* alert id */
@@ -735,9 +684,6 @@ TEST_C(MsgTransceiver, AddAlertMessage14ValidBytes)
 
 TEST_C(MsgTransceiver, AddAlertMessage15ValidBytes)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[15] = {
         0x2,                  /* message id */
         0x2,                  /* alert id */
@@ -757,9 +703,6 @@ TEST_C(MsgTransceiver, AddAlertMessage15ValidBytes)
 
 TEST_C(MsgTransceiver, AddAlertMessage16ValidBytes)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[16] = {
         0x2,                  /* message id */
         0x2,                  /* alert id */
@@ -780,9 +723,6 @@ TEST_C(MsgTransceiver, AddAlertMessage16ValidBytes)
 
 TEST_C(MsgTransceiver, AddAlertMessage17ValidBytes)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[17] = {
         0x2,                  /* message id */
         0x2,                  /* alert id */
@@ -804,9 +744,6 @@ TEST_C(MsgTransceiver, AddAlertMessage17ValidBytes)
 
 TEST_C(MsgTransceiver, AddAlertMessage18ValidBytes)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[18] = {
         0x2,                  /* message id */
         0x2,                  /* alert id */
@@ -829,9 +766,6 @@ TEST_C(MsgTransceiver, AddAlertMessage18ValidBytes)
 
 TEST_C(MsgTransceiver, AddAlertMessage19ValidBytesValidAlert)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[19] = {
         0x2,                  /* message id */
         0x2,                  /* alert id */
@@ -870,9 +804,6 @@ TEST_C(MsgTransceiver, AddAlertMessage19ValidBytesValidAlert)
 
 TEST_C(MsgTransceiver, AddAlertMessage19ValidBytes)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     /* Invalid because there should be two requirements in the first ORed requirement, but there is only one */
     uint8_t bytes[19] = {
         0x2,                  /* message id */
@@ -896,9 +827,6 @@ TEST_C(MsgTransceiver, AddAlertMessage19ValidBytes)
 
 TEST_C(MsgTransceiver, AddAlertMessage20ValidBytes)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     /* Invalid because there should be two requirements in the first ORed requirement, but there is only one */
     uint8_t bytes[20] = {
         0x2,                  /* message id */
@@ -923,9 +851,6 @@ TEST_C(MsgTransceiver, AddAlertMessage20ValidBytes)
 
 TEST_C(MsgTransceiver, AddAlertMessage21ValidBytes)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     /* Invalid because there should be two requirements in the first ORed requirement, but there is only one */
     uint8_t bytes[21] = {
         0x2,                  /* message id */
@@ -951,9 +876,6 @@ TEST_C(MsgTransceiver, AddAlertMessage21ValidBytes)
 
 TEST_C(MsgTransceiver, AddAlertMessage22ValidBytes)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     /* Invalid because there should be two requirements in the first ORed requirement, but there is only one */
     uint8_t bytes[22] = {
         0x2,                  /* message id */
@@ -980,9 +902,6 @@ TEST_C(MsgTransceiver, AddAlertMessage22ValidBytes)
 
 TEST_C(MsgTransceiver, AddAlertMessage17ValidBytesHumidity)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[17] = {
         0x2,                  /* message id */
         0x2,                  /* alert id */
@@ -1004,9 +923,6 @@ TEST_C(MsgTransceiver, AddAlertMessage17ValidBytesHumidity)
 
 TEST_C(MsgTransceiver, AddAlertMessage18ValidBytesHumidity)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[18] = {
         0x2,                  /* message id */
         0x2,                  /* alert id */
@@ -1029,9 +945,6 @@ TEST_C(MsgTransceiver, AddAlertMessage18ValidBytesHumidity)
 
 TEST_C(MsgTransceiver, AddAlertMessage17ValidBytesLightIntensity)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[17] = {
         0x2,                  /* message id */
         0x2,                  /* alert id */
@@ -1053,9 +966,6 @@ TEST_C(MsgTransceiver, AddAlertMessage17ValidBytesLightIntensity)
 
 TEST_C(MsgTransceiver, AddAlertMessage18ValidBytesLightIntensity)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[18] = {
         0x2,                  /* message id */
         0x2,                  /* alert id */
@@ -1078,9 +988,6 @@ TEST_C(MsgTransceiver, AddAlertMessage18ValidBytesLightIntensity)
 
 TEST_C(MsgTransceiver, AddAlertMessage19ValidBytesLightIntensity)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[19] = {
         0x2,                  /* message id */
         0x2,                  /* alert id */
@@ -1103,9 +1010,6 @@ TEST_C(MsgTransceiver, AddAlertMessage19ValidBytesLightIntensity)
 
 TEST_C(MsgTransceiver, AddAlertMessage20ValidBytesLightIntensity)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t bytes[20] = {
         0x2,                   /* message id */
         0x2,                   /* alert id */
@@ -1128,9 +1032,6 @@ TEST_C(MsgTransceiver, AddAlertMessage20ValidBytesLightIntensity)
 
 TEST_C(MsgTransceiver, AddAlertInvalidNotificationType)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t add_alert_bytes[19] = {
         0x2,                 /* message id */
         0x1,                 /* alert id */
@@ -1154,9 +1055,6 @@ TEST_C(MsgTransceiver, AddAlertInvalidNotificationType)
 
 TEST_C(MsgTransceiver, AddAlertInvalidVariableIdentifier)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     uint8_t add_alert_bytes[19] = {
         0x2,                 /* message id */
         0x1,                 /* alert id */
@@ -1180,9 +1078,6 @@ TEST_C(MsgTransceiver, AddAlertInvalidVariableIdentifier)
 
 TEST_C(MsgTransceiver, AddAlertNumBytesTooLarge)
 {
-    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
-    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
-
     /* The structure is valid, but has one extra byte at the end */
     uint8_t bytes[20] = {
         0x2,                  /* message id */
@@ -1202,5 +1097,30 @@ TEST_C(MsgTransceiver, AddAlertNumBytesTooLarge)
     receive_cb(bytes, 20, receive_cb_user_data);
 
     CHECK_C(!add_alert_cb_called);
+    CHECK_C(!remove_alert_cb_called);
+}
+
+TEST_C(MsgTransceiver, DeinitClearsRemoveAlertCb)
+{
+    /* Expected to be called in msg_transceiver_deinit */
+    mock_c()->expectOneCall("transceiver_unset_receive_cb");
+    /* Expected to be called in msg_transceiver_init */
+    mock_c()->expectOneCall("transceiver_set_receive_cb")->ignoreOtherParameters();
+
+    /* msg_transceiver_set_remove_alert_cb is called as a part of the test setup, so remove alert callback is initially
+     * set */
+
+    /* Mock receiving a "remove alert" message. 0x1 - message id, 0 - alert id */
+    uint8_t remove_alert_bytes[2] = {0x1, 0};
+    receive_cb(remove_alert_bytes, 2, receive_cb_user_data);
+    /* remove_alert_cb should have been called, since the callback is set */
+    CHECK_C(remove_alert_cb_called);
+
+    msg_transceiver_deinit();
+    msg_transceiver_init();
+
+    /* deinit should have cleared the callback, so now we expect remove alert cb to not be called */
+    remove_alert_cb_called = false;
+    receive_cb(remove_alert_bytes, 2, receive_cb_user_data);
     CHECK_C(!remove_alert_cb_called);
 }
