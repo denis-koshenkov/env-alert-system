@@ -243,6 +243,8 @@ static bool parse_variable_requirement(const uint8_t *const bytes, size_t num_by
         }
         break;
     default:
+        /* Invalid variable identifier */
+        return false;
         break;
     }
     return true;
