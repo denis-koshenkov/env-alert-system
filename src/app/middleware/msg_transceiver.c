@@ -130,7 +130,9 @@ static bool parse_cooldown_period(const uint8_t *const bytes, size_t num_bytes, 
 static bool parse_notification_type(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
                                     NotificationType *const notification_type)
 {
-    /* TODO: verify that there are still enough bytes available given index and num_bytes. Return false if not. */
+    if (!is_x_bytes_available(1, num_bytes, *index)) {
+        return false;
+    }
     notification_type->connectivity = (bytes[*index] & ((uint8_t)0x1U)) ? 1 : 0;
     notification_type->led = (bytes[*index] & ((uint8_t)0x2U)) ? 1 : 0;
     (*index)++;
@@ -139,7 +141,9 @@ static bool parse_notification_type(const uint8_t *const bytes, size_t num_bytes
 
 static bool parse_led_color(const uint8_t *const bytes, size_t num_bytes, size_t *const index, uint8_t *const led_color)
 {
-    /* TODO: verify that there are still enough bytes available given index and num_bytes. Return false if not. */
+    if (!is_x_bytes_available(1, num_bytes, *index)) {
+        return false;
+    }
     *led_color = bytes[(*index)++];
     return true;
 }
@@ -147,7 +151,9 @@ static bool parse_led_color(const uint8_t *const bytes, size_t num_bytes, size_t
 static bool parse_led_pattern(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
                               uint8_t *const led_pattern)
 {
-    /* TODO: verify that there are still enough bytes available given index and num_bytes. Return false if not. */
+    if (!is_x_bytes_available(1, num_bytes, *index)) {
+        return false;
+    }
     *led_pattern = bytes[(*index)++];
     return true;
 }
@@ -155,11 +161,16 @@ static bool parse_led_pattern(const uint8_t *const bytes, size_t num_bytes, size
 static bool parse_variable_requirement(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
                                        MsgTransceiverVariableRequirement *const requirement)
 {
-    /* TODO: verify that there are still enough bytes available given index and num_bytes. Return false if not. */
+    if (!is_x_bytes_available(2, num_bytes, *index)) {
+        return false;
+    }
     requirement->variable_identifier = bytes[(*index)++];
     requirement->operator = bytes[(*index)++];
     switch (requirement->variable_identifier) {
     case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_TEMPERATURE:
+        if (!is_x_bytes_available(2, num_bytes, *index)) {
+            return false;
+        }
         /* Store the two bytes in a variable */
         uint16_t value_unsigned = two_little_endian_bytes_to_uint16(&bytes[*index]);
         /* Interpret the two bytes as a two-byte signed integer */
@@ -189,14 +200,30 @@ static bool parse_variable_requirement(const uint8_t *const bytes, size_t num_by
 static bool parse_ored_requirement(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
                                    MsgTransceiverAlertCondition *const alert_condition)
 {
+    if (!is_x_bytes_available(1, num_bytes, *index)) {
+        return false;
+    }
     size_t num_variable_requirements_in_ored_requirement = bytes[(*index)++];
     for (size_t i = 0; i < num_variable_requirements_in_ored_requirement; i++) {
         MsgTransceiverVariableRequirement *const requirement =
             &(alert_condition->variable_requirements[alert_condition->num_variable_requirements]);
-        parse_variable_requirement(bytes, num_bytes, index, requirement);
+        if (!parse_variable_requirement(bytes, num_bytes, index, requirement)) {
+            return false;
+        }
         requirement->is_last_in_ored_requirement = (i == (num_variable_requirements_in_ored_requirement - 1));
         alert_condition->num_variable_requirements++;
     }
+    return true;
+}
+
+static bool parse_num_ored_requirements(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
+                                        uint8_t *const num_ored_requirements)
+{
+    if (!is_x_bytes_available(1, num_bytes, *index)) {
+        return false;
+    }
+    *num_ored_requirements = bytes[(*index)++];
+    return true;
 }
 
 /**
@@ -218,18 +245,29 @@ static void handle_add_alert_message(const uint8_t *const bytes, size_t num_byte
     if (!parse_cooldown_period(bytes, num_bytes, &index, &alert.cooldown_period)) {
         return;
     }
-    parse_notification_type(bytes, num_bytes, &index, &alert.notification_type);
+    if (!parse_notification_type(bytes, num_bytes, &index, &alert.notification_type)) {
+        return;
+    }
     if (alert.notification_type.led) {
-        parse_led_color(bytes, num_bytes, &index, &alert.led_color);
-        parse_led_pattern(bytes, num_bytes, &index, &alert.led_pattern);
+        if (!parse_led_color(bytes, num_bytes, &index, &alert.led_color)) {
+            return;
+        }
+        if (!parse_led_pattern(bytes, num_bytes, &index, &alert.led_pattern)) {
+            return;
+        }
     }
 
-    // TODO: validate that this is a valid byte to access given num_bytes and index
-    size_t num_ored_requirements = bytes[index++];
+    uint8_t num_ored_requirements = 0;
+    if (!parse_num_ored_requirements(bytes, num_bytes, &index, &num_ored_requirements)) {
+        return;
+    }
+
     /* parse_ored_requirement will increment this field whenever it adds a variable requirement to alert condition */
     alert.alert_condition.num_variable_requirements = 0;
     for (size_t i = 0; i < num_ored_requirements; i++) {
-        parse_ored_requirement(bytes, num_bytes, &index, &alert.alert_condition);
+        if (!parse_ored_requirement(bytes, num_bytes, &index, &alert.alert_condition)) {
+            return;
+        }
     }
 
     if (add_alert_cb) {
