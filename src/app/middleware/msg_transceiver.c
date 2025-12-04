@@ -133,6 +133,11 @@ static bool parse_notification_type(const uint8_t *const bytes, size_t num_bytes
     if (!is_x_bytes_available(1, num_bytes, *index)) {
         return false;
     }
+    /* Only bits 0 and 1 are allowed to be set */
+    if (bytes[*index] > 0x3) {
+        return false;
+    }
+
     notification_type->connectivity = (bytes[*index] & ((uint8_t)0x1U)) ? 1 : 0;
     notification_type->led = (bytes[*index] & ((uint8_t)0x2U)) ? 1 : 0;
     (*index)++;

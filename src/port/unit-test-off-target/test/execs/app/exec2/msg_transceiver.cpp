@@ -53,3 +53,4 @@ TEST_C_WRAPPER(MsgTransceiver, AddAlertMessage17ValidBytesLightIntensity);
 TEST_C_WRAPPER(MsgTransceiver, AddAlertMessage18ValidBytesLightIntensity);
 TEST_C_WRAPPER(MsgTransceiver, AddAlertMessage19ValidBytesLightIntensity);
 TEST_C_WRAPPER(MsgTransceiver, AddAlertMessage20ValidBytesLightIntensity);
+TEST_C_WRAPPER(MsgTransceiver, AddAlertInvalidNotificationType);

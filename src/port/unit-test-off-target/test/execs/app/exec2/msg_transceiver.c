@@ -1109,3 +1109,29 @@ TEST_C(MsgTransceiver, AddAlertMessage20ValidBytesLightIntensity)
     CHECK_C(!add_alert_cb_called);
     CHECK_C(!remove_alert_cb_called);
 }
+
+TEST_C(MsgTransceiver, AddAlertInvalidNotificationType)
+{
+    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
+    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
+
+    uint8_t add_alert_bytes[19] = {
+        0x2,                 /* message id */
+        0x1,                 /* alert id */
+        0xE8, 0x3, 0x0, 0x0, /* Warmup period - 1000 ms */
+        0xD0, 0x7, 0x0, 0x0, /* Cooldown period - 2000 ms */
+        0x13,                /* Invalid notification type - bit other than 0 and 1 is set */
+        0x0,                 /* Led color - red */
+        0x0,                 /* Led pattern - static */
+        0x1,                 /* Number of ORed requirements */
+        0x1,                 /* Number of variable requirements in the first ORed requirement */
+        /* Start of variable requirement 0 */
+        0x1,      /* Pressure variable identifier */
+        0x1,      /* Operator - less than or equal to */
+        0xE7, 0x3 /* Constraint value - 999 hPa */
+    };
+    receive_cb(add_alert_bytes, 19, receive_cb_user_data);
+
+    CHECK_C(!add_alert_cb_called);
+    CHECK_C(!remove_alert_cb_called);
+}
