@@ -477,3 +477,19 @@ TEST_C(MsgTransceiver, AddAlert3)
     CHECK_EQUAL_C_ULONG(-301, requirement4->constraint_value.temperature);
     CHECK_C(requirement4->is_last_in_ored_requirement);
 }
+
+TEST_C(MsgTransceiver, InvalidMessageId)
+{
+    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
+    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
+
+    /* Mock receiving a "add alert" message */
+    uint8_t bytes[5] = {
+        0xA0,                  /* invalid message id */
+        0x1,  0x4, 0xFF, 0xA5, /* Some garbage data */
+    };
+    receive_cb(bytes, 5, receive_cb_user_data);
+
+    CHECK_C(!add_alert_cb_called);
+    CHECK_C(!remove_alert_cb_called);
+}
