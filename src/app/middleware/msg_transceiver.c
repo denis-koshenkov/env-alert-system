@@ -39,13 +39,6 @@ static void handle_remove_alert_message(const uint8_t *const bytes, size_t num_b
     }
 }
 
-static bool parse_alert_id(const uint8_t *const bytes, size_t num_bytes, size_t *const index, uint8_t *const alert_id)
-{
-    /* TODO: verify that index is allowed to be accessed given num_bytes. Return false if not. */
-    *alert_id = bytes[(*index)++];
-    return true;
-}
-
 /**
  * @brief Convert four bytes in little endian to an integer of type uint32_t.
  *
@@ -71,11 +64,53 @@ static uint16_t two_little_endian_bytes_to_uint16(const uint8_t *const bytes)
     return (((uint16_t)(bytes[0])) | (((uint16_t)(bytes[1])) << 8));
 }
 
+/**
+ * @brief Check if a number of bytes is available in an array.
+ *
+ * There is a byte array of length @p total_num_bytes. @p index identifies a byte in the array - this is the next
+ * available byte. All bytes at indices >= @p index and < @p total_num_bytes are considered available bytes. This
+ * function checks whether this number of available bytes is greater than or equal to @p desired_num_available_bytes.
+ *
+ * @param desired_num_available_bytes The number of bytes that the caller wants to still be available in the array.
+ * @param total_num_bytes Total number of bytes in the array.
+ * @param index Index of the next available byte in the array.
+ *
+ * @return true There are at least @p desired_num_available_bytes bytes available in the array, or @p
+ * desired_num_available_bytes is 0 - 0 bytes are always available.
+ * @return false There are less than @p desired_num_available_bytes bytes available in the array, or @p index does not
+ * point to a valid byte in the array, i.e. @p index >= @p total_num_bytes.
+ */
+static bool is_x_bytes_available(size_t desired_num_available_bytes, size_t total_num_bytes, size_t index)
+{
+    if (desired_num_available_bytes == 0) {
+        /* 0 bytes are always available */
+        return true;
+    }
+    if (index >= total_num_bytes) {
+        /* 0 bytes available, already reached the end */
+        return false;
+    }
+    size_t actual_num_available_bytes = total_num_bytes - index;
+    return (actual_num_available_bytes >= desired_num_available_bytes);
+}
+
+static bool parse_alert_id(const uint8_t *const bytes, size_t num_bytes, size_t *const index, uint8_t *const alert_id)
+{
+    if (!is_x_bytes_available(1, num_bytes, *index)) {
+        /* No bytes left */
+        return false;
+    }
+
+    *alert_id = bytes[(*index)++];
+    return true;
+}
+
 static bool parse_warmup_period(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
                                 uint32_t *const warmup_period)
 {
-    /* TODO: verify that there are still 4 bytes available given index and num_bytes. Return false if not. */
-    /* Convert 4 bytes in little endian to uint32_t value */
+    if (!is_x_bytes_available(4, num_bytes, *index)) {
+        return false;
+    }
     *warmup_period = four_little_endian_bytes_to_uint32(&bytes[*index]);
     *index += 4;
     return true;
@@ -84,8 +119,9 @@ static bool parse_warmup_period(const uint8_t *const bytes, size_t num_bytes, si
 static bool parse_cooldown_period(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
                                   uint32_t *const cooldown_period)
 {
-    /* TODO: verify that there are still 4 bytes available given index and num_bytes. Return false if not. */
-    /* Convert 4 bytes in little endian to uint32_t value */
+    if (!is_x_bytes_available(4, num_bytes, *index)) {
+        return false;
+    }
     *cooldown_period = four_little_endian_bytes_to_uint32(&bytes[*index]);
     *index += 4;
     return true;
@@ -173,10 +209,15 @@ static void handle_add_alert_message(const uint8_t *const bytes, size_t num_byte
 {
     MsgTransceiverAlert alert;
     size_t index = 0;
-    /* TODO: return and do nothing if any of the parsing functions fail, they are all returning true for now. */
-    parse_alert_id(bytes, num_bytes, &index, &alert.alert_id);
-    parse_warmup_period(bytes, num_bytes, &index, &alert.warmup_period);
-    parse_cooldown_period(bytes, num_bytes, &index, &alert.cooldown_period);
+    if (!parse_alert_id(bytes, num_bytes, &index, &alert.alert_id)) {
+        return;
+    }
+    if (!parse_warmup_period(bytes, num_bytes, &index, &alert.warmup_period)) {
+        return;
+    }
+    if (!parse_cooldown_period(bytes, num_bytes, &index, &alert.cooldown_period)) {
+        return;
+    }
     parse_notification_type(bytes, num_bytes, &index, &alert.notification_type);
     if (alert.notification_type.led) {
         parse_led_color(bytes, num_bytes, &index, &alert.led_color);
