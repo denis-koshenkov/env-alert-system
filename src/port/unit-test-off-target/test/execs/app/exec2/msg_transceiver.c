@@ -877,3 +877,235 @@ TEST_C(MsgTransceiver, AddAlertMessage19ValidBytes)
     CHECK_C(!add_alert_cb_called);
     CHECK_C(!remove_alert_cb_called);
 }
+
+TEST_C(MsgTransceiver, AddAlertMessage20ValidBytes)
+{
+    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
+    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
+
+    /* Invalid because there should be two requirements in the first ORed requirement, but there is only one */
+    uint8_t bytes[20] = {
+        0x2,                  /* message id */
+        0x2,                  /* alert id */
+        0x1,  0x5,  0x0, 0x0, /* warmup period */
+        0x5A, 0x11, 0x0, 0x0, /* cooldown period */
+        0x3,                  /* notification type - connectivity enabled, LED enabled */
+        0x1,                  /* Led color - blue */
+        0x1,                  /* Led pattern - alert */
+        0x1,                  /* Number of ORed requirements */
+        0x2,                  /* Number of requirements in the first ORed requirement */
+        0x0,                  /* Start of var req 0: Temperature variable identifier */
+        0x0,                  /* Operator - greater than or equal to */
+        0x0,  0x0,            /* Constraint value */
+        0x1,                  /* Start of var req 1: Pressure variable identifier */
+    };
+    receive_cb(bytes, 20, receive_cb_user_data);
+
+    CHECK_C(!add_alert_cb_called);
+    CHECK_C(!remove_alert_cb_called);
+}
+
+TEST_C(MsgTransceiver, AddAlertMessage21ValidBytes)
+{
+    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
+    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
+
+    /* Invalid because there should be two requirements in the first ORed requirement, but there is only one */
+    uint8_t bytes[21] = {
+        0x2,                  /* message id */
+        0x2,                  /* alert id */
+        0x1,  0x5,  0x0, 0x0, /* warmup period */
+        0x5A, 0x11, 0x0, 0x0, /* cooldown period */
+        0x3,                  /* notification type - connectivity enabled, LED enabled */
+        0x1,                  /* Led color - blue */
+        0x1,                  /* Led pattern - alert */
+        0x1,                  /* Number of ORed requirements */
+        0x2,                  /* Number of requirements in the first ORed requirement */
+        0x0,                  /* Start of var req 0: Temperature variable identifier */
+        0x0,                  /* Operator - greater than or equal to */
+        0x0,  0x0,            /* Constraint value */
+        0x1,                  /* Start of var req 1: Pressure variable identifier */
+        0x0,                  /* Operator - greater than or equal to */
+    };
+    receive_cb(bytes, 21, receive_cb_user_data);
+
+    CHECK_C(!add_alert_cb_called);
+    CHECK_C(!remove_alert_cb_called);
+}
+
+TEST_C(MsgTransceiver, AddAlertMessage22ValidBytes)
+{
+    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
+    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
+
+    /* Invalid because there should be two requirements in the first ORed requirement, but there is only one */
+    uint8_t bytes[22] = {
+        0x2,                  /* message id */
+        0x2,                  /* alert id */
+        0x1,  0x5,  0x0, 0x0, /* warmup period */
+        0x5A, 0x11, 0x0, 0x0, /* cooldown period */
+        0x3,                  /* notification type - connectivity enabled, LED enabled */
+        0x1,                  /* Led color - blue */
+        0x1,                  /* Led pattern - alert */
+        0x1,                  /* Number of ORed requirements */
+        0x2,                  /* Number of requirements in the first ORed requirement */
+        0x0,                  /* Start of var req 0: Temperature variable identifier */
+        0x0,                  /* Operator - greater than or equal to */
+        0x0,  0x0,            /* Constraint value */
+        0x1,                  /* Start of var req 1: Pressure variable identifier */
+        0x0,                  /* Operator - greater than or equal to */
+        0x0,                  /* First byte of constraint value */
+    };
+    receive_cb(bytes, 22, receive_cb_user_data);
+
+    CHECK_C(!add_alert_cb_called);
+    CHECK_C(!remove_alert_cb_called);
+}
+
+TEST_C(MsgTransceiver, AddAlertMessage17ValidBytesHumidity)
+{
+    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
+    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
+
+    uint8_t bytes[17] = {
+        0x2,                  /* message id */
+        0x2,                  /* alert id */
+        0x1,  0x5,  0x0, 0x0, /* warmup period */
+        0x5A, 0x11, 0x0, 0x0, /* cooldown period */
+        0x3,                  /* notification type - connectivity enabled, LED enabled */
+        0x1,                  /* Led color - blue */
+        0x1,                  /* Led pattern - alert */
+        0x1,                  /* Number of ORed requirements */
+        0x1,                  /* Number of requirements in the first ORed requirement */
+        0x2,                  /* Start of var req 0: Humidity variable identifier */
+        0x1,                  /* Operator - less than or equal to */
+    };
+    receive_cb(bytes, 17, receive_cb_user_data);
+
+    CHECK_C(!add_alert_cb_called);
+    CHECK_C(!remove_alert_cb_called);
+}
+
+TEST_C(MsgTransceiver, AddAlertMessage18ValidBytesHumidity)
+{
+    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
+    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
+
+    uint8_t bytes[18] = {
+        0x2,                  /* message id */
+        0x2,                  /* alert id */
+        0x1,  0x5,  0x0, 0x0, /* warmup period */
+        0x5A, 0x11, 0x0, 0x0, /* cooldown period */
+        0x3,                  /* notification type - connectivity enabled, LED enabled */
+        0x1,                  /* Led color - blue */
+        0x1,                  /* Led pattern - alert */
+        0x1,                  /* Number of ORed requirements */
+        0x1,                  /* Number of requirements in the first ORed requirement */
+        0x2,                  /* Start of var req 0: Humidity variable identifier */
+        0x1,                  /* Operator - less than or equal to */
+        0x0,                  /* First byte of constraint value */
+    };
+    receive_cb(bytes, 18, receive_cb_user_data);
+
+    CHECK_C(!add_alert_cb_called);
+    CHECK_C(!remove_alert_cb_called);
+}
+
+TEST_C(MsgTransceiver, AddAlertMessage17ValidBytesLightIntensity)
+{
+    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
+    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
+
+    uint8_t bytes[17] = {
+        0x2,                  /* message id */
+        0x2,                  /* alert id */
+        0x1,  0x5,  0x0, 0x0, /* warmup period */
+        0x5A, 0x11, 0x0, 0x0, /* cooldown period */
+        0x3,                  /* notification type - connectivity enabled, LED enabled */
+        0x1,                  /* Led color - blue */
+        0x1,                  /* Led pattern - alert */
+        0x1,                  /* Number of ORed requirements */
+        0x1,                  /* Number of requirements in the first ORed requirement */
+        0x3,                  /* Start of var req 0: Light intensity variable identifier */
+        0x1,                  /* Operator - less than or equal to */
+    };
+    receive_cb(bytes, 17, receive_cb_user_data);
+
+    CHECK_C(!add_alert_cb_called);
+    CHECK_C(!remove_alert_cb_called);
+}
+
+TEST_C(MsgTransceiver, AddAlertMessage18ValidBytesLightIntensity)
+{
+    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
+    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
+
+    uint8_t bytes[18] = {
+        0x2,                  /* message id */
+        0x2,                  /* alert id */
+        0x1,  0x5,  0x0, 0x0, /* warmup period */
+        0x5A, 0x11, 0x0, 0x0, /* cooldown period */
+        0x3,                  /* notification type - connectivity enabled, LED enabled */
+        0x1,                  /* Led color - blue */
+        0x1,                  /* Led pattern - alert */
+        0x1,                  /* Number of ORed requirements */
+        0x1,                  /* Number of requirements in the first ORed requirement */
+        0x3,                  /* Start of var req 0: Light intensity variable identifier */
+        0x1,                  /* Operator - less than or equal to */
+        0x0,                  /* First byte of constraint value */
+    };
+    receive_cb(bytes, 18, receive_cb_user_data);
+
+    CHECK_C(!add_alert_cb_called);
+    CHECK_C(!remove_alert_cb_called);
+}
+
+TEST_C(MsgTransceiver, AddAlertMessage19ValidBytesLightIntensity)
+{
+    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
+    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
+
+    uint8_t bytes[19] = {
+        0x2,                  /* message id */
+        0x2,                  /* alert id */
+        0x1,  0x5,  0x0, 0x0, /* warmup period */
+        0x5A, 0x11, 0x0, 0x0, /* cooldown period */
+        0x3,                  /* notification type - connectivity enabled, LED enabled */
+        0x1,                  /* Led color - blue */
+        0x1,                  /* Led pattern - alert */
+        0x1,                  /* Number of ORed requirements */
+        0x1,                  /* Number of requirements in the first ORed requirement */
+        0x3,                  /* Start of var req 0: Light intensity variable identifier */
+        0x1,                  /* Operator - less than or equal to */
+        0x0,  0xA5,           /* First two bytes of constraint value */
+    };
+    receive_cb(bytes, 19, receive_cb_user_data);
+
+    CHECK_C(!add_alert_cb_called);
+    CHECK_C(!remove_alert_cb_called);
+}
+
+TEST_C(MsgTransceiver, AddAlertMessage20ValidBytesLightIntensity)
+{
+    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
+    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
+
+    uint8_t bytes[20] = {
+        0x2,                   /* message id */
+        0x2,                   /* alert id */
+        0x1,  0x5,  0x0,  0x0, /* warmup period */
+        0x5A, 0x11, 0x0,  0x0, /* cooldown period */
+        0x3,                   /* notification type - connectivity enabled, LED enabled */
+        0x1,                   /* Led color - blue */
+        0x1,                   /* Led pattern - alert */
+        0x1,                   /* Number of ORed requirements */
+        0x1,                   /* Number of requirements in the first ORed requirement */
+        0x3,                   /* Start of var req 0: Light intensity variable identifier */
+        0x1,                   /* Operator - less than or equal to */
+        0x0,  0xA5, 0x05,      /* First three bytes of constraint value */
+    };
+    receive_cb(bytes, 20, receive_cb_user_data);
+
+    CHECK_C(!add_alert_cb_called);
+    CHECK_C(!remove_alert_cb_called);
+}

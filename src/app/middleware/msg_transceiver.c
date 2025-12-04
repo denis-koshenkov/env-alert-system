@@ -180,14 +180,23 @@ static bool parse_variable_requirement(const uint8_t *const bytes, size_t num_by
         *index += 2;
         break;
     case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_PRESSURE:
+        if (!is_x_bytes_available(2, num_bytes, *index)) {
+            return false;
+        }
         requirement->constraint_value.pressure = two_little_endian_bytes_to_uint16(&bytes[*index]);
         *index += 2;
         break;
     case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_HUMIDITY:
+        if (!is_x_bytes_available(2, num_bytes, *index)) {
+            return false;
+        }
         requirement->constraint_value.humidity = two_little_endian_bytes_to_uint16(&bytes[*index]);
         *index += 2;
         break;
     case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_LIGHT_INTENSITY:
+        if (!is_x_bytes_available(4, num_bytes, *index)) {
+            return false;
+        }
         requirement->constraint_value.light_intensity = four_little_endian_bytes_to_uint32(&bytes[*index]);
         *index += 4;
         break;
