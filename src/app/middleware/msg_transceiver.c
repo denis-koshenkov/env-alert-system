@@ -158,6 +158,55 @@ static bool parse_led_pattern(const uint8_t *const bytes, size_t num_bytes, size
     return true;
 }
 
+static bool parse_temperature_constraint_value(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
+                                               MsgTransceiverTemperature *const constraint_value)
+{
+    if (!is_x_bytes_available(2, num_bytes, *index)) {
+        return false;
+    }
+    /* Store the two bytes in a variable */
+    uint16_t value_unsigned = two_little_endian_bytes_to_uint16(&bytes[*index]);
+    /* Interpret the two bytes as a two-byte signed integer */
+    int16_t *value_signed_p = (int16_t *)&value_unsigned;
+    /* Assign the two-byte signed integer as the temperature constraint value */
+    *constraint_value = *value_signed_p;
+    *index += 2;
+    return true;
+}
+
+static bool parse_pressure_constraint_value(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
+                                            MsgTransceiverPressure *const constraint_value)
+{
+    if (!is_x_bytes_available(2, num_bytes, *index)) {
+        return false;
+    }
+    *constraint_value = two_little_endian_bytes_to_uint16(&bytes[*index]);
+    *index += 2;
+    return true;
+}
+
+static bool parse_humidity_constraint_value(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
+                                            MsgTransceiverHumidity *const constraint_value)
+{
+    if (!is_x_bytes_available(2, num_bytes, *index)) {
+        return false;
+    }
+    *constraint_value = two_little_endian_bytes_to_uint16(&bytes[*index]);
+    *index += 2;
+    return true;
+}
+
+static bool parse_light_intensity_constraint_value(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
+                                                   MsgTransceiverLightIntensity *const constraint_value)
+{
+    if (!is_x_bytes_available(4, num_bytes, *index)) {
+        return false;
+    }
+    *constraint_value = four_little_endian_bytes_to_uint32(&bytes[*index]);
+    *index += 4;
+    return true;
+}
+
 static bool parse_variable_requirement(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
                                        MsgTransceiverVariableRequirement *const requirement)
 {
@@ -168,37 +217,25 @@ static bool parse_variable_requirement(const uint8_t *const bytes, size_t num_by
     requirement->operator = bytes[(*index)++];
     switch (requirement->variable_identifier) {
     case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_TEMPERATURE:
-        if (!is_x_bytes_available(2, num_bytes, *index)) {
+        if (!parse_temperature_constraint_value(bytes, num_bytes, index, &requirement->constraint_value.temperature)) {
             return false;
         }
-        /* Store the two bytes in a variable */
-        uint16_t value_unsigned = two_little_endian_bytes_to_uint16(&bytes[*index]);
-        /* Interpret the two bytes as a two-byte signed integer */
-        int16_t *value_signed_p = (int16_t *)&value_unsigned;
-        /* Assign the two-byte signed integer as the temperature constraint value */
-        requirement->constraint_value.temperature = *value_signed_p;
-        *index += 2;
         break;
     case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_PRESSURE:
-        if (!is_x_bytes_available(2, num_bytes, *index)) {
+        if (!parse_pressure_constraint_value(bytes, num_bytes, index, &requirement->constraint_value.pressure)) {
             return false;
         }
-        requirement->constraint_value.pressure = two_little_endian_bytes_to_uint16(&bytes[*index]);
-        *index += 2;
         break;
     case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_HUMIDITY:
-        if (!is_x_bytes_available(2, num_bytes, *index)) {
+        if (!parse_humidity_constraint_value(bytes, num_bytes, index, &requirement->constraint_value.humidity)) {
             return false;
         }
-        requirement->constraint_value.humidity = two_little_endian_bytes_to_uint16(&bytes[*index]);
-        *index += 2;
         break;
     case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_LIGHT_INTENSITY:
-        if (!is_x_bytes_available(4, num_bytes, *index)) {
+        if (!parse_light_intensity_constraint_value(bytes, num_bytes, index,
+                                                    &requirement->constraint_value.light_intensity)) {
             return false;
         }
-        requirement->constraint_value.light_intensity = four_little_endian_bytes_to_uint32(&bytes[*index]);
-        *index += 4;
         break;
     default:
         break;
