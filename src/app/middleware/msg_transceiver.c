@@ -323,6 +323,11 @@ static void handle_add_alert_message(const uint8_t *const bytes, size_t num_byte
         }
     }
 
+    /* There are extra bytes that were not parsed -> too many bytes, invalid payload structure */
+    if (index != num_bytes) {
+        return;
+    }
+
     if (add_alert_cb) {
         add_alert_cb(&alert, NULL);
     }

@@ -1161,3 +1161,30 @@ TEST_C(MsgTransceiver, AddAlertInvalidVariableIdentifier)
     CHECK_C(!add_alert_cb_called);
     CHECK_C(!remove_alert_cb_called);
 }
+
+TEST_C(MsgTransceiver, AddAlertNumBytesTooLarge)
+{
+    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
+    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
+
+    /* The structure is valid, but has one extra byte at the end */
+    uint8_t bytes[20] = {
+        0x2,                  /* message id */
+        0x2,                  /* alert id */
+        0x1,  0x5,  0x0, 0x0, /* warmup period */
+        0x5A, 0x11, 0x0, 0x0, /* cooldown period */
+        0x3,                  /* notification type - connectivity enabled, LED enabled */
+        0x1,                  /* Led color - blue */
+        0x1,                  /* Led pattern - alert */
+        0x1,                  /* Number of ORed requirements */
+        0x1,                  /* Number of requirements in the first ORed requirement */
+        0x0,                  /* Start of var req 0: Temperature variable identifier */
+        0x0,                  /* Operator - greater than or equal to */
+        0x0,  0x0,            /* Constraint value */
+        0x0                   /* Random excess byte */
+    };
+    receive_cb(bytes, 20, receive_cb_user_data);
+
+    CHECK_C(!add_alert_cb_called);
+    CHECK_C(!remove_alert_cb_called);
+}
