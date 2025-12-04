@@ -835,10 +835,10 @@ TEST_C(MsgTransceiver, AddAlertMessage19ValidBytesValidAlert)
     uint8_t bytes[19] = {
         0x2,                  /* message id */
         0x2,                  /* alert id */
-        0x1,  0x5,  0x0, 0x0, /* warmup period */
-        0x5A, 0x11, 0x0, 0x0, /* cooldown period */
+        0x1,  0x5,  0x0, 0x0, /* warmup period - 1281 ms */
+        0x5A, 0x11, 0x0, 0x0, /* cooldown period - 4442 ms */
         0x3,                  /* notification type - connectivity enabled, LED enabled */
-        0x1,                  /* Led color - blue */
+        0x2,                  /* Led color - blue */
         0x1,                  /* Led pattern - alert */
         0x1,                  /* Number of ORed requirements */
         0x1,                  /* Number of requirements in the first ORed requirement */
@@ -850,6 +850,22 @@ TEST_C(MsgTransceiver, AddAlertMessage19ValidBytesValidAlert)
 
     CHECK_C(add_alert_cb_called);
     CHECK_C(!remove_alert_cb_called);
+
+    /* Validate constructed alert */
+    const MsgTransceiverAlert *const alert = &add_alert_cb_alert;
+    CHECK_EQUAL_C_UBYTE(2, alert->alert_id);
+    CHECK_EQUAL_C_ULONG(1281, alert->warmup_period);
+    CHECK_EQUAL_C_ULONG(4442, alert->cooldown_period);
+    CHECK_C(alert->notification_type.connectivity);
+    CHECK_C(alert->notification_type.led);
+    CHECK_EQUAL_C_UBYTE(MSG_TRANSCEIVER_LED_COLOR_BLUE, alert->led_color);
+    CHECK_EQUAL_C_UBYTE(MSG_TRANSCEIVER_LED_PATTERN_ALERT, alert->led_pattern);
+    CHECK_EQUAL_C_UBYTE(1, alert->alert_condition.num_variable_requirements);
+    const MsgTransceiverVariableRequirement *requirement = &(alert->alert_condition.variable_requirements[0]);
+    CHECK_EQUAL_C_UBYTE(MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_TEMPERATURE, requirement->variable_identifier);
+    CHECK_EQUAL_C_UBYTE(MSG_TRANSCEIVER_REQUIREMENT_OPERATOR_GEQ, requirement->operator);
+    CHECK_EQUAL_C_ULONG(0, requirement->constraint_value.temperature);
+    CHECK_C(requirement->is_last_in_ored_requirement);
 }
 
 TEST_C(MsgTransceiver, AddAlertMessage19ValidBytes)
