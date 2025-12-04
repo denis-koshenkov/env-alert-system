@@ -586,3 +586,54 @@ TEST_C(MsgTransceiver, AddAlertMessage6ValidBytes)
     CHECK_C(!add_alert_cb_called);
     CHECK_C(!remove_alert_cb_called);
 }
+
+TEST_C(MsgTransceiver, AddAlertMessage7ValidBytes)
+{
+    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
+    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
+
+    uint8_t bytes[7] = {
+        0x2,                 /* message id */
+        0x2,                 /* alert id */
+        0x1,  0x5, 0x0, 0x0, /* warmup period */
+        0x5A,                /* first byte of cooldown period */
+    };
+    receive_cb(bytes, 7, receive_cb_user_data);
+
+    CHECK_C(!add_alert_cb_called);
+    CHECK_C(!remove_alert_cb_called);
+}
+
+TEST_C(MsgTransceiver, AddAlertMessage8ValidBytes)
+{
+    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
+    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
+
+    uint8_t bytes[8] = {
+        0x2,                  /* message id */
+        0x2,                  /* alert id */
+        0x1,  0x5,  0x0, 0x0, /* warmup period */
+        0x5A, 0x11,           /* first two bytes of cooldown period */
+    };
+    receive_cb(bytes, 8, receive_cb_user_data);
+
+    CHECK_C(!add_alert_cb_called);
+    CHECK_C(!remove_alert_cb_called);
+}
+
+TEST_C(MsgTransceiver, AddAlertMessage9ValidBytes)
+{
+    msg_transceiver_set_add_alert_cb(add_alert_cb, NULL);
+    msg_transceiver_set_remove_alert_cb(remove_alert_cb, NULL);
+
+    uint8_t bytes[9] = {
+        0x2,                  /* message id */
+        0x2,                  /* alert id */
+        0x1,  0x5,  0x0, 0x0, /* warmup period */
+        0x5A, 0x11, 0x0,      /* first three bytes of cooldown period */
+    };
+    receive_cb(bytes, 9, receive_cb_user_data);
+
+    CHECK_C(!add_alert_cb_called);
+    CHECK_C(!remove_alert_cb_called);
+}

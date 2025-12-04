@@ -30,3 +30,6 @@ TEST_C_WRAPPER(MsgTransceiver, AddAlertMessage3ValidBytes);
 TEST_C_WRAPPER(MsgTransceiver, AddAlertMessage4ValidBytes);
 TEST_C_WRAPPER(MsgTransceiver, AddAlertMessage5ValidBytes);
 TEST_C_WRAPPER(MsgTransceiver, AddAlertMessage6ValidBytes);
+TEST_C_WRAPPER(MsgTransceiver, AddAlertMessage7ValidBytes);
+TEST_C_WRAPPER(MsgTransceiver, AddAlertMessage8ValidBytes);
+TEST_C_WRAPPER(MsgTransceiver, AddAlertMessage9ValidBytes);
