@@ -258,6 +258,12 @@ static bool parse_ored_requirement(const uint8_t *const bytes, size_t num_bytes,
     }
     size_t num_variable_requirements_in_ored_requirement = bytes[(*index)++];
     for (size_t i = 0; i < num_variable_requirements_in_ored_requirement; i++) {
+        if (alert_condition->num_variable_requirements >=
+            CONFIG_MSG_TRANSCEIVER_MAX_NUM_VARIABLE_REQUIREMENTS_IN_ALERT_CONDITION) {
+            /* Max allowed number of variable requirements is exceeded */
+            return false;
+        }
+
         MsgTransceiverVariableRequirement *const requirement =
             &(alert_condition->variable_requirements[alert_condition->num_variable_requirements]);
         if (!parse_variable_requirement(bytes, num_bytes, index, requirement)) {
