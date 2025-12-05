@@ -94,6 +94,17 @@ static bool is_x_bytes_available(size_t desired_num_available_bytes, size_t tota
     return (actual_num_available_bytes >= desired_num_available_bytes);
 }
 
+/**
+ * @brief Parse alert id.
+ *
+ * @param bytes Array of bytes that contains the alert id.
+ * @param num_bytes Total number of bytes in @p bytes array.
+ * @param index Index in @p bytes array that points to the first byte of the alert id payload.
+ * @param[out] alert_id If true is returned, the resulting alert id is written to this parameter.
+ *
+ * @return true Successfully parsed alert id.
+ * @return false Failed to parse alert id, because there are not enough available bytes in the payload.
+ */
 static bool parse_alert_id(const uint8_t *const bytes, size_t num_bytes, size_t *const index, uint8_t *const alert_id)
 {
     if (!is_x_bytes_available(1, num_bytes, *index)) {
@@ -105,6 +116,17 @@ static bool parse_alert_id(const uint8_t *const bytes, size_t num_bytes, size_t 
     return true;
 }
 
+/**
+ * @brief Parse warmup period.
+ *
+ * @param bytes Array of bytes that contains the warmup period.
+ * @param num_bytes Total number of bytes in @p bytes array.
+ * @param index Index in @p bytes array that points to the first byte of the warmup period payload.
+ * @param[out] warmup_period If true is returned, the resulting warmup period is written to this parameter.
+ *
+ * @return true Successfully parsed warmup period.
+ * @return false Failed to parse warmup period, because there are not enough available bytes in the payload.
+ */
 static bool parse_warmup_period(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
                                 uint32_t *const warmup_period)
 {
@@ -116,6 +138,17 @@ static bool parse_warmup_period(const uint8_t *const bytes, size_t num_bytes, si
     return true;
 }
 
+/**
+ * @brief Parse cooldown period.
+ *
+ * @param bytes Array of bytes that contains the cooldown period.
+ * @param num_bytes Total number of bytes in @p bytes array.
+ * @param index Index in @p bytes array that points to the first byte of the cooldown period payload.
+ * @param[out] cooldown_period If true is returned, the resulting cooldown period is written to this parameter.
+ *
+ * @return true Successfully parsed cooldown period.
+ * @return false Failed to parse cooldown period, because there are not enough available bytes in the payload.
+ */
 static bool parse_cooldown_period(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
                                   uint32_t *const cooldown_period)
 {
@@ -127,6 +160,18 @@ static bool parse_cooldown_period(const uint8_t *const bytes, size_t num_bytes, 
     return true;
 }
 
+/**
+ * @brief Parse notification type.
+ *
+ * @param bytes Array of bytes that contains the notification type.
+ * @param num_bytes Total number of bytes in @p bytes array.
+ * @param index Index in @p bytes array that points to the first byte of the notification type payload.
+ * @param[out] notification_type If true is returned, the resulting notification type is written to this parameter.
+ *
+ * @return true Successfully parsed notification type.
+ * @return false Failed to parse notification type, because there are not enough available bytes in the payload or
+ * because invalid bits are set in the payload.
+ */
 static bool parse_notification_type(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
                                     NotificationType *const notification_type)
 {
@@ -144,6 +189,17 @@ static bool parse_notification_type(const uint8_t *const bytes, size_t num_bytes
     return true;
 }
 
+/**
+ * @brief Parse led color.
+ *
+ * @param bytes Array of bytes that contains the led color.
+ * @param num_bytes Total number of bytes in @p bytes array.
+ * @param index Index in @p bytes array that points to the first byte of the led color payload.
+ * @param[out] led_color If true is returned, the resulting led color is written to this parameter.
+ *
+ * @return true Successfully parsed led color.
+ * @return false Failed to parse led color, because there are not enough available bytes in the payload.
+ */
 static bool parse_led_color(const uint8_t *const bytes, size_t num_bytes, size_t *const index, uint8_t *const led_color)
 {
     if (!is_x_bytes_available(1, num_bytes, *index)) {
@@ -153,6 +209,17 @@ static bool parse_led_color(const uint8_t *const bytes, size_t num_bytes, size_t
     return true;
 }
 
+/**
+ * @brief Parse led pattern.
+ *
+ * @param bytes Array of bytes that contains the led pattern.
+ * @param num_bytes Total number of bytes in @p bytes array.
+ * @param index Index in @p bytes array that points to the first byte of the led pattern payload.
+ * @param[out] led_pattern If true is returned, the resulting led pattern is written to this parameter.
+ *
+ * @return true Successfully parsed led pattern.
+ * @return false Failed to parse led pattern, because there are not enough available bytes in the payload.
+ */
 static bool parse_led_pattern(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
                               uint8_t *const led_pattern)
 {
@@ -163,6 +230,19 @@ static bool parse_led_pattern(const uint8_t *const bytes, size_t num_bytes, size
     return true;
 }
 
+/**
+ * @brief Parse temperature constraint value.
+ *
+ * @param bytes Array of bytes that contains the temperature constraint value.
+ * @param num_bytes Total number of bytes in @p bytes array.
+ * @param index Index in @p bytes array that points to the first byte of the temperature constraint value payload.
+ * @param[out] constraint_value If true is returned, the resulting temperature constraint value is written to this
+ * parameter.
+ *
+ * @return true Successfully parsed temperature constraint value.
+ * @return false Failed to parse temperature constraint value, because there are not enough available bytes in the
+ * payload.
+ */
 static bool parse_temperature_constraint_value(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
                                                MsgTransceiverTemperature *const constraint_value)
 {
@@ -179,6 +259,19 @@ static bool parse_temperature_constraint_value(const uint8_t *const bytes, size_
     return true;
 }
 
+/**
+ * @brief Parse pressure constraint value.
+ *
+ * @param bytes Array of bytes that contains the pressure constraint value.
+ * @param num_bytes Total number of bytes in @p bytes array.
+ * @param index Index in @p bytes array that points to the first byte of the pressure constraint value payload.
+ * @param[out] constraint_value If true is returned, the resulting pressure constraint value is written to this
+ * parameter.
+ *
+ * @return true Successfully parsed pressure constraint value.
+ * @return false Failed to parse pressure constraint value, because there are not enough available bytes in the
+ * payload.
+ */
 static bool parse_pressure_constraint_value(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
                                             MsgTransceiverPressure *const constraint_value)
 {
@@ -190,6 +283,19 @@ static bool parse_pressure_constraint_value(const uint8_t *const bytes, size_t n
     return true;
 }
 
+/**
+ * @brief Parse humidity constraint value.
+ *
+ * @param bytes Array of bytes that contains the humidity constraint value.
+ * @param num_bytes Total number of bytes in @p bytes array.
+ * @param index Index in @p bytes array that points to the first byte of the humidity constraint value payload.
+ * @param[out] constraint_value If true is returned, the resulting humidity constraint value is written to this
+ * parameter.
+ *
+ * @return true Successfully parsed humidity constraint value.
+ * @return false Failed to parse humidity constraint value, because there are not enough available bytes in the
+ * payload.
+ */
 static bool parse_humidity_constraint_value(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
                                             MsgTransceiverHumidity *const constraint_value)
 {
@@ -201,6 +307,19 @@ static bool parse_humidity_constraint_value(const uint8_t *const bytes, size_t n
     return true;
 }
 
+/**
+ * @brief Parse light intensity constraint value.
+ *
+ * @param bytes Array of bytes that contains the light intensity constraint value.
+ * @param num_bytes Total number of bytes in @p bytes array.
+ * @param index Index in @p bytes array that points to the first byte of the light intensity constraint value payload.
+ * @param[out] constraint_value If true is returned, the resulting light intensity constraint value is written to this
+ * parameter.
+ *
+ * @return true Successfully parsed light intensity constraint value.
+ * @return false Failed to parse light intensity constraint value, because there are not enough available bytes in the
+ * payload.
+ */
 static bool parse_light_intensity_constraint_value(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
                                                    MsgTransceiverLightIntensity *const constraint_value)
 {
@@ -212,6 +331,21 @@ static bool parse_light_intensity_constraint_value(const uint8_t *const bytes, s
     return true;
 }
 
+/**
+ * @brief Parse variable requirement.
+ *
+ * @param bytes Array of bytes that contains the variable requirement.
+ * @param num_bytes Total number of bytes in @p bytes array.
+ * @param index Index in @p bytes array that points to the first byte of the variable requirement payload.
+ * @param[out] requirement If true is returned, the resulting variable requirement is written to this parameter.
+ *
+ * @return true Successfully parsed variable requirement.
+ * @return false Failed to parse variable requirement, because there are not enough available bytes in the payload, or
+ * the variable identifier is invalid.
+ *
+ * @note This function does NOT populate the is_last_in_ored_requirement field in @p requirement, because this function
+ * does not know whether this variable requirement is the last one in an ORed requirement.
+ */
 static bool parse_variable_requirement(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
                                        MsgTransceiverVariableRequirement *const requirement)
 {
@@ -250,6 +384,21 @@ static bool parse_variable_requirement(const uint8_t *const bytes, size_t num_by
     return true;
 }
 
+/**
+ * @brief Parse ORed requirement.
+ *
+ * @param bytes Array of bytes that contains the ORed requirement.
+ * @param num_bytes Total number of bytes in @p bytes array.
+ * @param index Index in @p bytes array that points to the first byte of the ORed requirement payload.
+ * @param alert_condition If true is returned, writes all variable requirements to this alert condition, starting
+ * at index alert_condition->num_variable_requirements. Increments alert_condition->num_variable_requirements for every
+ * added variable requirement.
+ *
+ * @return true Successfully parsed ORed requirement.
+ * @return false Failed to parse ORed requirement, because there are not enough available bytes in the payload, or the
+ * payload structure is invalid, or there maximum number of allowed variable requirements in an alert condition is
+ * exceeded.
+ */
 static bool parse_ored_requirement(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
                                    MsgTransceiverAlertCondition *const alert_condition)
 {
@@ -275,6 +424,19 @@ static bool parse_ored_requirement(const uint8_t *const bytes, size_t num_bytes,
     return true;
 }
 
+/**
+ * @brief Parse number of ORed requirements.
+ *
+ * @param bytes Array of bytes that contains the number of ORed requirements.
+ * @param num_bytes Total number of bytes in @p bytes array.
+ * @param index Index in @p bytes array that points to the first byte of the number of ORed requirements payload.
+ * @param[out] num_ored_requirements If true is returned, the resulting number of ORed requirements is written to this
+ * parameter.
+ *
+ * @return true Successfully parsed number of ORed requirements.
+ * @return false Failed to parse number of ORed requirements, because there are not enough available bytes in the
+ * payload.
+ */
 static bool parse_num_ored_requirements(const uint8_t *const bytes, size_t num_bytes, size_t *const index,
                                         uint8_t *const num_ored_requirements)
 {
@@ -287,6 +449,8 @@ static bool parse_num_ored_requirements(const uint8_t *const bytes, size_t num_b
 
 /**
  * @brief Handle receiving a "add alert" message.
+ *
+ * Calls the set "add alert" callback, if payload structure is valid. If payload structure is invalid, does nothing.
  *
  * @param bytes Received bytes excluding the first message id byte.
  * @param num_bytes Number of bytes in the @p bytes array.
