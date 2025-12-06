@@ -520,6 +520,7 @@ static void receive_cb(uint8_t *bytes, size_t num_bytes, void *user_data)
         handle_add_alert_message(&bytes[1], num_bytes - 1);
         break;
     default:
+        /* Invalid message id */
         break;
     }
 }
@@ -558,5 +559,7 @@ void msg_transceiver_deinit()
 {
     remove_alert_cb = NULL;
     add_alert_cb = NULL;
+    /* No need to clear user data for add and remove alert cbs, since it will get reset anyway when the new add/remove
+     * alert callback is set */
     transceiver_unset_receive_cb();
 }

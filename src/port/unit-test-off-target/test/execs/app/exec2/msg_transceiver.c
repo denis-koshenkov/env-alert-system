@@ -1253,3 +1253,71 @@ TEST_C(MsgTransceiver, AddAlertCbExecutedWithUserData)
     CHECK_C(add_alert_cb_called);
     CHECK_EQUAL_C_POINTER(user_data, add_alert_cb_user_data);
 }
+
+TEST_C(MsgTransceiver, ReceiveCbCalledBeforeAddAlertCbSet)
+{
+    /* Expected to be called in msg_transceiver_deinit */
+    mock_c()->expectOneCall("transceiver_unset_receive_cb");
+    /* Expected to be called in msg_transceiver_init */
+    mock_c()->expectOneCall("transceiver_set_receive_cb")->ignoreOtherParameters();
+
+    msg_transceiver_deinit();
+    msg_transceiver_init();
+
+    uint8_t add_alert_bytes[17] = {
+        0x2,                /* message id */
+        0x0,                /* alert id */
+        0x0, 0x0, 0x0, 0x0, /* Warmup period - 0 ms */
+        0x0, 0x0, 0x0, 0x0, /* Cooldown period - 0 ms */
+        0x1,                /* notification type - connectivity enabled, LED disabled */
+        0x1,                /* Number of ORed requirements */
+        0x1,                /* Number of variable requirements in the first ORed requirement */
+        /* Start of variable requirement 0 */
+        0x0,     /* Temperature variable identifier */
+        0x0,     /* Operator - greater than or equal to */
+        0x0, 0x0 /* Constraint value - 0 degrees Celsius */
+    };
+    receive_cb(add_alert_bytes, 17, receive_cb_user_data);
+
+    /* We are mostly checking that the program does not crash by running this test */
+    CHECK_C(!remove_alert_cb_called);
+    CHECK_C(!add_alert_cb_called);
+}
+
+TEST_C(MsgTransceiver, ReceiveCbCalledBeforeRemoveAlertCbSet)
+{
+    /* Expected to be called in msg_transceiver_deinit */
+    mock_c()->expectOneCall("transceiver_unset_receive_cb");
+    /* Expected to be called in msg_transceiver_init */
+    mock_c()->expectOneCall("transceiver_set_receive_cb")->ignoreOtherParameters();
+
+    msg_transceiver_deinit();
+    msg_transceiver_init();
+
+    /* Mock receiving a "remove alert" message. 0x1 - message id, 0 - alert id */
+    uint8_t remove_alert_bytes[2] = {0x1, 0};
+    receive_cb(remove_alert_bytes, 2, receive_cb_user_data);
+
+    /* We are mostly checking that the program does not crash by running this test */
+    CHECK_C(!remove_alert_cb_called);
+    CHECK_C(!add_alert_cb_called);
+}
+
+TEST_C(MsgTransceiver, ReceiveCbCalledBeforeCbsSet)
+{
+    /* Expected to be called in msg_transceiver_deinit */
+    mock_c()->expectOneCall("transceiver_unset_receive_cb");
+    /* Expected to be called in msg_transceiver_init */
+    mock_c()->expectOneCall("transceiver_set_receive_cb")->ignoreOtherParameters();
+
+    msg_transceiver_deinit();
+    msg_transceiver_init();
+
+    /* Garbage byte with invalid message id 0xFF*/
+    uint8_t bytes[4] = {0xFF, 0xA, 0xB, 0xC};
+    receive_cb(bytes, 4, receive_cb_user_data);
+
+    /* We are mostly checking that the program does not crash by running this test */
+    CHECK_C(!remove_alert_cb_called);
+    CHECK_C(!add_alert_cb_called);
+}

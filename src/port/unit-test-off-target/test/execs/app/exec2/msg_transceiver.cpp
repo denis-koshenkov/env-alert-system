@@ -60,3 +60,6 @@ TEST_C_WRAPPER(MsgTransceiver, DeinitClearsRemoveAlertCb);
 TEST_C_WRAPPER(MsgTransceiver, DeinitClearsAddAlertCb);
 TEST_C_WRAPPER(MsgTransceiver, AddAlertTooManyVariableRequirements);
 TEST_C_WRAPPER(MsgTransceiver, AddAlertCbExecutedWithUserData);
+TEST_C_WRAPPER(MsgTransceiver, ReceiveCbCalledBeforeAddAlertCbSet);
+TEST_C_WRAPPER(MsgTransceiver, ReceiveCbCalledBeforeRemoveAlertCbSet);
+TEST_C_WRAPPER(MsgTransceiver, ReceiveCbCalledBeforeCbsSet);
