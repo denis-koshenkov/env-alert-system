@@ -58,3 +58,4 @@ TEST_C_WRAPPER(MsgTransceiver, AddAlertInvalidVariableIdentifier);
 TEST_C_WRAPPER(MsgTransceiver, AddAlertNumBytesTooLarge);
 TEST_C_WRAPPER(MsgTransceiver, DeinitClearsRemoveAlertCb);
 TEST_C_WRAPPER(MsgTransceiver, AddAlertTooManyVariableRequirements);
+TEST_C_WRAPPER(MsgTransceiver, AddAlertCbExecutedWithUserData);

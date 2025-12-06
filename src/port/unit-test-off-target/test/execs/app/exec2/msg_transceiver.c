@@ -269,7 +269,6 @@ TEST_C(MsgTransceiver, RemoveAlertCbExecutedWithUserData)
     uint8_t remove_alert_bytes[2] = {0x1, 10};
     receive_cb(remove_alert_bytes, 2, receive_cb_user_data);
 
-    /* remove_alert_cb should have been called with alert_id 0 and user_data NULL */
     CHECK_C(remove_alert_cb_called);
     CHECK_EQUAL_C_UINT(10, remove_alert_cb_alert_id);
     CHECK_EQUAL_C_POINTER(user_data, remove_alert_cb_user_data);
@@ -473,7 +472,6 @@ TEST_C(MsgTransceiver, AddAlert3)
 
 TEST_C(MsgTransceiver, InvalidMessageId)
 {
-    /* Mock receiving a "add alert" message */
     uint8_t bytes[5] = {
         0xA0,                  /* invalid message id */
         0x1,  0x4, 0xFF, 0xA5, /* Some garbage data */
@@ -1191,4 +1189,31 @@ TEST_C(MsgTransceiver, AddAlertTooManyVariableRequirements)
 
     CHECK_C(!add_alert_cb_called);
     CHECK_C(!remove_alert_cb_called);
+}
+
+TEST_C(MsgTransceiver, AddAlertCbExecutedWithUserData)
+{
+    void *user_data = (void *)0x5A;
+    msg_transceiver_set_add_alert_cb(add_alert_cb, user_data);
+    /* Mock receiving a "add alert" message */
+    uint8_t add_alert_bytes[17] = {
+        0x2,                /* message id */
+        0x0,                /* alert id */
+        0x0, 0x0, 0x0, 0x0, /* Warmup period - 0 ms */
+        0x0, 0x0, 0x0, 0x0, /* Cooldown period - 0 ms */
+        0x1,                /* notification type - connectivity enabled, LED disabled */
+        0x1,                /* Number of ORed requirements */
+        0x1,                /* Number of variable requirements in the first ORed requirement */
+        /* Start of variable requirement 0 */
+        0x0,     /* Temperature variable identifier */
+        0x0,     /* Operator - greater than or equal to */
+        0x0, 0x0 /* Constraint value - 0 degrees Celsius */
+    };
+    receive_cb(add_alert_bytes, 17, receive_cb_user_data);
+
+    /* Not verifying the alert contents - the purpose of this test is to only verify the user data in the callback.
+     * Other tests verify alert contents. */
+    CHECK_C(!remove_alert_cb_called);
+    CHECK_C(add_alert_cb_called);
+    CHECK_EQUAL_C_POINTER(user_data, add_alert_cb_user_data);
 }
