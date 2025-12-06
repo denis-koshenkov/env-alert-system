@@ -6,6 +6,7 @@
 #define MSG_TRANSCEIVER_MESSAGE_ID_REMOVE_ALERT 1
 #define MSG_TRANSCEIVER_MESSAGE_ID_ADD_ALERT 2
 
+static bool initialized = false;
 static MsgTransceiverMessageSentCb message_sent_cb = NULL;
 static MsgTransceiverRemoveAlertCb remove_alert_cb = NULL;
 static void *remove_alert_cb_user_data = NULL;
@@ -528,11 +529,14 @@ static void receive_cb(uint8_t *bytes, size_t num_bytes, void *user_data)
 void msg_transceiver_init()
 {
     transceiver_set_receive_cb(receive_cb, NULL);
+    initialized = true;
 }
 
 void msg_transceiver_send_alert_status_change_message(uint8_t alert_id, bool is_raised, MsgTransceiverMessageSentCb cb,
                                                       void *user_data)
 {
+    EAS_ASSERT(initialized);
+
     message_sent_cb = cb;
     uint8_t bytes[3];
     bytes[0] = MSG_TRANSCEIVER_MESSAGE_ID_ALERT_STATUS_CHANGE;
