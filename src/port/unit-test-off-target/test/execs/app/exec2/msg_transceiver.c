@@ -1122,6 +1122,42 @@ TEST_C(MsgTransceiver, DeinitClearsRemoveAlertCb)
     CHECK_C(!remove_alert_cb_called);
 }
 
+TEST_C(MsgTransceiver, DeinitClearsAddAlertCb)
+{
+    /* Expected to be called in msg_transceiver_deinit */
+    mock_c()->expectOneCall("transceiver_unset_receive_cb");
+    /* Expected to be called in msg_transceiver_init */
+    mock_c()->expectOneCall("transceiver_set_receive_cb")->ignoreOtherParameters();
+
+    /* msg_transceiver_set_add_alert_cb is called as a part of the test setup, so add alert callback is initially set */
+
+    /* Mock receiving a "add alert" message */
+    uint8_t add_alert_bytes[17] = {
+        0x2,                /* message id */
+        0x0,                /* alert id */
+        0x0, 0x0, 0x0, 0x0, /* Warmup period - 0 ms */
+        0x0, 0x0, 0x0, 0x0, /* Cooldown period - 0 ms */
+        0x1,                /* notification type - connectivity enabled, LED disabled */
+        0x1,                /* Number of ORed requirements */
+        0x1,                /* Number of variable requirements in the first ORed requirement */
+        /* Start of variable requirement 0 */
+        0x0,     /* Temperature variable identifier */
+        0x0,     /* Operator - greater than or equal to */
+        0x0, 0x0 /* Constraint value - 0 degrees Celsius */
+    };
+    receive_cb(add_alert_bytes, 17, receive_cb_user_data);
+    /* add_alert_cb should have been called, since the callback is set */
+    CHECK_C(add_alert_cb_called);
+
+    msg_transceiver_deinit();
+    msg_transceiver_init();
+
+    /* deinit should have cleared the callback, so now we expect add alert cb to not be called */
+    add_alert_cb_called = false;
+    receive_cb(add_alert_bytes, 17, receive_cb_user_data);
+    CHECK_C(!add_alert_cb_called);
+}
+
 TEST_C(MsgTransceiver, AddAlertTooManyVariableRequirements)
 {
     /* Mock receiving a "add alert" message */

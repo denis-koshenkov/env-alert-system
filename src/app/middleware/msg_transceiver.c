@@ -557,5 +557,6 @@ void msg_transceiver_set_remove_alert_cb(MsgTransceiverRemoveAlertCb cb, void *u
 void msg_transceiver_deinit()
 {
     remove_alert_cb = NULL;
+    add_alert_cb = NULL;
     transceiver_unset_receive_cb();
 }
