@@ -129,12 +129,28 @@ typedef void (*MsgTransceiverAddAlertCb)(const MsgTransceiverAlert *const alert,
  */
 typedef void (*MsgTransceiverRemoveAlertCb)(uint8_t alert_id, void *user_data);
 
+/**
+ * @brief Initialize message transceiver module.
+ *
+ * This function should be called before any other function in this module.
+ */
 void msg_transceiver_init();
+
+/**
+ * @brief Send alert status change message.
+ *
+ * @param alert_id Alert id.
+ * @param is_raised True if alert status changed to "raised", false if alert status changed to "silenced".
+ * @param cb Callback to execute once the message is sent.
+ * @param user_data User data to pass to @p cb as a parameter.
+ */
 void msg_transceiver_send_alert_status_change_message(uint8_t alert_id, bool is_raised, MsgTransceiverMessageSentCb cb,
                                                       void *user_data);
 
 /**
  * @brief Set callback to execute whenever a "add alert" message is received.
+ *
+ * @pre Module has been initialized by calling @ref msg_transceiver_init.
  *
  * @param cb Callback to execute.
  * @param user_data User data to pass to @p cb as a parameter.
@@ -144,11 +160,18 @@ void msg_transceiver_set_add_alert_cb(MsgTransceiverAddAlertCb cb, void *user_da
 /**
  * @brief Set callback to execute whenever a "remove alert" message is received.
  *
+ * @pre Module has been initialized by calling @ref msg_transceiver_init.
+ *
  * @param cb Callback to execute.
  * @param user_data User data to pass to @p cb as a parameter.
  */
 void msg_transceiver_set_remove_alert_cb(MsgTransceiverRemoveAlertCb cb, void *user_data);
 
+/**
+ * @brief Deinitialize message transceiver module.
+ *
+ * Does nothing if it is already in the deinitialized state.
+ */
 void msg_transceiver_deinit();
 
 #ifdef __cplusplus

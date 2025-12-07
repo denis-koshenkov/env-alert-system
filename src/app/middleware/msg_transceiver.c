@@ -13,6 +13,12 @@ static void *remove_alert_cb_user_data = NULL;
 static MsgTransceiverAddAlertCb add_alert_cb = NULL;
 static void *add_alert_cb_user_data = NULL;
 
+/**
+ * @brief Callback that transmitter should execute when bytes have been transmitted.
+ *
+ * @param result True if bytes transmitted successfully, false otherwise.
+ * @param user_data User data.
+ */
 static void transmit_complete_cb(bool result, void *user_data)
 {
     if (message_sent_cb) {
@@ -505,6 +511,13 @@ static void handle_add_alert_message(const uint8_t *const bytes, size_t num_byte
     }
 }
 
+/**
+ * @brief Callback to execute when bytes are received by the transmitter.
+ *
+ * @param bytes Array of received bytes.
+ * @param num_bytes Number of elements in the @p bytes array.
+ * @param user_data User data.
+ */
 static void receive_cb(uint8_t *bytes, size_t num_bytes, void *user_data)
 {
     EAS_ASSERT(bytes);
