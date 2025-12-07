@@ -1321,3 +1321,21 @@ TEST_C(MsgTransceiver, ReceiveCbCalledBeforeCbsSet)
     CHECK_C(!remove_alert_cb_called);
     CHECK_C(!add_alert_cb_called);
 }
+
+TEST_C(MsgTransceiver, SendAlertStatusChangeMessageCbNull)
+{
+    TEST_ASSERT_PLUGIN_C_EXPECT_ASSERTION("cb", "msg_transceiver_send_alert_status_change_message");
+    msg_transceiver_send_alert_status_change_message(0, false, NULL, NULL);
+}
+
+TEST_C(MsgTransceiver, SetAddAlertCbCbNull)
+{
+    TEST_ASSERT_PLUGIN_C_EXPECT_ASSERTION("cb", "msg_transceiver_set_add_alert_cb");
+    msg_transceiver_set_add_alert_cb(NULL, NULL);
+}
+
+TEST_C(MsgTransceiver, SetRemoveAlertCbCbNull)
+{
+    TEST_ASSERT_PLUGIN_C_EXPECT_ASSERTION("cb", "msg_transceiver_set_remove_alert_cb");
+    msg_transceiver_set_remove_alert_cb(NULL, NULL);
+}

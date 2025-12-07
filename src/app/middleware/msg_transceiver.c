@@ -528,6 +528,8 @@ static void receive_cb(uint8_t *bytes, size_t num_bytes, void *user_data)
 
 void msg_transceiver_init()
 {
+    EAS_ASSERT(!initialized);
+
     transceiver_set_receive_cb(receive_cb, NULL);
     initialized = true;
 }
@@ -536,6 +538,7 @@ void msg_transceiver_send_alert_status_change_message(uint8_t alert_id, bool is_
                                                       void *user_data)
 {
     EAS_ASSERT(initialized);
+    EAS_ASSERT(cb);
 
     message_sent_cb = cb;
     uint8_t bytes[3];
@@ -549,21 +552,33 @@ void msg_transceiver_send_alert_status_change_message(uint8_t alert_id, bool is_
 
 void msg_transceiver_set_add_alert_cb(MsgTransceiverAddAlertCb cb, void *user_data)
 {
+    EAS_ASSERT(initialized);
+    EAS_ASSERT(cb);
+
     add_alert_cb = cb;
     add_alert_cb_user_data = user_data;
 }
 
 void msg_transceiver_set_remove_alert_cb(MsgTransceiverRemoveAlertCb cb, void *user_data)
 {
+    EAS_ASSERT(initialized);
+    EAS_ASSERT(cb);
+
     remove_alert_cb = cb;
     remove_alert_cb_user_data = user_data;
 }
 
 void msg_transceiver_deinit()
 {
+    if (!initialized) {
+        /* Already deinitialized, nothing to do */
+        return;
+    }
+
     remove_alert_cb = NULL;
     add_alert_cb = NULL;
     /* No need to clear user data for add and remove alert cbs, since it will get reset anyway when the new add/remove
      * alert callback is set */
     transceiver_unset_receive_cb();
+    initialized = false;
 }
