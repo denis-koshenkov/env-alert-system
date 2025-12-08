@@ -548,6 +548,22 @@ static void handle_add_alert_message(const uint8_t *const bytes, size_t num_byte
 }
 
 /**
+ * @brief Find empty "alert status change" message slot.
+ *
+ * @return AlertStatusChangeMessageSlot* Pointer to the free slot. NULL if there are no free slots.
+ */
+static AlertStatusChangeMessageSlot *find_empty_message_slot()
+{
+    for (size_t i = 0; i < MSG_TRANSCEIVER_NUM_MSG_SLOTS; i++) {
+        if (!message_slots[i].is_occupied) {
+            return &(message_slots[i]);
+        }
+    }
+    /* No free slots */
+    return NULL;
+}
+
+/**
  * @brief Callback to execute when bytes are received by the transmitter.
  *
  * @param bytes Array of received bytes.
@@ -573,22 +589,6 @@ static void receive_cb(uint8_t *bytes, size_t num_bytes, void *user_data)
         /* Invalid message id */
         break;
     }
-}
-
-/**
- * @brief Find empty "alert status change" message slot.
- *
- * @return AlertStatusChangeMessageSlot* Pointer to the free slot. NULL if there are no free slots.
- */
-static AlertStatusChangeMessageSlot *find_empty_message_slot()
-{
-    for (size_t i = 0; i < MSG_TRANSCEIVER_NUM_MSG_SLOTS; i++) {
-        if (!message_slots[i].is_occupied) {
-            return &(message_slots[i]);
-        }
-    }
-    /* No free slots */
-    return NULL;
 }
 
 void msg_transceiver_init()

@@ -12,6 +12,30 @@ extern "C"
 
 #include "config.h"
 
+/**
+ * @brief Sends and receives application protocol messages.
+ *
+ * The main responsibility of this module is to convert between structured data and raw bytes of application protocol
+ * messages. Whenever application protocol messages are received, this module parses the received bytes, and if the
+ * payload structure is valid, converts the raw bytes to a structured representation of the payload.
+ *
+ * Whenever an application protocol message needs to be sent, this module converts structured data into raw bytes and
+ * transmits the bytes.
+ *
+ * # Usage
+ *
+ * ```
+ * // Initialize the module
+ * msg_transceiver_init();
+ * // Register callbacks to execute whenever "add alert" and "remove alert" messages are received
+ * msg_transceiver_set_add_alert_cb(add_alert_cb, add_alert_cb_user_data);
+ * msg_transceiver_set_remove_alert_cb(remove_alert_cb, remove_alert_cb_user_data);
+ *
+ * // Send "alert status change" message whenever needed
+ * msg_transceiver_send_alert_status_change_message(alert_id, is_raised, cb, user_data);
+ * ```
+ */
+
 #ifndef CONFIG_MSG_TRANSCEIVER_MAX_NUM_VARIABLE_REQUIREMENTS_IN_ALERT_CONDITION
 #define CONFIG_MSG_TRANSCEIVER_MAX_NUM_VARIABLE_REQUIREMENTS_IN_ALERT_CONDITION 1
 #endif
@@ -132,12 +156,15 @@ typedef void (*MsgTransceiverRemoveAlertCb)(uint8_t alert_id, void *user_data);
 /**
  * @brief Initialize message transceiver module.
  *
- * This function should be called before any other function in this module.
+ * This function should be called before any other function in this module. Raises an assert if the module is already
+ * initialized.
  */
 void msg_transceiver_init();
 
 /**
  * @brief Send alert status change message.
+ *
+ * @pre Module has been initialized by calling @ref msg_transceiver_init.
  *
  * @param alert_id Alert id.
  * @param is_raised True if alert status changed to "raised", false if alert status changed to "silenced".
@@ -171,6 +198,11 @@ void msg_transceiver_set_remove_alert_cb(MsgTransceiverRemoveAlertCb cb, void *u
  * @brief Deinitialize message transceiver module.
  *
  * Does nothing if it is already in the deinitialized state.
+ *
+ * If this function is called when one or more alert status messages are in the process of being sent, their "message
+ * sent" callbacks will not be executed anymore. "In the process of being sent" means that @ref
+ * msg_transceiver_send_alert_status_change_message has been called, but the callback passed as a parameter to that
+ * function has not yet been executed.
  */
 void msg_transceiver_deinit();
 
