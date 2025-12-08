@@ -51,7 +51,9 @@ static void transmit_complete_cb(bool result, void *user_data)
 
     AlertStatusChangeMessageSlot const *const slot = (AlertStatusChangeMessageSlot *)user_data;
     EAS_ASSERT(slot);
-    slot->cb(result, slot->cb_user_data);
+    if (slot->cb) {
+        slot->cb(result, slot->cb_user_data);
+    }
 }
 
 /**
@@ -589,7 +591,6 @@ void msg_transceiver_send_alert_status_change_message(uint8_t alert_id, bool is_
                                                       void *user_data)
 {
     EAS_ASSERT(initialized);
-    EAS_ASSERT(cb);
 
     /* Store cb and user_data so that we can execute it from inside transmit_complete_cb */
     AlertStatusChangeMessageSlot *slot = find_empty_message_slot();

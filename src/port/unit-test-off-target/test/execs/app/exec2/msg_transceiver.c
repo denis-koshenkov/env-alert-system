@@ -1347,8 +1347,20 @@ TEST_C(MsgTransceiver, ReceiveCbCalledBeforeCbsSet)
 
 TEST_C(MsgTransceiver, SendAlertStatusChangeMessageCbNull)
 {
-    TEST_ASSERT_PLUGIN_C_EXPECT_ASSERTION("cb", "msg_transceiver_send_alert_status_change_message");
-    msg_transceiver_send_alert_status_change_message(0, false, NULL, NULL);
+    uint8_t expected_payload[] = {0x0, 0x2, 0x1};
+    /* msg_transceiver_send_alert_status_change_message */
+    mock_c()
+        ->expectOneCall("transceiver_transmit")
+        ->withMemoryBufferParameter("bytes", expected_payload, 3)
+        ->withUnsignedLongIntParameters("num_bytes", 3)
+        ->ignoreOtherParameters();
+    msg_transceiver_send_alert_status_change_message(2, true, NULL, NULL);
+
+    /* Mock transmission success */
+    (transmit_complete_cbs[0])(true, transmit_complete_cbs_user_data[0]);
+
+    /* Nothing to verify - we just make sure that transceiver_transmit was indeed called, even though callback is NULL
+     */
 }
 
 TEST_C(MsgTransceiver, SetAddAlertCbCbNull)
