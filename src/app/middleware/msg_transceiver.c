@@ -569,6 +569,11 @@ static void receive_cb(uint8_t *bytes, size_t num_bytes, void *user_data)
     }
 }
 
+/**
+ * @brief Find empty "alert status change" message slot.
+ *
+ * @return AlertStatusChangeMessageSlot* Pointer to the free slot. NULL if there are no free slots.
+ */
 static AlertStatusChangeMessageSlot *find_empty_message_slot()
 {
     for (size_t i = 0; i < MSG_TRANSCEIVER_NUM_MSG_SLOTS; i++) {
@@ -576,6 +581,8 @@ static AlertStatusChangeMessageSlot *find_empty_message_slot()
             return &(message_slots[i]);
         }
     }
+    /* No free slots */
+    return NULL;
 }
 
 void msg_transceiver_init()
@@ -594,6 +601,13 @@ void msg_transceiver_send_alert_status_change_message(uint8_t alert_id, bool is_
 
     /* Store cb and user_data so that we can execute it from inside transmit_complete_cb */
     AlertStatusChangeMessageSlot *slot = find_empty_message_slot();
+    if (slot == NULL) {
+        /* All slots are full, failed to send message */
+        if (cb) {
+            cb(false, user_data);
+        }
+        return;
+    }
     slot->cb = cb;
     slot->cb_user_data = user_data;
     slot->is_occupied = true;

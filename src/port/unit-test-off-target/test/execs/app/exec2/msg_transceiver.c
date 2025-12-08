@@ -6,6 +6,7 @@
 
 #include "msg_transceiver.h"
 #include "hal/mock_transceiver.h"
+#include "config.h"
 
 #define TEST_MSG_TRANSCEIVER_MAX_NUM_TRANSMIT_COMPLETE_CBS 2
 
@@ -1407,4 +1408,29 @@ TEST_C(MsgTransceiver, SendTwoSuccessfulAlertStatusChangeMessages)
     CHECK_C(message_sent_cb_1_result);
     CHECK_EQUAL_C_POINTER(user_data_0, message_sent_cb_user_data);
     CHECK_EQUAL_C_POINTER(user_data_1, message_sent_cb_1_user_data);
+}
+
+TEST_C(MsgTransceiver, TooManyConcurrentAlertStatusChangeMessages)
+{
+    uint8_t expected_payload[] = {0x0, 0x3, 0x0};
+    for (size_t i = 0; i < CONFIG_MSG_TRANSCEIVER_MAX_NUM_CONCURRENT_ALERT_STATUS_CHANGE_MESSAGES; i++) {
+        mock_c()
+            ->expectOneCall("transceiver_transmit")
+            ->withMemoryBufferParameter("bytes", expected_payload, 3)
+            ->withUnsignedLongIntParameters("num_bytes", 3)
+            ->ignoreOtherParameters();
+    }
+
+    for (size_t i = 0; i < CONFIG_MSG_TRANSCEIVER_MAX_NUM_CONCURRENT_ALERT_STATUS_CHANGE_MESSAGES; i++) {
+        msg_transceiver_send_alert_status_change_message(3, false, message_sent_cb, NULL);
+    }
+
+    void *user_data = (void *)0x71;
+    /* Different cb than the previous calls, so that we can verify that the callback passed to this function is actually
+     * the one called */
+    msg_transceiver_send_alert_status_change_message(4, true, message_sent_cb_1, user_data);
+
+    CHECK_C(message_sent_cb_1_called);
+    CHECK_C(!message_sent_cb_1_result);
+    CHECK_EQUAL_C_POINTER(user_data, message_sent_cb_1_user_data);
 }
