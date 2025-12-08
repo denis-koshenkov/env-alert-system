@@ -68,3 +68,4 @@ TEST_C_WRAPPER(MsgTransceiver, SetAddAlertCbCbNull);
 TEST_C_WRAPPER(MsgTransceiver, SetRemoveAlertCbCbNull);
 TEST_C_WRAPPER(MsgTransceiver, SendTwoSuccessfulAlertStatusChangeMessages);
 TEST_C_WRAPPER(MsgTransceiver, TooManyConcurrentAlertStatusChangeMessages);
+TEST_C_WRAPPER(MsgTransceiver, ReuseAlertStatusChangeMessageSlot);

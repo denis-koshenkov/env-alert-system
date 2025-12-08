@@ -7,8 +7,11 @@
 #include "msg_transceiver.h"
 #include "hal/mock_transceiver.h"
 #include "config.h"
+#include "eas_assert.h"
 
-#define TEST_MSG_TRANSCEIVER_MAX_NUM_TRANSMIT_COMPLETE_CBS 2
+/* In the ReuseAlertStatusChangeMessageSlot test, we send alert status change message this number of times. */
+#define TEST_MSG_TRANSCEIVER_MAX_NUM_TRANSMIT_COMPLETE_CBS                                                             \
+    (CONFIG_MSG_TRANSCEIVER_MAX_NUM_CONCURRENT_ALERT_STATUS_CHANGE_MESSAGES + 1)
 
 /* Transceiver mock object populates these every time msg_transceiver implementation calls transceiver_transmit */
 static TransceiverTransmitCompleteCb transmit_complete_cbs[TEST_MSG_TRANSCEIVER_MAX_NUM_TRANSMIT_COMPLETE_CBS];
@@ -1432,5 +1435,44 @@ TEST_C(MsgTransceiver, TooManyConcurrentAlertStatusChangeMessages)
 
     CHECK_C(message_sent_cb_1_called);
     CHECK_C(!message_sent_cb_1_result);
+    CHECK_EQUAL_C_POINTER(user_data, message_sent_cb_1_user_data);
+}
+
+TEST_C(MsgTransceiver, ReuseAlertStatusChangeMessageSlot)
+{
+    uint8_t expected_payload_0[] = {0x0, 0x4, 0x1};
+    uint8_t expected_payload_1[] = {0x0, 0x5, 0x0};
+    for (size_t i = 0; i < CONFIG_MSG_TRANSCEIVER_MAX_NUM_CONCURRENT_ALERT_STATUS_CHANGE_MESSAGES; i++) {
+        /* Calls to msg_transceiver_send_alert_status_change_message inside the for loop */
+        mock_c()
+            ->expectOneCall("transceiver_transmit")
+            ->withMemoryBufferParameter("bytes", expected_payload_0, 3)
+            ->withUnsignedLongIntParameters("num_bytes", 3)
+            ->ignoreOtherParameters();
+    }
+    /* Call to msg_transceiver_send_alert_status_change_message after the for loop */
+    mock_c()
+        ->expectOneCall("transceiver_transmit")
+        ->withMemoryBufferParameter("bytes", expected_payload_1, 3)
+        ->withUnsignedLongIntParameters("num_bytes", 3)
+        ->ignoreOtherParameters();
+
+    for (size_t i = 0; i < CONFIG_MSG_TRANSCEIVER_MAX_NUM_CONCURRENT_ALERT_STATUS_CHANGE_MESSAGES; i++) {
+        msg_transceiver_send_alert_status_change_message(4, true, message_sent_cb, NULL);
+    }
+
+    /* One slot should get freed */
+    EAS_ASSERT(6 < CONFIG_MSG_TRANSCEIVER_MAX_NUM_CONCURRENT_ALERT_STATUS_CHANGE_MESSAGES);
+    (transmit_complete_cbs[6])(true, transmit_complete_cbs_user_data[6]);
+
+    void *user_data = (void *)0x39;
+    /* Different cb than the previous calls, so that we can verify that the callback passed to this function is actually
+     * the one called */
+    msg_transceiver_send_alert_status_change_message(5, false, message_sent_cb_1, user_data);
+    size_t idx = CONFIG_MSG_TRANSCEIVER_MAX_NUM_CONCURRENT_ALERT_STATUS_CHANGE_MESSAGES;
+    (transmit_complete_cbs[idx])(true, transmit_complete_cbs_user_data[idx]);
+
+    CHECK_C(message_sent_cb_1_called);
+    CHECK_C(message_sent_cb_1_result);
     CHECK_EQUAL_C_POINTER(user_data, message_sent_cb_1_user_data);
 }

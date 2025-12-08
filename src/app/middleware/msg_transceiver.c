@@ -49,8 +49,10 @@ static void transmit_complete_cb(bool result, void *user_data)
 {
     EAS_ASSERT(user_data);
 
-    AlertStatusChangeMessageSlot const *const slot = (AlertStatusChangeMessageSlot *)user_data;
+    AlertStatusChangeMessageSlot *const slot = (AlertStatusChangeMessageSlot *)user_data;
     EAS_ASSERT(slot);
+    EAS_ASSERT(slot->is_occupied);
+    slot->is_occupied = false;
     if (slot->cb) {
         slot->cb(result, slot->cb_user_data);
     }
