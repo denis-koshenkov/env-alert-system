@@ -1,17 +1,23 @@
 #include "CppUTestExt/MockSupport.h"
-#include "hal/transceiver.h"
+#include "hal/mock_transceiver.h"
+#include "eas_assert.h"
+
+static size_t cbs_index = 0;
 
 void transceiver_transmit(const uint8_t *const bytes, size_t num_bytes, TransceiverTransmitCompleteCb cb,
                           void *user_data)
 {
     /* Give cb and user_data to the test by populating the provided pointers, so that the test can simulate calling the
      * TransmitCompleteCb */
-    TransceiverTransmitCompleteCb *transmit_complete_cb_pointer =
-        (TransceiverTransmitCompleteCb *)mock().getData("transmitCompleteCb").getPointerValue();
-    void **transmit_complete_cb_user_data_pointer =
-        (void **)mock().getData("transmitCompleteCbUserData").getPointerValue();
-    *transmit_complete_cb_pointer = cb;
-    *transmit_complete_cb_user_data_pointer = user_data;
+    TransceiverTransmitCompleteCb *transmit_complete_cbs =
+        (TransceiverTransmitCompleteCb *)mock().getData("transmitCompleteCbs").getPointerValue();
+    void **transmit_complete_cbs_user_data = (void **)mock().getData("transmitCompleteCbsUserData").getPointerValue();
+    size_t num_cbs = mock().getData("numTransmitCompleteCbs").getUnsignedIntValue();
+
+    EAS_ASSERT(cbs_index < num_cbs);
+    transmit_complete_cbs[cbs_index] = cb;
+    transmit_complete_cbs_user_data[cbs_index] = user_data;
+    cbs_index = (cbs_index + 1) % num_cbs;
 
     mock()
         .actualCall("transceiver_transmit")
@@ -36,4 +42,9 @@ void transceiver_set_receive_cb(TransceiverReceiveCb cb, void *user_data)
 void transceiver_unset_receive_cb()
 {
     mock().actualCall("transceiver_unset_receive_cb");
+}
+
+void mock_transceiver_reset_cbs_index()
+{
+    cbs_index = 0;
 }

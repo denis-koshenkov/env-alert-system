@@ -5,11 +5,13 @@
 #include "CppUTestExt/TestAssertPlugin_c.h"
 
 #include "msg_transceiver.h"
-#include "hal/transceiver.h"
+#include "hal/mock_transceiver.h"
+
+#define TEST_MSG_TRANSCEIVER_MAX_NUM_TRANSMIT_COMPLETE_CBS 2
 
 /* Transceiver mock object populates these every time msg_transceiver implementation calls transceiver_transmit */
-static TransceiverTransmitCompleteCb transmit_complete_cb = NULL;
-static void *transmit_complete_cb_user_data = NULL;
+static TransceiverTransmitCompleteCb transmit_complete_cbs[TEST_MSG_TRANSCEIVER_MAX_NUM_TRANSMIT_COMPLETE_CBS];
+static void *transmit_complete_cbs_user_data[TEST_MSG_TRANSCEIVER_MAX_NUM_TRANSMIT_COMPLETE_CBS];
 /* Transceiver mock object populates these every time msg_transceiver implementation calls transceiver_set_receive_cb */
 static TransceiverReceiveCb receive_cb = NULL;
 static void *receive_cb_user_data = NULL;
@@ -17,6 +19,10 @@ static void *receive_cb_user_data = NULL;
 static bool message_sent_cb_called = false;
 static bool message_sent_cb_result = false;
 static void *message_sent_cb_user_data = NULL;
+/* Populated from inside message_sent_cb_1 */
+static bool message_sent_cb_1_called = false;
+static bool message_sent_cb_1_result = false;
+static void *message_sent_cb_1_user_data = NULL;
 /* Populated from inside remove_alert_cb */
 static bool remove_alert_cb_called = false;
 static uint8_t remove_alert_cb_alert_id = false;
@@ -31,6 +37,13 @@ static void message_sent_cb(bool result, void *user_data)
     message_sent_cb_called = true;
     message_sent_cb_result = result;
     message_sent_cb_user_data = user_data;
+}
+
+static void message_sent_cb_1(bool result, void *user_data)
+{
+    message_sent_cb_1_called = true;
+    message_sent_cb_1_result = result;
+    message_sent_cb_1_user_data = user_data;
 }
 
 static void remove_alert_cb(uint8_t alert_id, void *user_data)
@@ -49,13 +62,17 @@ static void add_alert_cb(const MsgTransceiverAlert *const alert, void *user_data
 
 TEST_GROUP_C_SETUP(MsgTransceiver)
 {
-    transmit_complete_cb = NULL;
-    transmit_complete_cb_user_data = NULL;
+    memset(transmit_complete_cbs, 0,
+           TEST_MSG_TRANSCEIVER_MAX_NUM_TRANSMIT_COMPLETE_CBS * sizeof(TransceiverTransmitCompleteCb));
+    memset(transmit_complete_cbs_user_data, 0, TEST_MSG_TRANSCEIVER_MAX_NUM_TRANSMIT_COMPLETE_CBS * sizeof(void *));
     receive_cb = NULL;
     receive_cb_user_data = NULL;
     message_sent_cb_called = false;
     message_sent_cb_result = false;
     message_sent_cb_user_data = NULL;
+    message_sent_cb_1_called = false;
+    message_sent_cb_1_result = false;
+    message_sent_cb_1_user_data = NULL;
     remove_alert_cb_called = false;
     remove_alert_cb_alert_id = 0xFF;
     remove_alert_cb_user_data = NULL;
@@ -63,14 +80,20 @@ TEST_GROUP_C_SETUP(MsgTransceiver)
     /* Some tests test for 0 values, so the tests are more reliable if the alert memory is initially set to 0xFF*/
     memset(&add_alert_cb_alert, 0xFF, sizeof(MsgTransceiverAlert));
     add_alert_cb_user_data = NULL;
+    /* So that transceiver mock starts populating transmitCompleteCbs and their user data at index 0 at the beginning of
+     * each test */
+    mock_transceiver_reset_cbs_index();
 
     mock_c()->strictOrder();
 
-    /* Pass pointers to the mock object so that it populates them TransmitCompleteCb and its user data when
-     * transceiver_transmit gets called. We need to execute this callback to trigger MsgTransceiver to execute the
+    /* Pass pointers to the mock object so that it populates TransmitCompleteCbs and their user data when
+     * transceiver_transmit gets called. We need to execute these callbacks to trigger MsgTransceiver to execute the
      * MessageSentCb that we pass as a parameter to msg_transceiver_send_alert_status_change_message. */
-    mock_c()->setPointerData("transmitCompleteCb", (void **)&transmit_complete_cb);
-    mock_c()->setPointerData("transmitCompleteCbUserData", (void **)&transmit_complete_cb_user_data);
+    mock_c()->setPointerData("transmitCompleteCbs", (void *)transmit_complete_cbs);
+    mock_c()->setPointerData("transmitCompleteCbsUserData", transmit_complete_cbs_user_data);
+    /* Give the size of the arrays to the mock object so that it never does out of bound accesses */
+    mock_c()->setUnsignedIntData("numTransmitCompleteCbs",
+                                 (unsigned int)TEST_MSG_TRANSCEIVER_MAX_NUM_TRANSMIT_COMPLETE_CBS);
 
     /* Transceiver mock object populates these pointers whenever transceiver_set_receive_cb is called. The test can then
      * simulate receiving bytes by calling this callback. */
@@ -106,7 +129,7 @@ TEST_C(MsgTransceiver, Alert0Silenced)
 
     msg_transceiver_send_alert_status_change_message(0, false, message_sent_cb, NULL);
     /* Mock transmission success */
-    transmit_complete_cb(true, transmit_complete_cb_user_data);
+    (transmit_complete_cbs[0])(true, transmit_complete_cbs_user_data[0]);
 
     /* message_sent_cb should have been called with result == true */
     CHECK_C(message_sent_cb_called);
@@ -126,7 +149,7 @@ TEST_C(MsgTransceiver, Alert0Raised)
 
     msg_transceiver_send_alert_status_change_message(0, true, message_sent_cb, NULL);
     /* Mock transmission success */
-    transmit_complete_cb(true, transmit_complete_cb_user_data);
+    (transmit_complete_cbs[0])(true, transmit_complete_cbs_user_data[0]);
 
     /* message_sent_cb should have been called with result == true */
     CHECK_C(message_sent_cb_called);
@@ -146,7 +169,7 @@ TEST_C(MsgTransceiver, Alert1Silenced)
 
     msg_transceiver_send_alert_status_change_message(1, false, message_sent_cb, NULL);
     /* Mock transmission success */
-    transmit_complete_cb(true, transmit_complete_cb_user_data);
+    (transmit_complete_cbs[0])(true, transmit_complete_cbs_user_data[0]);
 
     /* message_sent_cb should have been called with result == true */
     CHECK_C(message_sent_cb_called);
@@ -166,7 +189,7 @@ TEST_C(MsgTransceiver, Alert8RaisedFailed)
 
     msg_transceiver_send_alert_status_change_message(8, true, message_sent_cb, NULL);
     /* Mock transmission failure */
-    transmit_complete_cb(false, transmit_complete_cb_user_data);
+    (transmit_complete_cbs[0])(false, transmit_complete_cbs_user_data[0]);
 
     /* message_sent_cb should have been called with result == false */
     CHECK_C(message_sent_cb_called);
@@ -187,7 +210,7 @@ TEST_C(MsgTransceiver, MessageSentCbCalledWithUserData)
 
     msg_transceiver_send_alert_status_change_message(20, false, message_sent_cb, user_data);
     /* Mock transmission success */
-    transmit_complete_cb(true, transmit_complete_cb_user_data);
+    (transmit_complete_cbs[0])(true, transmit_complete_cbs_user_data[0]);
 
     CHECK_C(message_sent_cb_called);
     CHECK_C(message_sent_cb_result);
@@ -1338,4 +1361,38 @@ TEST_C(MsgTransceiver, SetRemoveAlertCbCbNull)
 {
     TEST_ASSERT_PLUGIN_C_EXPECT_ASSERTION("cb", "msg_transceiver_set_remove_alert_cb");
     msg_transceiver_set_remove_alert_cb(NULL, NULL);
+}
+
+TEST_C(MsgTransceiver, SendTwoSuccessfulAlertStatusChangeMessages)
+{
+    uint8_t expected_payload_0[] = {0x0, 0x0, 0x0};
+    uint8_t expected_payload_1[] = {0x0, 0x1, 0x1};
+    /* First call to msg_transceiver_send_alert_status_change_message */
+    mock_c()
+        ->expectOneCall("transceiver_transmit")
+        ->withMemoryBufferParameter("bytes", expected_payload_0, 3)
+        ->withUnsignedLongIntParameters("num_bytes", 3)
+        ->ignoreOtherParameters();
+
+    /* Second call to msg_transceiver_send_alert_status_change_message */
+    mock_c()
+        ->expectOneCall("transceiver_transmit")
+        ->withMemoryBufferParameter("bytes", expected_payload_1, 3)
+        ->withUnsignedLongIntParameters("num_bytes", 3)
+        ->ignoreOtherParameters();
+
+    void *user_data_0 = (void *)0x34;
+    void *user_data_1 = (void *)0x23;
+    msg_transceiver_send_alert_status_change_message(0, false, message_sent_cb, user_data_0);
+    msg_transceiver_send_alert_status_change_message(1, true, message_sent_cb_1, user_data_1);
+    /* Mock transmission success for both messages */
+    (transmit_complete_cbs[0])(true, transmit_complete_cbs_user_data[0]);
+    (transmit_complete_cbs[1])(true, transmit_complete_cbs_user_data[1]);
+
+    CHECK_C(message_sent_cb_called);
+    CHECK_C(message_sent_cb_1_called);
+    CHECK_C(message_sent_cb_result);
+    CHECK_C(message_sent_cb_1_result);
+    CHECK_EQUAL_C_POINTER(user_data_0, message_sent_cb_user_data);
+    CHECK_EQUAL_C_POINTER(user_data_1, message_sent_cb_1_user_data);
 }

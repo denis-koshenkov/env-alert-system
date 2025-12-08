@@ -115,4 +115,20 @@
  * time. */
 #define CONFIG_FAKE_VARIABLE_REQUIREMENT_ALLOCATOR_NUM_REQUIREMENTS 10
 
+/**
+ * @brief Defines the number of alert status change messages that can be in the process of being sent at the same time.
+ *
+ * Message transceiver is an asynchronous interface. The user calls @ref
+ * msg_transceiver_send_alert_status_change_message, and gets notified when the message is sent via a callback. The user
+ * can call @ref msg_transceiver_send_alert_status_change_message many times in quick succession, which would mean that
+ * several "alert status change" messages are now in the progress of being sent.
+ *
+ * If @ref msg_transceiver_send_alert_status_change_message is called when the maximum allowed number of alert status
+ * change messages is already in the process of being sent, that message will fail to get sent.
+ *
+ * Set to CONFIG_MAX_NUM_ALERTS * 2, since in theory every registered alert can change status at the same time.
+ * Multiplied by 2 to be on the safe side and allow for a margin.
+ */
+#define CONFIG_MSG_TRANSCEIVER_MAX_NUM_CONCURRENT_ALERT_STATUS_CHANGE_MESSAGES (CONFIG_MAX_NUM_ALERTS * 2)
+
 #endif /* ENV_ALERT_SYSTEM_SRC_PORT_UNIT_TEST_OFF_TARGET_INCLUDE_CONFIG_H */

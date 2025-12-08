@@ -2,16 +2,42 @@
 #include "hal/transceiver.h"
 #include "eas_assert.h"
 
+#ifndef CONFIG_MSG_TRANSCEIVER_MAX_NUM_CONCURRENT_ALERT_STATUS_CHANGE_MESSAGES
+#define CONFIG_MSG_TRANSCEIVER_MAX_NUM_CONCURRENT_ALERT_STATUS_CHANGE_MESSAGES 1
+#endif
+
+/* Convenience macro */
+#define MSG_TRANSCEIVER_NUM_MSG_SLOTS CONFIG_MSG_TRANSCEIVER_MAX_NUM_CONCURRENT_ALERT_STATUS_CHANGE_MESSAGES
+
 #define MSG_TRANSCEIVER_MESSAGE_ID_ALERT_STATUS_CHANGE 0
 #define MSG_TRANSCEIVER_MESSAGE_ID_REMOVE_ALERT 1
 #define MSG_TRANSCEIVER_MESSAGE_ID_ADD_ALERT 2
 
+typedef struct AlertStatusChangeMessageSlot {
+    bool is_occupied;
+    MsgTransceiverMessageSentCb cb;
+    void *cb_user_data;
+} AlertStatusChangeMessageSlot;
+
 static bool initialized = false;
-static MsgTransceiverMessageSentCb message_sent_cb = NULL;
 static MsgTransceiverRemoveAlertCb remove_alert_cb = NULL;
 static void *remove_alert_cb_user_data = NULL;
 static MsgTransceiverAddAlertCb add_alert_cb = NULL;
 static void *add_alert_cb_user_data = NULL;
+
+static AlertStatusChangeMessageSlot message_slots[MSG_TRANSCEIVER_NUM_MSG_SLOTS];
+
+/**
+ * @brief Make all message slots unoccupied and clear all callbacks and user data.
+ */
+static void reset_message_slots()
+{
+    for (size_t i = 0; i < MSG_TRANSCEIVER_NUM_MSG_SLOTS; i++) {
+        message_slots[i].cb = NULL;
+        message_slots[i].cb_user_data = NULL;
+        message_slots[i].is_occupied = false;
+    }
+}
 
 /**
  * @brief Callback that transmitter should execute when bytes have been transmitted.
@@ -21,9 +47,11 @@ static void *add_alert_cb_user_data = NULL;
  */
 static void transmit_complete_cb(bool result, void *user_data)
 {
-    if (message_sent_cb) {
-        message_sent_cb(result, user_data);
-    }
+    EAS_ASSERT(user_data);
+
+    AlertStatusChangeMessageSlot const *const slot = (AlertStatusChangeMessageSlot *)user_data;
+    EAS_ASSERT(slot);
+    slot->cb(result, slot->cb_user_data);
 }
 
 /**
@@ -539,10 +567,20 @@ static void receive_cb(uint8_t *bytes, size_t num_bytes, void *user_data)
     }
 }
 
+static AlertStatusChangeMessageSlot *find_empty_message_slot()
+{
+    for (size_t i = 0; i < MSG_TRANSCEIVER_NUM_MSG_SLOTS; i++) {
+        if (!message_slots[i].is_occupied) {
+            return &(message_slots[i]);
+        }
+    }
+}
+
 void msg_transceiver_init()
 {
     EAS_ASSERT(!initialized);
 
+    reset_message_slots();
     transceiver_set_receive_cb(receive_cb, NULL);
     initialized = true;
 }
@@ -553,14 +591,17 @@ void msg_transceiver_send_alert_status_change_message(uint8_t alert_id, bool is_
     EAS_ASSERT(initialized);
     EAS_ASSERT(cb);
 
-    message_sent_cb = cb;
+    /* Store cb and user_data so that we can execute it from inside transmit_complete_cb */
+    AlertStatusChangeMessageSlot *slot = find_empty_message_slot();
+    slot->cb = cb;
+    slot->cb_user_data = user_data;
+    slot->is_occupied = true;
+
     uint8_t bytes[3];
     bytes[0] = MSG_TRANSCEIVER_MESSAGE_ID_ALERT_STATUS_CHANGE;
     bytes[1] = alert_id;
     bytes[2] = is_raised ? 0x1 : 0x0;
-    /* Pass user_data so that it is available inside transmit_complete_cb, and we can pass it as a parameter to
-     * message_sent_cb */
-    transceiver_transmit(bytes, 3, transmit_complete_cb, user_data);
+    transceiver_transmit(bytes, 3, transmit_complete_cb, (void *)slot);
 }
 
 void msg_transceiver_set_add_alert_cb(MsgTransceiverAddAlertCb cb, void *user_data)
