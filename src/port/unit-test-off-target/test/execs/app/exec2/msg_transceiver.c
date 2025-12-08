@@ -424,40 +424,53 @@ TEST_C(MsgTransceiver, AddAlert3)
 {
     /* Mock receiving a "add alert" message */
     uint8_t add_alert_bytes[36] = {
-        0x2,                 /* message id */
-        0x3,                 /* alert id */
-        0xA, 0x0, 0x0, 0x0,  /* Warmup period - 10 ms */
-        0x14, 0x0, 0x0, 0x0, /* Cooldown period - 20 ms */
-        0x0,                 /* notification type - connectivity disabled, LED disabled */
-        0x2,                 /* Number of ORed requirements */
+        0x2, /* message id */
+        0x3, /* alert id */
+        0xA,
+        0x0,
+        0x0,
+        0x0, /* Warmup period - 10 ms */
+        0x14,
+        0x0,
+        0x0,
+        0x0, /* Cooldown period - 20 ms */
+        0x0, /* notification type - connectivity disabled, LED disabled */
+        0x2, /* Number of ORed requirements */
 
         /* Start of first ORed requirement */
         0x2, /* Number of variable requirements in the first ORed requirement */
 
         /* Start of variable requirement 0 */
-        0x0,       /* Temperature variable identifier */
-        0x0,       /* Operator - greater than or equal to */
-        0xCD, 0x0, /* Constraint value 205 -> 20.5 degrees Celsius */
+        0x0, /* Temperature variable identifier */
+        0x0, /* Operator - greater than or equal to */
+        0xCD,
+        0x0, /* Constraint value 205 -> 20.5 degrees Celsius */
         /* Start of variable requirement 1 */
-        0x1,        /* Pressure variable identifier */
-        0x0,        /* Operator - greater than or equal to */
-        0x67, 0x2B, /* Constraint value 11111 -> 1111.1 hPa */
+        0x1, /* Pressure variable identifier */
+        0x0, /* Operator - greater than or equal to */
+        0x67,
+        0x2B, /* Constraint value 11111 -> 1111.1 hPa */
 
         /* Start of second ORed requirement */
         0x3, /* Number of variable requirements in the second ORed requirement */
 
         /* Start of variable requirement 0 */
-        0x3,                  /* Light intensity variable identifier */
-        0x1,                  /* Operator - less than or equal to */
-        0xA0, 0x86, 0x1, 0x0, /* Constraint value 100000 -> 100,000 lx */
+        0x3, /* Light intensity variable identifier */
+        0x1, /* Operator - less than or equal to */
+        0xA0,
+        0x86,
+        0x1,
+        0x0, /* Constraint value 100000 -> 100,000 lx */
         /* Start of variable requirement 1 */
-        0x2,       /* Humidity variable identifier */
-        0x1,       /* Operator - less than or equal to */
-        0xA4, 0x1, /* Constraint value 420 -> 42.0 % RH */
+        0x2, /* Humidity variable identifier */
+        0x1, /* Operator - less than or equal to */
+        0xA4,
+        0x1, /* Constraint value 420 -> 42.0 % RH */
         /* Start of variable requirement 2 */
-        0x0,        /* Temperature variable identifier */
-        0x1,        /* Operator - less than or equal to */
-        0xD3, 0xFE, /* Constraint value -301 -> -30.1 degrees Celsius */
+        0x0, /* Temperature variable identifier */
+        0x1, /* Operator - less than or equal to */
+        0xD3,
+        0xFE, /* Constraint value -301 -> -30.1 degrees Celsius */
     };
     receive_cb(add_alert_bytes, 36, receive_cb_user_data);
 
@@ -1189,64 +1202,83 @@ TEST_C(MsgTransceiver, AddAlertTooManyVariableRequirements)
 {
     /* Mock receiving a "add alert" message */
     uint8_t add_alert_bytes[60] = {
-        0x2,                 /* message id */
-        0x3,                 /* alert id */
-        0xA, 0x0, 0x0, 0x0,  /* Warmup period - 10 ms */
-        0x14, 0x0, 0x0, 0x0, /* Cooldown period - 20 ms */
-        0x0,                 /* notification type - connectivity disabled, LED disabled */
-        0x2,                 /* Number of ORed requirements */
+        0x2, /* message id */
+        0x3, /* alert id */
+        0xA,
+        0x0,
+        0x0,
+        0x0, /* Warmup period - 10 ms */
+        0x14,
+        0x0,
+        0x0,
+        0x0, /* Cooldown period - 20 ms */
+        0x0, /* notification type - connectivity disabled, LED disabled */
+        0x2, /* Number of ORed requirements */
 
         /* Start of first ORed requirement */
         0x2, /* Number of variable requirements in the first ORed requirement */
 
         /* Start of variable requirement 0 */
-        0x0,       /* Temperature variable identifier */
-        0x0,       /* Operator - greater than or equal to */
-        0xCD, 0x0, /* Constraint value 205 -> 20.5 degrees Celsius */
+        0x0, /* Temperature variable identifier */
+        0x0, /* Operator - greater than or equal to */
+        0xCD,
+        0x0, /* Constraint value 205 -> 20.5 degrees Celsius */
         /* Start of variable requirement 1 */
-        0x1,        /* Pressure variable identifier */
-        0x0,        /* Operator - greater than or equal to */
-        0x67, 0x2B, /* Constraint value 11111 -> 1111.1 hPa */
+        0x1, /* Pressure variable identifier */
+        0x0, /* Operator - greater than or equal to */
+        0x67,
+        0x2B, /* Constraint value 11111 -> 1111.1 hPa */
 
         /* Start of second ORed requirement */
         0x9, /* Number of variable requirements in the second ORed requirement */
 
         /* Start of variable requirement 2 */
-        0x3,                  /* Light intensity variable identifier */
-        0x1,                  /* Operator - less than or equal to */
-        0xA0, 0x86, 0x1, 0x0, /* Constraint value 100000 -> 100,000 lx */
+        0x3, /* Light intensity variable identifier */
+        0x1, /* Operator - less than or equal to */
+        0xA0,
+        0x86,
+        0x1,
+        0x0, /* Constraint value 100000 -> 100,000 lx */
         /* Start of variable requirement 3 */
-        0x2,       /* Humidity variable identifier */
-        0x1,       /* Operator - less than or equal to */
-        0xA4, 0x1, /* Constraint value 420 -> 42.0 % RH */
+        0x2, /* Humidity variable identifier */
+        0x1, /* Operator - less than or equal to */
+        0xA4,
+        0x1, /* Constraint value 420 -> 42.0 % RH */
         /* Start of variable requirement 4 */
-        0x0,        /* Temperature variable identifier */
-        0x1,        /* Operator - less than or equal to */
-        0xD3, 0xFE, /* Constraint value -301 -> -30.1 degrees Celsius */
+        0x0, /* Temperature variable identifier */
+        0x1, /* Operator - less than or equal to */
+        0xD3,
+        0xFE, /* Constraint value -301 -> -30.1 degrees Celsius */
         /* Start of variable requirement 5 */
-        0x0,      /* Temperature variable identifier */
-        0x1,      /* Operator - less than or equal to */
-        0x0, 0x0, /* Constraint value */
+        0x0, /* Temperature variable identifier */
+        0x1, /* Operator - less than or equal to */
+        0x0,
+        0x0, /* Constraint value */
         /* Start of variable requirement 6 */
-        0x0,      /* Temperature variable identifier */
-        0x1,      /* Operator - less than or equal to */
-        0x0, 0x0, /* Constraint value */
+        0x0, /* Temperature variable identifier */
+        0x1, /* Operator - less than or equal to */
+        0x0,
+        0x0, /* Constraint value */
         /* Start of variable requirement 7 */
-        0x0,      /* Temperature variable identifier */
-        0x1,      /* Operator - less than or equal to */
-        0x0, 0x0, /* Constraint value */
+        0x0, /* Temperature variable identifier */
+        0x1, /* Operator - less than or equal to */
+        0x0,
+        0x0, /* Constraint value */
         /* Start of variable requirement 8 */
-        0x0,      /* Temperature variable identifier */
-        0x1,      /* Operator - less than or equal to */
-        0x0, 0x0, /* Constraint value */
+        0x0, /* Temperature variable identifier */
+        0x1, /* Operator - less than or equal to */
+        0x0,
+        0x0, /* Constraint value */
         /* Start of variable requirement 9 */
-        0x0,      /* Temperature variable identifier */
-        0x1,      /* Operator - less than or equal to */
-        0x0, 0x0, /* Constraint value */
+        0x0, /* Temperature variable identifier */
+        0x1, /* Operator - less than or equal to */
+        0x0,
+        0x0, /* Constraint value */
         /* Start of variable requirement 10 - this one is out of bounds */
-        0x0,      /* Temperature variable identifier */
-        0x1,      /* Operator - less than or equal to */
-        0x0, 0x0, /* Constraint value */
+        0x0, /* Temperature variable identifier */
+        0x1, /* Operator - less than or equal to */
+        0x0,
+        0x0, /* Constraint value */
     };
     receive_cb(add_alert_bytes, 60, receive_cb_user_data);
 
@@ -1475,4 +1507,37 @@ TEST_C(MsgTransceiver, ReuseAlertStatusChangeMessageSlot)
     CHECK_C(message_sent_cb_1_called);
     CHECK_C(message_sent_cb_1_result);
     CHECK_EQUAL_C_POINTER(user_data, message_sent_cb_1_user_data);
+}
+
+TEST_C(MsgTransceiver, AlertStatusChangeMessagesCbsExecutedInReverseOrder)
+{
+    uint8_t expected_payload_0[] = {0x0, 0x5, 0x1};
+    uint8_t expected_payload_1[] = {0x0, 0x2, 0x0};
+    /* First call to msg_transceiver_send_alert_status_change_message */
+    mock_c()
+        ->expectOneCall("transceiver_transmit")
+        ->withMemoryBufferParameter("bytes", expected_payload_0, 3)
+        ->withUnsignedLongIntParameters("num_bytes", 3)
+        ->ignoreOtherParameters();
+    /* Second call to msg_transceiver_send_alert_status_change_message */
+    mock_c()
+        ->expectOneCall("transceiver_transmit")
+        ->withMemoryBufferParameter("bytes", expected_payload_1, 3)
+        ->withUnsignedLongIntParameters("num_bytes", 3)
+        ->ignoreOtherParameters();
+
+    void *user_data_0 = (void *)0xAB;
+    void *user_data_1 = (void *)0xCD;
+    msg_transceiver_send_alert_status_change_message(5, true, message_sent_cb, user_data_0);
+    msg_transceiver_send_alert_status_change_message(2, false, message_sent_cb_1, user_data_1);
+    /* Mock transmission in reverse order */
+    (transmit_complete_cbs[1])(false, transmit_complete_cbs_user_data[1]);
+    (transmit_complete_cbs[0])(true, transmit_complete_cbs_user_data[0]);
+
+    CHECK_C(message_sent_cb_called);
+    CHECK_C(message_sent_cb_1_called);
+    CHECK_C(message_sent_cb_result);
+    CHECK_C(!message_sent_cb_1_result);
+    CHECK_EQUAL_C_POINTER(user_data_0, message_sent_cb_user_data);
+    CHECK_EQUAL_C_POINTER(user_data_1, message_sent_cb_1_user_data);
 }
