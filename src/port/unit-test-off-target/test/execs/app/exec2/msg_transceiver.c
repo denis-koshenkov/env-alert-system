@@ -1541,3 +1541,31 @@ TEST_C(MsgTransceiver, AlertStatusChangeMessagesCbsExecutedInReverseOrder)
     CHECK_EQUAL_C_POINTER(user_data_0, message_sent_cb_user_data);
     CHECK_EQUAL_C_POINTER(user_data_1, message_sent_cb_1_user_data);
 }
+
+TEST_C(MsgTransceiver, TransmissionCompleteAfterDeinit)
+{
+    uint8_t expected_payload_0[] = {0x0, 0x2, 0x0};
+    /* msg_transceiver_send_alert_status_change_message */
+    mock_c()
+        ->expectOneCall("transceiver_transmit")
+        ->withMemoryBufferParameter("bytes", expected_payload_0, 3)
+        ->withUnsignedLongIntParameters("num_bytes", 3)
+        ->ignoreOtherParameters();
+    /* Expected to be called in msg_transceiver_deinit */
+    mock_c()->expectOneCall("transceiver_unset_receive_cb");
+    /* Expected to be called in msg_transceiver_init */
+    mock_c()->expectOneCall("transceiver_set_receive_cb")->ignoreOtherParameters();
+
+    void *user_data_0 = (void *)0xAB;
+    msg_transceiver_send_alert_status_change_message(2, false, message_sent_cb, user_data_0);
+    msg_transceiver_deinit();
+
+    /* Transmission complete after interface is deinitialized */
+    (transmit_complete_cbs[0])(true, transmit_complete_cbs_user_data[0]);
+
+    CHECK_C(!message_sent_cb_called);
+
+    /* Teardown calls deinit and expects a call to transceiver_unset_receive_cb from inside deinit. In order to satisfy
+     * that, the module should be initialized at the end of the test. */
+    msg_transceiver_init();
+}

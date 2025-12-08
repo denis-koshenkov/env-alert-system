@@ -51,7 +51,11 @@ static void transmit_complete_cb(bool result, void *user_data)
 
     AlertStatusChangeMessageSlot *const slot = (AlertStatusChangeMessageSlot *)user_data;
     EAS_ASSERT(slot);
-    EAS_ASSERT(slot->is_occupied);
+    if (!slot->is_occupied) {
+        /* Interface got deinitialized since the call to msg_transceiver_send_alert_status_change_message for this
+         * message */
+        return;
+    }
     slot->is_occupied = false;
     if (slot->cb) {
         slot->cb(result, slot->cb_user_data);
@@ -646,6 +650,7 @@ void msg_transceiver_deinit()
         return;
     }
 
+    reset_message_slots();
     remove_alert_cb = NULL;
     add_alert_cb = NULL;
     /* No need to clear user data for add and remove alert cbs, since it will get reset anyway when the new add/remove
