@@ -2,6 +2,7 @@ target_sources(eas_app INTERFACE
     alert_adder.c
     alert_validator.c
     alert_remover.c
+    new_sample_handler.c
 )
 
 target_include_directories(eas_app INTERFACE
