@@ -9,7 +9,7 @@ manifest:
     - name: nrf
       remote: nrfconnect
       repo-path: sdk-nrf
-      revision: v3.0.2
+      revision: v3.2.0
       import:
         path-prefix: nrf-sdk
     - name: cpputest
