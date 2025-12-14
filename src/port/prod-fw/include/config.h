@@ -24,4 +24,17 @@
  */
 #define CONFIG_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES 1
 
+/** Only one message queue is used - in the central event queue. */
+#define CONFIG_EAS_MESSAGE_QUEUE_MAX_NUM_INSTANCES 1
+
+/** Should be plenty to store all events that can in theory happen at the same time */
+#define CONFIG_CENTRAL_EVENT_QUEUE_MESSAGE_QUEUE_BUF_SIZE 1024
+
+/** Default value, kind of random*/
+#define CONFIG_EAS_THREAD_STACK_SIZE 1024
+
+/** Main thread has priority 0 by default. The EAS thread has lower priority than main thread, so that main thread can
+ * finish whatever it is doing before we start processing messages in the event queue. */
+#define CONFIG_EAS_THREAD_PRIORITY 1
+
 #endif /* ENV_ALERT_SYSTEM_SRC_PORT_PROD_FW_INCLUDE_CONFIG_H */

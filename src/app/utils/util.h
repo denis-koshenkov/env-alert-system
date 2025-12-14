@@ -27,6 +27,24 @@ extern "C"
 #define EAS_STATIC_ASSERT(condition) extern int static_assert[1 - 2 * !(condition)]
 #endif
 
+/**
+ * @brief Find maximum out of two values - a and b.
+ *
+ * @p a
+ * @p b
+ */
+#define MAX2(a, b) ((a) > (b) ? (a) : (b))
+
+/**
+ * @brief Find maximum out of four values - a, b, c, and d.
+ *
+ * @p a
+ * @p b
+ * @p c
+ * @p d
+ */
+#define MAX4(a, b, c, d) MAX2(MAX2((a), (b)), MAX2((c), (d)))
+
 #ifdef __cplusplus
 }
 #endif

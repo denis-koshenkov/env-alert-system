@@ -9,6 +9,8 @@ target_sources(port INTERFACE
     interfaces/virtual_led_mock.cpp
     interfaces/eas_current_time.c
     interfaces/transceiver.cpp
+    interfaces/osal/eas_thread.c
+    interfaces/osal/eas_message_queue.c
 )
 
 target_include_directories(port INTERFACE
