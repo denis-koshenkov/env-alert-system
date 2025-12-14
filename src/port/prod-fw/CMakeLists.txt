@@ -1,6 +1,7 @@
 add_library(port INTERFACE)
 
 target_sources(port INTERFACE
+    main.c
     interfaces/linked_list_node_allocator.c
     interfaces/variable_requirement_allocator.c
     interfaces/osal/eas_thread.c
