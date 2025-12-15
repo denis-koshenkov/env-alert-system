@@ -8,11 +8,8 @@
  *
  * The size of each variable requirement type should be less than or equal to this config. It is the responsibility of
  * each variable requirement module to assert that.
- *
- * TODO: setting this to 1 so that prod fw build fails and we need to adjust this according to the variable requirement
- * sizes on the target hardware.
  */
-#define CONFIG_VARIABLE_REQUIREMENT_MAX_SIZE 1
+#define CONFIG_VARIABLE_REQUIREMENT_MAX_SIZE 16
 
 /** The maximal number of nodes that the linked list node allocator module can allocate at the same time.
  * We need CONFIG_MAX_NUM_ALERTS nodes for LedManager - one node for each added LedNotification. We also need nodes for
@@ -24,13 +21,15 @@
  */
 #define CONFIG_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES 1
 
-/** Only one message queue is used - in the central event queue. */
-#define CONFIG_EAS_MESSAGE_QUEUE_MAX_NUM_INSTANCES 1
-
 /** Should be plenty to store all events that can in theory happen at the same time */
 #define CONFIG_CENTRAL_EVENT_QUEUE_MESSAGE_QUEUE_BUF_SIZE 1024
 
-/** Default value, kind of random*/
+/* Configs for port-specific modules */
+
+/** Only one message queue is used - in the central event queue. */
+#define CONFIG_EAS_MESSAGE_QUEUE_MAX_NUM_INSTANCES 1
+
+/** Default value, kind of random */
 #define CONFIG_EAS_THREAD_STACK_SIZE 1024
 
 /** Main thread has priority 0 by default. The EAS thread has lower priority than main thread, so that main thread can
