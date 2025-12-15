@@ -8,6 +8,7 @@
 #include "utils/util.h"
 #include "new_sample_handler.h"
 #include "config.h"
+#include "init_handler.h"
 
 #ifndef CONFIG_CENTRAL_EVENT_QUEUE_MESSAGE_QUEUE_BUF_SIZE
 #define CONFIG_CENTRAL_EVENT_QUEUE_MESSAGE_QUEUE_BUF_SIZE 1024
@@ -20,7 +21,8 @@ typedef struct CentralEventQueue {
 
 /** Unique event identifiers. This is the first byte of every event message to signal what kind of event it is. */
 typedef enum EventId {
-    EVENT_ID_NEW_TEMPERATURE_SAMPLE = 0,
+    EVENT_ID_INIT = 0,
+    EVENT_ID_NEW_TEMPERATURE_SAMPLE,
     EVENT_ID_NEW_PRESSURE_SAMPLE,
     EVENT_ID_NEW_HUMIDITY_SAMPLE,
     EVENT_ID_NEW_LIGHT_INTENSITY_SAMPLE,
@@ -59,6 +61,11 @@ enum {
 };
 
 static CentralEventQueue self;
+
+static void handle_init_event()
+{
+    init_handler_handle_init_event();
+}
 
 static void handle_new_temperature_sample_event(const NewTemperatureSampleEvent *const event)
 {
@@ -99,6 +106,11 @@ static void central_event_queue_thread_run()
         /* Received a new message! */
         const Event *const generic_event = (const Event *const)message;
         switch (generic_event->id) {
+        case EVENT_ID_INIT: {
+            EAS_ASSERT(message_size == sizeof(Event));
+            handle_init_event();
+            break;
+        }
         case EVENT_ID_NEW_TEMPERATURE_SAMPLE: {
             EAS_ASSERT(message_size == sizeof(NewTemperatureSampleEvent));
             const NewTemperatureSampleEvent *const event = (const NewTemperatureSampleEvent *const)message;
@@ -149,6 +161,14 @@ void central_event_queue_init()
         eas_message_queue_create(self.message_queue_buf, CONFIG_CENTRAL_EVENT_QUEUE_MESSAGE_QUEUE_BUF_SIZE,
                                  CENTRAL_EVENT_QUEUE_MAX_MESSAGE_SIZE);
     eas_thread_create(central_event_queue_thread_run);
+}
+
+void central_event_queue_submit_init_event()
+{
+    Event event = {
+        .id = EVENT_ID_INIT,
+    };
+    push_event_to_queue((const uint8_t *const)&event, sizeof(Event));
 }
 
 void central_event_queue_submit_new_temperature_sample_event(Temperature temperature)

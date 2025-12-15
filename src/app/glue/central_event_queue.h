@@ -34,6 +34,11 @@ extern "C"
 void central_event_queue_init();
 
 /**
+ * @brief Submit init event to the event queue.
+ */
+void central_event_queue_submit_init_event();
+
+/**
  * @brief Submit new temperature sample event to the event queue.
  *
  * @param temperature New temperature sample value.
