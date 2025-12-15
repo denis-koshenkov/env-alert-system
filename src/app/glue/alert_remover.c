@@ -17,7 +17,7 @@ static void destroy_variable_requirement(VariableRequirement variable_requiremen
     variable_requirement_destroy(variable_requirement);
 }
 
-void alert_remover_remove_alert(uint8_t alert_id)
+void alert_remover_remove_alert(uint8_t alert_id, void *user_data)
 {
     /* Do not attempt to remove an alert with an invalid id */
     if (!alert_validator_is_alert_id_valid(alert_id)) {

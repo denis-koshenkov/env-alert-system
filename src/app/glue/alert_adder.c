@@ -83,7 +83,7 @@ map_msg_transceiver_operator_to_variable_requirement_operator(MsgTransceiverRequ
     }
 }
 
-void alert_adder_add_alert(const MsgTransceiverAlert *const alert)
+void alert_adder_add_alert(const MsgTransceiverAlert *const alert, void *user_data)
 {
     EAS_ASSERT(alert);
 

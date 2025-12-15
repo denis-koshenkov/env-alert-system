@@ -6,6 +6,12 @@ extern "C"
 {
 #endif
 
+/**
+ * @brief Initialize all application modules.
+ *
+ * This function is called as a handler for the "init" event. This should only happen once, on the bootup of the
+ * application.
+ */
 void init_handler_handle_init_event();
 
 #ifdef __cplusplus
