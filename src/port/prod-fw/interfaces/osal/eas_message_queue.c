@@ -9,7 +9,7 @@
 #endif
 
 typedef struct EasMessageQueueStruct {
-    k_pipe pipe;
+    struct k_pipe pipe;
     uint8_t max_message_size;
 } EasMessageQueueStruct;
 

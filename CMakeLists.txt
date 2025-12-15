@@ -22,8 +22,6 @@ if(BUILD_TESTS)
 else()
     # Building production firmware
     set(PORT_DIR "prod-fw")
-    target_sources(app PRIVATE src/main.c)
-    target_link_libraries(app PRIVATE eas port)
 endif()
 
 add_subdirectory(src/app)

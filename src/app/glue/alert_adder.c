@@ -121,7 +121,7 @@ void alert_adder_add_alert(const MsgTransceiverAlert *const alert, void *user_da
             map_msg_transceiver_operator_to_variable_requirement_operator(variable_requirement->operator);
 
         /* Create a new variable requirement instance and add it to the list of variable requirements of that type */
-        VariableRequirement new_variable_requirement;
+        VariableRequirement new_variable_requirement = NULL;
         switch (variable_requirement->variable_identifier) {
         case MSG_TRANSCEIVER_VARIABLE_IDENTIFIER_TEMPERATURE:
             new_variable_requirement = temperature_requirement_create(
@@ -142,6 +142,10 @@ void alert_adder_add_alert(const MsgTransceiverAlert *const alert, void *user_da
             new_variable_requirement = light_intensity_requirement_create(
                 alert->alert_id, operator, (LightIntensity)variable_requirement->constraint_value.light_intensity);
             light_intensity_requirement_list_add(new_variable_requirement);
+            break;
+        default:
+            /* Invalid variable identifier. Should never happen since alert was validated. */
+            EAS_ASSERT(0);
             break;
         }
 
