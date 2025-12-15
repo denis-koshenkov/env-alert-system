@@ -45,6 +45,9 @@ extern "C"
  */
 #define MAX4(a, b, c, d) MAX2(MAX2((a), (b)), MAX2((c), (d)))
 
+/** Makes x divisible by 4 by increasing its value, if necessary. */
+#define DIV4_UP(x) (((x) + 3) % 4)
+
 #ifdef __cplusplus
 }
 #endif
