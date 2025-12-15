@@ -11,6 +11,8 @@
 #define CONFIG_ALERT_CONDITION_MAX_NUM_INSTANCES 1
 #define CONFIG_ALERT_RAISER_MAX_NUM_INSTANCES 27
 
+/** For the off-target unit test build, this config is used in mock variable requirement allocator to determine the size
+ * of the buffer for one variable requirement. */
 #define CONFIG_VARIABLE_REQUIREMENT_MAX_SIZE 24
 
 #define CONFIG_MAX_NUM_VARIABLE_REQUIREMENTS_IN_ALERT_CONDITION 10
