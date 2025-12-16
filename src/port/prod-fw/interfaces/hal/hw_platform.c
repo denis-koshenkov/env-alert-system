@@ -1,7 +1,7 @@
 #include "hal/hw_platform.h"
-#include "virtual_led_mock.h"
+#include "led_nrf52840.h"
 
 const Led *const hw_platform_get_led()
 {
-    return virtual_led_mock_get();
+    return led_nrf52840_get();
 }

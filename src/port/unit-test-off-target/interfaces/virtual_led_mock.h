@@ -12,9 +12,9 @@ extern "C"
  * @brief Returns the LED interface with function pointers initialized to functions that call the CppUTest mocking
  * framework.
  *
- * @return const Led* Virtual LED mock interface.
+ * @return const Led* const Virtual LED mock interface.
  */
-const Led *virtual_led_mock_get();
+const Led *const virtual_led_mock_get();
 
 #ifdef __cplusplus
 }

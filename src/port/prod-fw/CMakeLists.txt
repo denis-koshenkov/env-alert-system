@@ -9,6 +9,8 @@ target_sources(port INTERFACE
     interfaces/eas_timer.c
     interfaces/osal/eas_thread.c
     interfaces/osal/eas_message_queue.c
+    interfaces/hal/hw_platform.c
+    interfaces/hal/led_nrf52840.c
 )
 
 target_include_directories(port INTERFACE
