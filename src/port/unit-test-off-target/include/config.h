@@ -27,6 +27,11 @@
 #define CONFIG_MAX_TOTAL_NUM_VARIABLE_REQUIREMENTS                                                                     \
     (CONFIG_MAX_NUM_ALERTS * CONFIG_MAX_NUM_VARIABLE_REQUIREMENTS_IN_ALERT_CONDITION)
 
+/* This config has no effect on the behavior of the unit test port. This port implements two version of variable
+ * requirement allocator: mock and fake. Mock simply records function calls, so it does not define any memory for the
+ * allocated requirements. The fake uses its own config, CONFIG_FAKE_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES. */
+#define CONFIG_VARIABLE_REQUIREMENT_ALLOCATOR_NUM_REQUIREMENTS 1
+
 #define CONFIG_ALERT_CONDITIONS_NUM_INSTANCES_TO_CREATE CONFIG_MAX_NUM_ALERTS
 
 #define CONFIG_ALERT_RAISERS_NUM_INSTANCES_TO_CREATE CONFIG_MAX_NUM_ALERTS

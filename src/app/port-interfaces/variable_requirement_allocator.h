@@ -7,9 +7,9 @@ extern "C"
 #endif
 
 /** The implementation of this interface must be able to simulatensously allocate
- * CONFIG_MAX_TOTAL_NUM_VARIABLE_REQUIREMENTS memory blocks of size CONFIG_VARIABLE_REQUIREMENT_MAX_SIZE bytes. Each
- * memory block is one variable requirement. Since the size of a variable requirement is not tied to a specific data
- * type, but is instead defined as a macro, this interface operates on void pointers.
+ * CONFIG_VARIABLE_REQUIREMENT_ALLOCATOR_NUM_REQUIREMENTS memory blocks of size CONFIG_VARIABLE_REQUIREMENT_MAX_SIZE
+ * bytes. Each memory block is one variable requirement. Since the size of a variable requirement is not tied to a
+ * specific data type, but is instead defined as a macro, this interface operates on void pointers.
  */
 
 /**

@@ -53,6 +53,10 @@
  * (CONFIG_MAX_NUM_ALERTS * CONFIG_MAX_NUM_VARIABLE_REQUIREMENTS_IN_ALERT_CONDITION). */
 #define CONFIG_MAX_TOTAL_NUM_VARIABLE_REQUIREMENTS
 
+/** Maximum number of variable requirements that can be simultaneously allocated by the variable requirement allocator.
+ * Should be set to CONFIG_MAX_TOTAL_NUM_VARIABLE_REQUIREMENTS. */
+#define CONFIG_VARIABLE_REQUIREMENT_ALLOCATOR_NUM_REQUIREMENTS
+
 /** Defines how many AlertCondition instances the AlertConditions module creates. Set to CONFIG_MAX_NUM_ALERTS. */
 #define CONFIG_ALERT_CONDITIONS_NUM_INSTANCES_TO_CREATE
 
