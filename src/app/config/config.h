@@ -141,4 +141,9 @@
  * CONFIG_MAX_TOTAL_NUM_VARIABLE_REQUIREMENTS for variable requirements. */
 #define CONFIG_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES
 
+/** Maximum number of led notifications that can be simultaneously allocated by the led notification allocator. Should
+ * be set to CONFIG_MAX_NUM_ALERTS. LedManager is the only module that allocates led notifications, and it can allocate
+ * at most one for each alert. */
+#define CONFIG_LED_NOTIFICATION_ALLOCATOR_NUM_NOTIFICATIONS
+
 #endif /* ENV_ALERT_SYSTEM_SRC_APP_CONFIG_CONFIG_H */

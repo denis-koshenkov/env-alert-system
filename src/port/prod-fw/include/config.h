@@ -55,6 +55,8 @@
 
 #define CONFIG_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES (CONFIG_MAX_NUM_ALERTS + CONFIG_MAX_TOTAL_NUM_VARIABLE_REQUIREMENTS)
 
+#define CONFIG_LED_NOTIFICATION_ALLOCATOR_NUM_NOTIFICATIONS CONFIG_MAX_NUM_ALERTS
+
 /* Configs for port-specific modules */
 
 /** Only one message queue is used - in the central event queue. */

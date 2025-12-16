@@ -59,6 +59,10 @@
  * nodes. The fake uses its own config, CONFIG_FAKE_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES. */
 #define CONFIG_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES 1
 
+/* This config has no effect on the behavior of the unit test port. This port implements a mock object for the
+ * led_notification_allocator interface. The mock does not define any memory for the allocated notifications. */
+#define CONFIG_LED_NOTIFICATION_ALLOCATOR_NUM_NOTIFICATIONS 1
+
 /* Configs for port-specific modules */
 
 /** Should correspond to the number of times <module_name>_create() will be called in the unit test program. */

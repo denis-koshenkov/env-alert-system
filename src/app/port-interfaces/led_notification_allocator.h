@@ -9,6 +9,14 @@ extern "C"
 #include "led_manager_private.h"
 
 /**
+ * @brief Block memory allocator for led notifications.
+ *
+ * The implementation of this interface must be able to simulatensously allocate
+ * CONFIG_LED_NOTIFICATION_ALLOCATOR_NUM_NOTIFICATIONS memory blocks of size sizeof(LedNotification) bytes. Each memory
+ * block is one led notification.
+ */
+
+/**
  * @brief Allocate memory for a led notification.
  *
  * @return LedNotification* If successful, points to allocated memory for led notification. If failed due to being out
