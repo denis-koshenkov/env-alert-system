@@ -16,19 +16,19 @@
  * waste more space in each block. */
 #define LED_NOTIFICATION_ALLOCATOR_BUF_ALIGNMENT 4
 
-SYS_MEM_BLOCKS_DEFINE_STATIC(allocator, LED_NOTIFICATION_ALLOCATOR_BLOCK_SIZE,
+SYS_MEM_BLOCKS_DEFINE_STATIC(led_notification_allocator, LED_NOTIFICATION_ALLOCATOR_BLOCK_SIZE,
                              CONFIG_LED_NOTIFICATION_ALLOCATOR_NUM_NOTIFICATIONS,
                              LED_NOTIFICATION_ALLOCATOR_BUF_ALIGNMENT);
 
 LedNotification *led_notification_allocator_alloc()
 {
     void *out_block = NULL;
-    int ret = sys_mem_blocks_alloc(&allocator, 1, &out_block);
+    int ret = sys_mem_blocks_alloc(&led_notification_allocator, 1, &out_block);
     return (ret == 0) ? ((LedNotification *)out_block) : NULL;
 }
 
 void led_notification_allocator_free(LedNotification *led_notification)
 {
-    int ret = sys_mem_blocks_free(&allocator, 1, (void **)&led_notification);
+    int ret = sys_mem_blocks_free(&led_notification_allocator, 1, (void **)&led_notification);
     EAS_ASSERT(ret == 0);
 }

@@ -16,19 +16,19 @@
  * waste more space in each block. */
 #define LINKED_LIST_NODE_ALLOCATOR_BUF_ALIGNMENT 4
 
-SYS_MEM_BLOCKS_DEFINE_STATIC(allocator, LINKED_LIST_NODE_ALLOCATOR_BLOCK_SIZE,
+SYS_MEM_BLOCKS_DEFINE_STATIC(linked_list_node_allocator, LINKED_LIST_NODE_ALLOCATOR_BLOCK_SIZE,
                              CONFIG_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES, LINKED_LIST_NODE_ALLOCATOR_BUF_ALIGNMENT);
 
 static LinkedListNode *prod_fw_linked_list_node_allocator_alloc()
 {
     void *out_block = NULL;
-    int ret = sys_mem_blocks_alloc(&allocator, 1, &out_block);
+    int ret = sys_mem_blocks_alloc(&linked_list_node_allocator, 1, &out_block);
     return (ret == 0) ? ((LinkedListNode *)out_block) : NULL;
 }
 
 static void prod_fw_linked_list_node_allocator_free(LinkedListNode *linked_list_node)
 {
-    int ret = sys_mem_blocks_free(&allocator, 1, (void **)&linked_list_node);
+    int ret = sys_mem_blocks_free(&linked_list_node_allocator, 1, (void **)&linked_list_node);
     EAS_ASSERT(ret == 0);
 }
 

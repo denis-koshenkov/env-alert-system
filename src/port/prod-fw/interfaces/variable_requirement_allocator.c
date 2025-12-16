@@ -16,19 +16,19 @@
  * waste more space in each block. */
 #define VARIABLE_REQUIREMENT_ALLOCATOR_BUF_ALIGNMENT 4
 
-SYS_MEM_BLOCKS_DEFINE_STATIC(allocator, VARIABLE_REQUIREMENT_ALLOCATOR_BLOCK_SIZE,
+SYS_MEM_BLOCKS_DEFINE_STATIC(var_req_allocator, VARIABLE_REQUIREMENT_ALLOCATOR_BLOCK_SIZE,
                              CONFIG_VARIABLE_REQUIREMENT_ALLOCATOR_NUM_REQUIREMENTS,
                              VARIABLE_REQUIREMENT_ALLOCATOR_BUF_ALIGNMENT);
 
 void *variable_requirement_allocator_alloc()
 {
     void *out_block = NULL;
-    int ret = sys_mem_blocks_alloc(&allocator, 1, &out_block);
+    int ret = sys_mem_blocks_alloc(&var_req_allocator, 1, &out_block);
     return (ret == 0) ? out_block : NULL;
 }
 
 void variable_requirement_allocator_free(void *buf)
 {
-    int ret = sys_mem_blocks_free(&allocator, 1, &buf);
+    int ret = sys_mem_blocks_free(&var_req_allocator, 1, &buf);
     EAS_ASSERT(ret == 0);
 }
