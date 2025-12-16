@@ -8,7 +8,14 @@ extern "C"
 
 #include "utils/linked_list_private.h"
 
-/** This interface is implemented as function pointers so that the interface functions can be changed during runtime.
+/**
+ * @brief Block memory allocator for linked list nodes.
+ *
+ * The implementation of this interface must be able to simulatensously allocate
+ * CONFIG_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES memory blocks of size sizeof(LinkedListNode) bytes. Each memory
+ * block is one linked list node.
+ *
+ * This interface is implemented as function pointers so that the interface functions can be changed during runtime.
  * This is necessary for the unit test port, which uses different mocks/stubs for different tests.
  *
  * The implementation should implement the interface in a .c file, and then assign the function pointers below to the
