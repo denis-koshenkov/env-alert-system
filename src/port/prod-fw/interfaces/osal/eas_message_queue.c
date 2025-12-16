@@ -8,10 +8,10 @@
 #define CONFIG_EAS_MESSAGE_QUEUE_MAX_NUM_INSTANCES 1
 #endif
 
-typedef struct EasMessageQueueStruct {
+struct EasMessageQueueStruct {
     struct k_pipe pipe;
     uint8_t max_message_size;
-} EasMessageQueueStruct;
+};
 
 static struct EasMessageQueueStruct instances[CONFIG_EAS_MESSAGE_QUEUE_MAX_NUM_INSTANCES];
 static size_t instance_idx = 0;
