@@ -8,6 +8,7 @@ extern "C"
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 /**
  * @brief Interface to send and receive bytes over a connectivity medium.

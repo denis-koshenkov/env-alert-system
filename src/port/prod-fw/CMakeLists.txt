@@ -11,6 +11,7 @@ target_sources(port INTERFACE
     interfaces/osal/eas_message_queue.c
     interfaces/hal/hw_platform.c
     interfaces/hal/led_nrf52840.c
+    interfaces/hal/transceiver.c
 )
 
 target_include_directories(port INTERFACE
