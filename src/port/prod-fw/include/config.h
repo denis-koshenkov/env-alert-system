@@ -15,6 +15,9 @@
 #define CONFIG_VARIABLE_REQUIREMENT_LIST_MAX_NUM_INSTANCES 4
 #define CONFIG_ALERT_CONDITION_MAX_NUM_INSTANCES CONFIG_MAX_NUM_ALERTS
 #define CONFIG_ALERT_RAISER_MAX_NUM_INSTANCES CONFIG_MAX_NUM_ALERTS
+/* Each alert raiser creates two timer instances - warmup timer and cooldown timer. +1 is for LedManager - it uses one
+ * timer instance to switch between LED notifications. */
+#define CONFIG_EAS_TIMER_MAX_NUM_INSTANCES ((CONFIG_ALERT_RAISER_MAX_NUM_INSTANCES * 2) + 1)
 
 /* Chosen through trial and error. If set too low, static asserts will fire. */
 #define CONFIG_VARIABLE_REQUIREMENT_MAX_SIZE 16

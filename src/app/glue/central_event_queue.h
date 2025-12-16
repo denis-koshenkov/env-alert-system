@@ -26,6 +26,17 @@ extern "C"
  */
 
 /**
+ * @brief Callback type definition for a function without return value and one void* parameter.
+ *
+ * This callback type definition is used for the "void cb with user data" event. When this event is submitted to the
+ * event queue, the handling for this event invokes this callback with user data. Both the callback and the user data
+ * are passed as event payload.
+ *
+ * @param user_data User data.
+ */
+typedef void (*CentralEventQueueVoidCbWithUserData)(void *user_data);
+
+/**
  * @brief Initialize central event queue.
  *
  * Creates the message queue and the thread. The thread is immediately started. This function should be called on system
@@ -65,6 +76,16 @@ void central_event_queue_submit_new_humidity_sample_event(Humidity humidity);
  * @param light_intensity New light intensity sample value.
  */
 void central_event_queue_submit_new_light_intensity_sample_event(LightIntensity light_intensity);
+
+/**
+ * @brief Submit void cb with user data event to the event queue.
+ *
+ * The handler for this event will execute @p cb and pass @p user_data as the parameter to @p cb.
+ *
+ * @param cb Callback to execute.
+ * @param user_data User data to pass to the callback.
+ */
+void central_event_queue_submit_void_cb_with_user_data_event(CentralEventQueueVoidCbWithUserData cb, void *user_data);
 
 #ifdef __cplusplus
 }

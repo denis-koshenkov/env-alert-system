@@ -4,9 +4,12 @@
 #include "alert_adder.h"
 #include "alert_remover.h"
 #include "msg_transceiver.h"
+#include "eas_timer.h"
+#include "eas_timer_callback_executor.h"
 
 void init_handler_handle_init_event()
 {
+    eas_timer_set_execute_timer_expiry_function_cb(eas_timer_callback_executor_execute_callback);
     alert_conditions_create_instances();
     alert_raisers_create_instances();
     msg_transceiver_init();

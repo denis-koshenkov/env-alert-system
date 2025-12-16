@@ -26,6 +26,9 @@ typedef enum EventId {
     EVENT_ID_NEW_PRESSURE_SAMPLE,
     EVENT_ID_NEW_HUMIDITY_SAMPLE,
     EVENT_ID_NEW_LIGHT_INTENSITY_SAMPLE,
+    /** Handler for this event executes a callback function provided in the event payload. User data parameter to pass
+     * to the callback is also a part of the payload. */
+    EVENT_ID_VOID_CB_WITH_USER_DATA,
 } EventId;
 
 /** Abstract event class that includes only event id. Events that have payload should put this struct as the first field
@@ -54,10 +57,17 @@ typedef struct NewLightIntensitySampleEvent {
     LightIntensity sample;
 } NewLightIntensitySampleEvent;
 
+typedef struct VoidCbWithUserDataEvent {
+    Event event;
+    CentralEventQueueVoidCbWithUserData cb;
+    void *user_data;
+} VoidCbWithUserDataEvent;
+
 /* Wrapping in an enum, so that the value is a constant, and we can declare an array of this size */
 enum {
-    CENTRAL_EVENT_QUEUE_MAX_MESSAGE_SIZE = MAX4(sizeof(NewTemperatureSampleEvent), sizeof(NewPressureSampleEvent),
-                                                sizeof(NewHumiditySampleEvent), sizeof(NewLightIntensitySampleEvent))
+    CENTRAL_EVENT_QUEUE_MAX_MESSAGE_SIZE =
+        MAX5(sizeof(NewTemperatureSampleEvent), sizeof(NewPressureSampleEvent), sizeof(NewHumiditySampleEvent),
+             sizeof(NewLightIntensitySampleEvent), sizeof(VoidCbWithUserDataEvent))
 };
 
 static CentralEventQueue self;
@@ -89,6 +99,18 @@ static void handle_new_light_intensity_sample_event(const NewLightIntensitySampl
 {
     EAS_ASSERT(event);
     new_sample_handler_light_intensity(event->sample);
+}
+
+/**
+ * @brief Handle "void cb with user data" event by invoking the callback.
+ *
+ * @param event "Void cb with user data" event.
+ */
+static void handle_void_cb_with_user_data_event(const VoidCbWithUserDataEvent *const event)
+{
+    EAS_ASSERT(event);
+    EAS_ASSERT(event->cb);
+    event->cb(event->user_data);
 }
 
 /**
@@ -133,6 +155,12 @@ static void central_event_queue_thread_run()
             EAS_ASSERT(message_size == sizeof(NewLightIntensitySampleEvent));
             const NewLightIntensitySampleEvent *const event = (const NewLightIntensitySampleEvent *const)message;
             handle_new_light_intensity_sample_event(event);
+            break;
+        }
+        case EVENT_ID_VOID_CB_WITH_USER_DATA: {
+            EAS_ASSERT(message_size == sizeof(VoidCbWithUserDataEvent));
+            const VoidCbWithUserDataEvent *const event = (const VoidCbWithUserDataEvent *const)message;
+            handle_void_cb_with_user_data_event(event);
             break;
         }
         default:
@@ -205,4 +233,15 @@ void central_event_queue_submit_new_light_intensity_sample_event(LightIntensity 
         .sample = light_intensity,
     };
     push_event_to_queue((const uint8_t *const)&event, sizeof(NewLightIntensitySampleEvent));
+}
+
+void central_event_queue_submit_void_cb_with_user_data_event(CentralEventQueueVoidCbWithUserData cb, void *user_data)
+{
+    EAS_ASSERT(cb);
+    VoidCbWithUserDataEvent event = {
+        .event.id = EVENT_ID_VOID_CB_WITH_USER_DATA,
+        .cb = cb,
+        .user_data = user_data,
+    };
+    push_event_to_queue((const uint8_t *const)&event, sizeof(VoidCbWithUserDataEvent));
 }

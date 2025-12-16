@@ -18,9 +18,50 @@ extern "C"
  * possible to periodically execute a callback function using a periodic timer.
  */
 
+/**
+ * @brief A callback function prototype that executes the timer expiry callback.
+ *
+ * When a timer is created, an expiry callback function of type EasTimerCb is passed to @ref eas_timer_create. This
+ * callback should be executed when the timer period expires.
+ *
+ * The implementation of eas_timer cannot invoke the EasTimerCb functions directly. The application module that created
+ * and started the timer expects that the EasTimerCb callback is executed from the same thread/context as the
+ * other functions of that application module.
+ *
+ * On the contrary, the implementation of this module likely relies on the timer implementation of the underlying RTOS.
+ * In most cases, the RTOS timer implemenetation allows to execute a function after a certain period from ISR context or
+ * from the context of a dedicated thread. This means that we cannot directly call EasTimerCb from that context.
+ *
+ * Instead, we call this EasTimerExecuteTimerExpiryFunctionCb callback from that context. To reiterate, it is allowed to
+ * call this callback from any context - any thread or ISR. As parameters, this function gets the EasTimerCb and its
+ * user_data that were passed to @ref eas_timer_create.
+ *
+ * The implementation of this callback is responsible for ensuring that the EasTimerCb is executed from the same
+ * context/thread as the application module that is using the timer. An example implementation of this callback is to
+ * submit an event to the event queue that handles all events in the system. As payload to that event, we pass the
+ * EasTimerCb and user_data. Since the event queue handles all events in the system, the context from which EasTimer cb
+ * is called is the same context from which all application module APIs are called.
+ *
+ * This is just an example implementation. Any other implementation is allowed, as long as EasTimerCb gets executed from
+ * the same context as the application module that created and started that timer.
+ *
+ * The EasTimerExecuteTimerExpiryFunctionCb is set externally by calling @ref
+ * eas_timer_set_execute_timer_expiry_function_cb. This callback is then used by ALL timer instances.
+ */
+typedef void (*EasTimerExecuteTimerExpiryFunctionCb)(EasTimerCb cb, void *user_data);
+
 /* Convenience macros for readability to pass to the "periodic" parameter of eas_timer_create */
 #define EAS_TIMER_PERIODIC true
 #define EAS_TIMER_ONE_SHOT false
+
+/**
+ * @brief Set a callback that the eas_timer implementation will call when it wants to execute the timer expiry function.
+ *
+ * For details on the purpose of this function, see @ref EasTimerExecuteTimerExpiryFunctionCb.
+ *
+ * @param cb Callback to set.
+ */
+void eas_timer_set_execute_timer_expiry_function_cb(EasTimerExecuteTimerExpiryFunctionCb cb);
 
 /**
  * @brief Create a timer instance.
@@ -28,12 +69,12 @@ extern "C"
  * Creates a timer that will execute @p cb with @p user_data after @p period_ms ms elapse since the timer is started.
  *
  * @param period_ms The amount of time that passes from the moment the timer is started to the moment the timer expiry
- * @p cb is executed.
+ * @p cb is executed. Cannot be 0 - an assert is fired in this case.
  * @param periodic If true, creates a periodic timer, meaning that @p cb keeps being executed every @p period_ms ms. If
  * false, creates a one-shot timer, meaning that @p cb is executed only once.
- * @param cb Callback to execute when the timer expires. It is guaranteed that this callback will be executed from the
- * same context (thread) from which @ref eas_timer_create and @ref eas_timer_start were called to create and start the
- * timer.
+ * @param cb Callback to execute when the timer expires. When the timer expires, the execute timer expiry function will
+ * be executed and @p cb and @p user_data will be passed to it. It is then the responsibility of the implementation of
+ * that callback to invoke @p cb from the desired context/thread.
  * @param user_data User data to pass to @p cb.
  *
  * @return EasTimer Timer instance.
@@ -58,6 +99,9 @@ void eas_timer_set_period(EasTimer self, uint32_t period_ms);
  * expiry callback will still be executed for the previous timer run.
  *
  * @param self Timer instance returned by @ref eas_timer_create.
+ *
+ * @warning An assert will fire if the timer expiry function cb has not been set yet. Set it by callng @ref
+ * eas_timer_set_execute_timer_expiry_function_cb before starting any timers.
  */
 void eas_timer_start(EasTimer self);
 

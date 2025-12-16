@@ -2,6 +2,11 @@
 #include "eas_timer.h"
 #include "eas_assert.h"
 
+void eas_timer_set_execute_timer_expiry_function_cb(EasTimerExecuteTimerExpiryFunctionCb cb)
+{
+    mock().actualCall("eas_timer_set_execute_timer_expiry_function_cb").withParameter("cb", cb);
+}
+
 EasTimer eas_timer_create(uint32_t period_ms, bool periodic, EasTimerCb cb, void *user_data)
 {
     EasTimerCb *timer_cbs = (EasTimerCb *)mock().getData("timerCbs").getPointerValue();

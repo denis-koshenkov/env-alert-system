@@ -3,6 +3,7 @@ target_sources(eas_app INTERFACE
     alert_validator.c
     alert_remover.c
     central_event_queue.c
+    eas_timer_callback_executor.c
 )
 
 target_include_directories(eas_app INTERFACE

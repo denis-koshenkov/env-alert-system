@@ -45,6 +45,17 @@ extern "C"
  */
 #define MAX4(a, b, c, d) MAX2(MAX2((a), (b)), MAX2((c), (d)))
 
+/**
+ * @brief Find maximum out of five values - a, b, c, d, e.
+ *
+ * @p a
+ * @p b
+ * @p c
+ * @p d
+ * @p e
+ */
+#define MAX5(a, b, c, d, e) MAX2(MAX4(a, b, c, d), (e))
+
 /** Makes x divisible by 4 by increasing its value, if necessary. */
 #define DIV4_UP(x) (((x) + 3) % 4)
 
