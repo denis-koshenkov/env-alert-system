@@ -11,8 +11,8 @@ extern "C"
 /** This interface is implemented as function pointers so that the interface functions can be changed during runtime.
  * This is necessary for the unit test port, which uses different mocks/stubs for different tests.
  *
- * The implementation for production firmware should implement the interface in a .c file, and then assign the function
- * pointers below to the function implementations.
+ * The implementation should implement the interface in a .c file, and then assign the function pointers below to the
+ * function implementations.
  */
 
 /**

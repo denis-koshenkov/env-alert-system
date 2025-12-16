@@ -135,4 +135,10 @@
  */
 #define CONFIG_CENTRAL_EVENT_QUEUE_MESSAGE_QUEUE_BUF_SIZE
 
+/** Maximum number of linked list nodes that can be simultaneously allocated by the linked list node allocator.
+ * Should be set to (CONFIG_MAX_NUM_ALERTS + CONFIG_MAX_TOTAL_NUM_VARIABLE_REQUIREMENTS). We need CONFIG_MAX_NUM_ALERTS
+ * nodes for LedManager - one node for each added LedNotification. We also need nodes
+ * CONFIG_MAX_TOTAL_NUM_VARIABLE_REQUIREMENTS for variable requirements. */
+#define CONFIG_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES
+
 #endif /* ENV_ALERT_SYSTEM_SRC_APP_CONFIG_CONFIG_H */

@@ -29,7 +29,7 @@
 
 /* This config has no effect on the behavior of the unit test port. This port implements two version of variable
  * requirement allocator: mock and fake. Mock simply records function calls, so it does not define any memory for the
- * allocated requirements. The fake uses its own config, CONFIG_FAKE_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES. */
+ * allocated requirements. The fake uses its own config, CONFIG_FAKE_VARIABLE_REQUIREMENT_ALLOCATOR_NUM_REQUIREMENTS. */
 #define CONFIG_VARIABLE_REQUIREMENT_ALLOCATOR_NUM_REQUIREMENTS 1
 
 #define CONFIG_ALERT_CONDITIONS_NUM_INSTANCES_TO_CREATE CONFIG_MAX_NUM_ALERTS
@@ -53,6 +53,11 @@
 
 /** It is defined here, but not actually used since central event queue is not used in the unit test port. */
 #define CONFIG_CENTRAL_EVENT_QUEUE_MESSAGE_QUEUE_BUF_SIZE 1024
+
+/* This config has no effect on the behavior of the unit test port. This port implements two version of linked list node
+ * allocator: mock and fake. Mock simply records function calls, so it does not define any memory for the allocated
+ * nodes. The fake uses its own config, CONFIG_FAKE_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES. */
+#define CONFIG_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES 1
 
 /* Configs for port-specific modules */
 

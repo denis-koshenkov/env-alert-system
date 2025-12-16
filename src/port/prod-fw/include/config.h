@@ -53,17 +53,9 @@
 /** Should be plenty to store all events that can in theory happen at the same time */
 #define CONFIG_CENTRAL_EVENT_QUEUE_MESSAGE_QUEUE_BUF_SIZE 1024
 
-/* Configs for port-specific modules */
+#define CONFIG_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES (CONFIG_MAX_NUM_ALERTS + CONFIG_MAX_TOTAL_NUM_VARIABLE_REQUIREMENTS)
 
-/** The maximal number of nodes that the linked list node allocator module can allocate at the same time.
- * We need CONFIG_MAX_NUM_ALERTS nodes for LedManager - one node for each added LedNotification. We also need nodes for
- * variable requirements. We also need nodes for variable requirements, probably 100 - (CONFIG_MAX_NUM_ALERTS *
- * CONFIG_MAX_NUM_REQUIREMENTS_PER_ALERT), where CONFIG_MAX_NUM_REQUIREMENTS_PER_ALERT is 10. This way, we can always
- * store all variable requirements.
- *
- * TODO: setting this to one to not have enough nodes so that we adjust it according to the calculation.
- */
-#define CONFIG_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES (CONFIG_MAX_NUM_ALERTS +)
+/* Configs for port-specific modules */
 
 /** Only one message queue is used - in the central event queue. */
 #define CONFIG_EAS_MESSAGE_QUEUE_MAX_NUM_INSTANCES 1
