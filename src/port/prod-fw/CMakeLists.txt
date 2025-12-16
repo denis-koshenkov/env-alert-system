@@ -5,6 +5,7 @@ target_sources(port INTERFACE
     interfaces/linked_list_node_allocator.c
     interfaces/variable_requirement_allocator.c
     interfaces/led_notification_allocator.c
+    interfaces/eas_current_time.c
     interfaces/osal/eas_thread.c
     interfaces/osal/eas_message_queue.c
 )
