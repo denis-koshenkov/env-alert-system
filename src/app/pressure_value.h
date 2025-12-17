@@ -8,7 +8,7 @@ extern "C"
 
 #include <stdbool.h>
 
-#include "hal/pressure.h"
+#include "pressure.h"
 
 /**
  * @brief Stores a pressure value and reports when it changes.

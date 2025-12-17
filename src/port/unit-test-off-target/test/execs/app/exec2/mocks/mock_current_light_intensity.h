@@ -8,7 +8,7 @@ extern "C"
 
 #include <stdbool.h>
 
-#include "hal/light_intensity.h"
+#include "light_intensity.h"
 
 void current_light_intensity_set(LightIntensity light_intensity);
 

@@ -6,10 +6,10 @@ extern "C"
 {
 #endif
 
-#include "hal/temperature.h"
-#include "hal/pressure.h"
-#include "hal/humidity.h"
-#include "hal/light_intensity.h"
+#include "temperature.h"
+#include "pressure.h"
+#include "humidity.h"
+#include "light_intensity.h"
 
 /**
  * @brief Callbacks to invoke whenever a new sample is received from HAL.

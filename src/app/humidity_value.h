@@ -8,7 +8,7 @@ extern "C"
 
 #include <stdbool.h>
 
-#include "hal/humidity.h"
+#include "humidity.h"
 
 /**
  * @brief Stores a humidity value and reports when it changes.

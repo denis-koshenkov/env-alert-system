@@ -5,7 +5,7 @@
 #include "CppUTestExt/TestAssertPlugin_c.h"
 
 #include "msg_transceiver.h"
-#include "hal/mock_transceiver.h"
+#include "mock_transceiver.h"
 #include "config.h"
 #include "eas_assert.h"
 

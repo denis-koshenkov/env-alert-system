@@ -1,5 +1,5 @@
 #include "CppUTestExt/MockSupport.h"
-#include "hal/mock_transceiver.h"
+#include "mock_transceiver.h"
 #include "eas_assert.h"
 
 static size_t cbs_index = 0;

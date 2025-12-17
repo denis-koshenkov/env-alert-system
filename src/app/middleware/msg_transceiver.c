@@ -1,5 +1,5 @@
 #include "msg_transceiver.h"
-#include "hal/transceiver.h"
+#include "transceiver.h"
 #include "eas_assert.h"
 
 #ifndef CONFIG_MSG_TRANSCEIVER_MAX_NUM_CONCURRENT_ALERT_STATUS_CHANGE_MESSAGES

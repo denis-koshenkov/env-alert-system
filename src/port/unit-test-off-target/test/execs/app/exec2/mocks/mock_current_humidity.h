@@ -8,7 +8,7 @@ extern "C"
 
 #include <stdbool.h>
 
-#include "hal/humidity.h"
+#include "humidity.h"
 
 void current_humidity_set(Humidity humidity);
 

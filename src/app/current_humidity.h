@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-#include "hal/humidity.h"
+#include "humidity.h"
 
 /**
  * @brief This module stores current humidity and reports when it changes.

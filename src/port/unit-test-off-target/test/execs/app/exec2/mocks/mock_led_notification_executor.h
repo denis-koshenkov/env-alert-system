@@ -8,7 +8,7 @@ extern "C"
 
 #include <stdbool.h>
 
-#include "hal/led_defs.h"
+#include "led_defs.h"
 
 void led_notification_executor_execute(LedColor led_color, LedPattern led_pattern, bool should_be_displayed);
 

@@ -8,7 +8,7 @@
 #include "eas_assert.h"
 #include "config.h"
 #include "utils/util.h"
-#include "hal/pressure.h"
+#include "pressure.h"
 #include "current_pressure.h"
 
 typedef struct PressureRequirementStruct *PressureRequirement;

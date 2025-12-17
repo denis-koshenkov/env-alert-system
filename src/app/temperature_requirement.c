@@ -8,7 +8,7 @@
 #include "eas_assert.h"
 #include "config.h"
 #include "utils/util.h"
-#include "hal/temperature.h"
+#include "temperature.h"
 #include "current_temperature.h"
 
 typedef struct TemperatureRequirementStruct *TemperatureRequirement;
