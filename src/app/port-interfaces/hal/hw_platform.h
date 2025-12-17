@@ -3,6 +3,7 @@
 
 #include "led.h"
 #include "temperature.h"
+#include "humidity_sensor.h"
 
 /**
  * @brief Initialize hardware platform.
@@ -33,5 +34,14 @@ const Led *const hw_platform_get_led();
  * @return const TemperatureSensor* const Temperature sensor instance.
  */
 const TemperatureSensor *const hw_platform_get_temperature_sensor();
+
+/**
+ * @brief Get humidity sensor instance from the hardware platform.
+ *
+ * The implementation should return a humidity sensor interface initialized with valid functions.
+ *
+ * @return const HumiditySensor* const Humidity sensor instance.
+ */
+const HumiditySensor *const hw_platform_get_humidity_sensor();
 
 #endif /* ENV_ALERT_SYSTEM_SRC_APP_PORT_INTERFACES_HAL_HW_PLATFORM_H */

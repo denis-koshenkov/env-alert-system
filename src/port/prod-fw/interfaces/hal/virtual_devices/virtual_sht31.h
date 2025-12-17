@@ -7,10 +7,12 @@ extern "C"
 #endif
 
 #include "temperature.h"
+#include "humidity_sensor.h"
 
 /** All virtual devices that are based on SHT31. */
 typedef struct SHT31VirtualInterfaces {
     const TemperatureSensor *const temperature_sensor;
+    const HumiditySensor *const humidity_sensor;
 } SHT31VirtualInterfaces;
 
 /**
