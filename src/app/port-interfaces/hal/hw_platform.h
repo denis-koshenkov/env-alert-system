@@ -2,6 +2,18 @@
 #define ENV_ALERT_SYSTEM_SRC_APP_PORT_INTERFACES_HAL_HW_PLATFORM_H
 
 #include "led.h"
+#include "temperature.h"
+
+/**
+ * @brief Initialize hardware platform.
+ *
+ * This function should be called on initialization. The application is only allowed to call the get functions to use
+ * the virtual device interfaces after this function is called.
+ *
+ * The implementation should do everything necessary to fully initialize the virtual devices returned by the get
+ * functions.
+ */
+void hw_platform_init();
 
 /**
  * @brief Get led instance from hardware platform.
@@ -12,5 +24,14 @@
  * @return const Led* const Led instance.
  */
 const Led *const hw_platform_get_led();
+
+/**
+ * @brief Get temperature sensor instance from the hardware platform.
+ *
+ * The implementation should return a temperature sensor interface initialized with valid functions.
+ *
+ * @return const TemperatureSensor* const Temperature sensor instance.
+ */
+const TemperatureSensor *const hw_platform_get_temperature_sensor();
 
 #endif /* ENV_ALERT_SYSTEM_SRC_APP_PORT_INTERFACES_HAL_HW_PLATFORM_H */
