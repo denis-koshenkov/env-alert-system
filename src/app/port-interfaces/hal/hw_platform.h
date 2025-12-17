@@ -2,7 +2,7 @@
 #define ENV_ALERT_SYSTEM_SRC_APP_PORT_INTERFACES_HAL_HW_PLATFORM_H
 
 #include "led.h"
-#include "temperature.h"
+#include "temperature_sensor.h"
 #include "humidity_sensor.h"
 
 /**
