@@ -14,6 +14,9 @@
 #include "alert_raisers.h"
 #include "alert_raiser.h"
 #include "eas_assert.h"
+#include "eas_log.h"
+
+EAS_LOG_ENABLE_IN_FILE();
 
 /**
  * @brief Evaluate variable requirement and if its result changed, also evaluate the alert condition it is a part of.
@@ -162,24 +165,28 @@ static void new_sample_handler(const void *const sample, void (*notify_alert_eva
 
 void new_sample_handler_temperature(Temperature temperature)
 {
+    EAS_LOG_INF("New temperature sample %d", temperature);
     new_sample_handler(&temperature, alert_evaluation_readiness_notify_received_temperature_sample,
                        set_current_temperature_value, handle_temperature_value_change);
 }
 
 void new_sample_handler_pressure(Pressure pressure)
 {
+    EAS_LOG_INF("New pressure sample %d", pressure);
     new_sample_handler(&pressure, alert_evaluation_readiness_notify_received_pressure_sample,
                        set_current_pressure_value, handle_pressure_value_change);
 }
 
 void new_sample_handler_humidity(Humidity humidity)
 {
+    EAS_LOG_INF("New humidity sample %d", humidity);
     new_sample_handler(&humidity, alert_evaluation_readiness_notify_received_humidity_sample,
                        set_current_humidity_value, handle_humidity_value_change);
 }
 
 void new_sample_handler_light_intensity(LightIntensity light_intensity)
 {
+    EAS_LOG_INF("New light intensity sample %d", light_intensity);
     new_sample_handler(&light_intensity, alert_evaluation_readiness_notify_received_light_intensity_sample,
                        set_current_light_intensity_value, handle_light_intensity_value_change);
 }
