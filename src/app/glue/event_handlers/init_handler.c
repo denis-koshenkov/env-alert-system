@@ -10,6 +10,7 @@
 
 void init_handler_handle_init_event()
 {
+    /* Done before initializing hardware platform, in case hw_platform_init starts any timers. */
     eas_timer_set_execute_timer_expiry_function_cb(eas_timer_callback_executor_execute_callback);
     hw_platform_init();
     alert_conditions_create_instances();

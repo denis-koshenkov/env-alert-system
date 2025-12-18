@@ -20,6 +20,12 @@ const TemperatureSensor *const hw_platform_get_temperature_sensor()
 }
 
 /* Unused in unit test port */
+const PressureSensor *const hw_platform_get_pressure_sensor()
+{
+    return NULL;
+}
+
+/* Unused in unit test port */
 const HumiditySensor *const hw_platform_get_humidity_sensor()
 {
     return NULL;

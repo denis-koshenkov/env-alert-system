@@ -3,6 +3,7 @@
 
 #include "led.h"
 #include "temperature_sensor.h"
+#include "pressure_sensor.h"
 #include "humidity_sensor.h"
 
 /**
@@ -34,6 +35,15 @@ const Led *const hw_platform_get_led();
  * @return const TemperatureSensor* const Temperature sensor instance.
  */
 const TemperatureSensor *const hw_platform_get_temperature_sensor();
+
+/**
+ * @brief Get pressure sensor instance from the hardware platform.
+ *
+ * The implementation should return a pressure sensor interface initialized with valid functions.
+ *
+ * @return const PressureSensor* const Pressure sensor instance.
+ */
+const PressureSensor *const hw_platform_get_pressure_sensor();
 
 /**
  * @brief Get humidity sensor instance from the hardware platform.
