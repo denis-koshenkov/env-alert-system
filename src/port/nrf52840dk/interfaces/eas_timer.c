@@ -48,8 +48,6 @@ EasTimer eas_timer_create(uint32_t period_ms, bool periodic, EasTimerCb cb, void
     /* The only way to notify the caller about timer expiry is via cb, so it does not make sense to create a timer
      * without a defined cb. */
     EAS_ASSERT(cb);
-    /* This timer API is only for scheduling functions to execute in the future */
-    EAS_ASSERT(period_ms != 0);
 
     EAS_ASSERT(instance_idx < CONFIG_EAS_TIMER_MAX_NUM_INSTANCES);
     struct EasTimerStruct *instance = &instances[instance_idx];
@@ -75,6 +73,8 @@ void eas_timer_start(EasTimer self)
      * execute_timer_expiry_function_cb will be called as a part of the timer's expiry callback. */
     EAS_ASSERT(execute_timer_expiry_function_cb);
     EAS_ASSERT(self);
+    /* This timer API is only for scheduling functions to execute in the future */
+    EAS_ASSERT(self->period_ms != 0);
 
     k_timeout_t period = self->periodic ? K_MSEC(self->period_ms) : K_FOREVER;
     k_timer_start(&(self->timer), K_MSEC(self->period_ms), period);

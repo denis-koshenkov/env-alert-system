@@ -69,7 +69,7 @@ void eas_timer_set_execute_timer_expiry_function_cb(EasTimerExecuteTimerExpiryFu
  * Creates a timer that will execute @p cb with @p user_data after @p period_ms ms elapse since the timer is started.
  *
  * @param period_ms The amount of time that passes from the moment the timer is started to the moment the timer expiry
- * @p cb is executed. Cannot be 0 - an assert is fired in this case.
+ * @p cb is executed.
  * @param periodic If true, creates a periodic timer, meaning that @p cb keeps being executed every @p period_ms ms. If
  * false, creates a one-shot timer, meaning that @p cb is executed only once.
  * @param cb Callback to execute when the timer expires. When the timer expires, the execute timer expiry function will
@@ -97,6 +97,8 @@ void eas_timer_set_period(EasTimer self, uint32_t period_ms);
  *
  * If the timer is already running, this will restart the timer. However, in this scenario it is possible that the timer
  * expiry callback will still be executed for the previous timer run.
+ *
+ * It is not allowed to call this function of period is set to 0. An assert is fired in that case.
  *
  * @param self Timer instance returned by @ref eas_timer_create.
  *
