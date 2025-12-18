@@ -1,7 +1,9 @@
 from west.commands import WestCommand
+from west.manifest import Manifest
 
 import shutil
 import subprocess
+from pathlib import Path
 
 class EasBuildNrf(WestCommand):
 
@@ -26,6 +28,9 @@ class EasBuildNrf(WestCommand):
             print('west is not installed or cannot be found; cannot build.')
             return
 
-        cmd = ['west', 'build', '-b', 'nrf52840dk/nrf52840']
+        manifest = Manifest.from_topdir()
+        conf_file_path = Path(manifest.repo_abspath) / 'src' / 'port' / 'nrf52840dk' / 'prj.conf'
+
+        cmd = ['west', 'build', '-b', 'nrf52840dk/nrf52840', '--', '-DCONF_FILE=' + str(conf_file_path)]
         print('Running command: ' + ' '.join(cmd))
         p = subprocess.run(cmd, check=True)
