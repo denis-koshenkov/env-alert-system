@@ -7,12 +7,23 @@
 #include "eas_timer.h"
 #include "eas_timer_callback_executor.h"
 #include "hw_platform.h"
+#include "new_sample_callbacks.h"
 
 void init_handler_handle_init_event()
 {
-    /* Done before initializing hardware platform, in case hw_platform_init starts any timers. */
+    /* Done before initializing hardware platform, in case hw_platform_init starts timers. */
     eas_timer_set_execute_timer_expiry_function_cb(eas_timer_callback_executor_execute_callback);
+
     hw_platform_init();
+    hw_platform_get_temperature_sensor()->register_new_sample_cb(new_sample_callback_temperature, NULL);
+    hw_platform_get_pressure_sensor()->register_new_sample_cb(new_sample_callback_pressure, NULL);
+    hw_platform_get_humidity_sensor()->register_new_sample_cb(new_sample_callback_humidity, NULL);
+    hw_platform_get_light_intensity_sensor()->register_new_sample_cb(new_sample_callback_light_intensity, NULL);
+    hw_platform_get_temperature_sensor()->start();
+    hw_platform_get_pressure_sensor()->start();
+    hw_platform_get_humidity_sensor()->start();
+    hw_platform_get_light_intensity_sensor()->start();
+
     alert_conditions_create_instances();
     alert_raisers_create_instances();
     msg_transceiver_init();
