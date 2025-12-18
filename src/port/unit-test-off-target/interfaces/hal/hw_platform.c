@@ -30,3 +30,9 @@ const HumiditySensor *const hw_platform_get_humidity_sensor()
 {
     return NULL;
 }
+
+/* Unused in unit test port */
+const LightIntensitySensor *const hw_platform_get_light_intensity_sensor()
+{
+    return NULL;
+}

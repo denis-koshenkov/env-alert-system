@@ -5,6 +5,7 @@
 #include "temperature_sensor.h"
 #include "pressure_sensor.h"
 #include "humidity_sensor.h"
+#include "light_intensity_sensor.h"
 
 /**
  * @brief Initialize hardware platform.
@@ -53,5 +54,14 @@ const PressureSensor *const hw_platform_get_pressure_sensor();
  * @return const HumiditySensor* const Humidity sensor instance.
  */
 const HumiditySensor *const hw_platform_get_humidity_sensor();
+
+/**
+ * @brief Get light intensity sensor instance from the hardware platform.
+ *
+ * The implementation should return a light intensity sensor interface initialized with valid functions.
+ *
+ * @return const LightIntensitySensor* const Light intensity sensor instance.
+ */
+const LightIntensitySensor *const hw_platform_get_light_intensity_sensor();
 
 #endif /* ENV_ALERT_SYSTEM_SRC_APP_PORT_INTERFACES_HAL_HW_PLATFORM_H */

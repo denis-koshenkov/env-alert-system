@@ -5,10 +5,12 @@
 #include "eas_assert.h"
 #include "virtual_sht31.h"
 #include "virtual_bmp280.h"
+#include "virtual_bh1750.h"
 
 static const TemperatureSensor *temperature_sensor = NULL;
 static const HumiditySensor *humidity_sensor = NULL;
 static const PressureSensor *pressure_sensor = NULL;
+static const LightIntensitySensor *light_intensity_sensor = NULL;
 
 void hw_platform_init()
 {
@@ -18,6 +20,9 @@ void hw_platform_init()
 
     BMP280VirtualInterfaces bmp280_interfaces = virtual_bmp280_initialize();
     pressure_sensor = bmp280_interfaces.pressure_sensor;
+
+    BH1750VirtualInterfaces bh1750_interfaces = virtual_bh1750_initialize();
+    light_intensity_sensor = bh1750_interfaces.light_intensity_sensor;
 }
 
 const Led *const hw_platform_get_led()
@@ -41,4 +46,10 @@ const HumiditySensor *const hw_platform_get_humidity_sensor()
 {
     EAS_ASSERT(humidity_sensor);
     return humidity_sensor;
+}
+
+const LightIntensitySensor *const hw_platform_get_light_intensity_sensor()
+{
+    EAS_ASSERT(light_intensity_sensor);
+    return light_intensity_sensor;
 }
