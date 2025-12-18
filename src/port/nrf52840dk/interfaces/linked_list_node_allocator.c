@@ -19,18 +19,18 @@
 SYS_MEM_BLOCKS_DEFINE_STATIC(linked_list_node_allocator, LINKED_LIST_NODE_ALLOCATOR_BLOCK_SIZE,
                              CONFIG_LINKED_LIST_NODE_ALLOCATOR_NUM_NODES, LINKED_LIST_NODE_ALLOCATOR_BUF_ALIGNMENT);
 
-static LinkedListNode *prod_fw_linked_list_node_allocator_alloc()
+static LinkedListNode *zephyr_linked_list_node_allocator_alloc()
 {
     void *out_block = NULL;
     int ret = sys_mem_blocks_alloc(&linked_list_node_allocator, 1, &out_block);
     return (ret == 0) ? ((LinkedListNode *)out_block) : NULL;
 }
 
-static void prod_fw_linked_list_node_allocator_free(LinkedListNode *linked_list_node)
+static void zephyr_linked_list_node_allocator_free(LinkedListNode *linked_list_node)
 {
     int ret = sys_mem_blocks_free(&linked_list_node_allocator, 1, (void **)&linked_list_node);
     EAS_ASSERT(ret == 0);
 }
 
-LinkedListNode *(*linked_list_node_allocator_alloc)() = prod_fw_linked_list_node_allocator_alloc;
-void (*linked_list_node_allocator_free)(LinkedListNode *linked_list_node) = prod_fw_linked_list_node_allocator_free;
+LinkedListNode *(*linked_list_node_allocator_alloc)() = zephyr_linked_list_node_allocator_alloc;
+void (*linked_list_node_allocator_free)(LinkedListNode *linked_list_node) = zephyr_linked_list_node_allocator_free;
