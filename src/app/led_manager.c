@@ -14,6 +14,8 @@
 #include "utils/util.h"
 
 #define LED_MANAGER_NOTIFICATION_DURATION_MS (CONFIG_LED_MANAGER_NOTIFICATION_DURATION_SECONDS * 1000)
+/* Eas timer does not allow to start a timer with 0 ms. It also does not make sense to not display any notifications. */
+EAS_STATIC_ASSERT(LED_MANAGER_NOTIFICATION_DURATION_MS != 0);
 
 /** If the timer expiry callback is executed before LED_MANAGER_IGNORE_TIMER_PERIOD_MS pass since starting the timer,
  * the timer expiry callback is ignored. */
