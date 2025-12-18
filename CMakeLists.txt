@@ -20,8 +20,7 @@ set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 if(BUILD_TESTS)
     set(PORT_DIR "unit-test-off-target")
 else()
-    # Building production firmware
-    set(PORT_DIR "prod-fw")
+    set(PORT_DIR "nrf52840dk")
 endif()
 
 add_subdirectory(src/app)
