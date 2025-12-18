@@ -4,6 +4,7 @@ from west.manifest import Manifest
 import shutil
 import subprocess
 from pathlib import Path
+import os
 
 class EasBuildNrf(WestCommand):
 
@@ -34,3 +35,8 @@ class EasBuildNrf(WestCommand):
         cmd = ['west', 'build', '-b', 'nrf52840dk/nrf52840', '--', '-DCONF_FILE=' + str(conf_file_path)]
         print('Running command: ' + ' '.join(cmd))
         p = subprocess.run(cmd, check=True)
+
+        # Rename firmware file to a descriptive and not zephyr-specific filename
+        src_path = Path(manifest.repo_abspath) / 'build' / 'merged.hex'
+        dest_path = Path(manifest.repo_abspath) / 'build' / 'eas.hex'
+        os.rename(src_path, dest_path)
