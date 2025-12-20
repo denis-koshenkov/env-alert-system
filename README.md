@@ -80,7 +80,7 @@ In order not to keep track if these files were updated as a part of a `nrf-sdk` 
 # Flashing
 Run the following outside the docker container from the `env-alert-system` directory:
 ```
-nrfutil device program --firmware build/merged.hex --options chip_erase_mode=ERASE_ALL,reset=RESET_SYSTEM
+nrfutil device program --firmware build/eas.hex --options chip_erase_mode=ERASE_ALL,reset=RESET_SYSTEM
 ```
 
 Flashing the firmware happens outside of the docker container. The purpose of the docker container is create the firmware binary in a reproducable manner, not upload the firmware to the target hardware. The reasoning for this is to allow developers to use GUI-based debuggers (e.g. SEGGER Ozone) which is impossible from inside the docker container.
