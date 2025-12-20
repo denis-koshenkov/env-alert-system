@@ -1,6 +1,10 @@
 &i2c0 {
-	sht3xd@44 {
-		compatible = "sensirion,sht3xd";
+    status = "okay";
+    clock-frequency = <I2C_BITRATE_FAST_PLUS>; /* 1000 kHz */
+
+	sht31d: sht31d@44 {
+        status = "okay";
+		compatible = "i2c-device";
 		reg = <0x44>;
 	};
 };
