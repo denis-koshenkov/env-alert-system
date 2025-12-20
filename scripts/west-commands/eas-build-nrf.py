@@ -30,9 +30,10 @@ class EasBuildNrf(WestCommand):
             return
 
         manifest = Manifest.from_topdir()
-        conf_file_path = Path(manifest.repo_abspath) / 'src' / 'port' / 'nrf52840dk' / 'prj.conf'
+        conf_file_path = Path(manifest.repo_abspath) / 'src' / 'port' / 'nrf52840dk' / 'zephyr' / 'prj.conf'
+        dt_overlay_path = Path(manifest.repo_abspath) / 'src' / 'port' / 'nrf52840dk' / 'zephyr' / 'boards' / 'nrf52840_nrf52840dk.overlay'
 
-        cmd = ['west', 'build', '-b', 'nrf52840dk/nrf52840', '--', '-DCONF_FILE=' + str(conf_file_path)]
+        cmd = ['west', 'build', '-b', 'nrf52840dk/nrf52840', '--', '-DCONF_FILE=' + str(conf_file_path), '-DDTC_OVERLAY_FILE=' + str(dt_overlay_path)]
         print('Running command: ' + ' '.join(cmd))
         p = subprocess.run(cmd, check=True)
 
