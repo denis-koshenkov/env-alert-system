@@ -5,7 +5,7 @@
 #include "variable_requirement_allocator.h"
 
 #include "config.h"
-#include "utils/util.h"
+#include "util.h"
 
 typedef struct MockVariableRequirementStruct *MockVariableRequirement;
 

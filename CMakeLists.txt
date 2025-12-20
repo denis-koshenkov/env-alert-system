@@ -25,3 +25,4 @@ endif()
 
 add_subdirectory(src/app)
 add_subdirectory("src/port/${PORT_DIR}")
+add_subdirectory(src/utils)

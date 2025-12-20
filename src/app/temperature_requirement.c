@@ -7,7 +7,7 @@
 
 #include "eas_assert.h"
 #include "config.h"
-#include "utils/util.h"
+#include "util.h"
 #include "temperature.h"
 #include "current_temperature.h"
 

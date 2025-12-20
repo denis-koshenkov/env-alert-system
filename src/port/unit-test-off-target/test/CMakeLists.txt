@@ -9,6 +9,7 @@ add_subdirectory(
 target_link_libraries(test_common INTERFACE
     eas_app
     port
+    utils
     test_internal
     CppUTest
     CppUTestExt

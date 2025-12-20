@@ -5,7 +5,7 @@
 #include "osal/eas_thread.h"
 #include "temperature.h"
 #include "eas_assert.h"
-#include "utils/util.h"
+#include "util.h"
 #include "new_sample_handler.h"
 #include "config.h"
 #include "init_handler.h"

@@ -4,7 +4,7 @@
 
 #include "led_notification_allocator.h"
 #include "config.h"
-#include "utils/util.h"
+#include "util.h"
 #include "eas_assert.h"
 
 /** Zephyr requirement: block size must be at least 4N bytes long, where N is greater than 0. */

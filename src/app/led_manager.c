@@ -11,7 +11,7 @@
 #include "eas_assert.h"
 #include "utils/eas_time.h"
 #include "eas_current_time.h"
-#include "utils/util.h"
+#include "util.h"
 
 #define LED_MANAGER_NOTIFICATION_DURATION_MS (CONFIG_LED_MANAGER_NOTIFICATION_DURATION_SECONDS * 1000)
 /* Eas timer does not allow to start a timer with 0 ms. It also does not make sense to not display any notifications. */

@@ -3,7 +3,7 @@
 #include <zephyr/sys/mem_blocks.h>
 
 #include "linked_list_node_allocator.h"
-#include "utils/util.h"
+#include "util.h"
 #include "config.h"
 #include "eas_assert.h"
 

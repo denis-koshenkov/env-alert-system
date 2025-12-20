@@ -1,5 +1,5 @@
 #include "utils/eas_time.h"
-#include "utils/util.h"
+#include "util.h"
 
 /* The implementation assumes that EasTime is an unsigned type of 4 bytes, and the max value that can be represented by
  * that type is 0xFFFFFFFF. */

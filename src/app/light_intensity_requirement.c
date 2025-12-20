@@ -7,7 +7,7 @@
 
 #include "eas_assert.h"
 #include "config.h"
-#include "utils/util.h"
+#include "util.h"
 #include "light_intensity.h"
 #include "current_light_intensity.h"
 

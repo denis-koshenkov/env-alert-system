@@ -5,7 +5,7 @@
 #include "variable_requirement_allocator.h"
 #include "config.h"
 #include "eas_assert.h"
-#include "utils/util.h"
+#include "util.h"
 
 /** Zephyr requirement: block size must be at least 4N bytes long, where N is greater than 0. */
 #define VARIABLE_REQUIREMENT_ALLOCATOR_BLOCK_SIZE DIV4_UP(CONFIG_VARIABLE_REQUIREMENT_MAX_SIZE)
