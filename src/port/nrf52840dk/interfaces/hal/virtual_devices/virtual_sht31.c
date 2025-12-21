@@ -1,10 +1,18 @@
 #include <stddef.h>
-
-// TODO: remove
-#include <zephyr/kernel.h>
+#include <math.h>
 
 #include "virtual_sht31.h"
 #include "eas_assert.h"
+#include "eas_timer.h"
+#include "eas_log.h"
+#include "sht31.h"
+#include "util.h"
+
+EAS_LOG_ENABLE_IN_FILE();
+
+#define SHT31_TEMPERATURE_READOUT_PERIOD_MS 250
+#define SHT31_HUMIDITY_READOUT_PERIOD_MS 250
+EAS_STATIC_ASSERT(SHT31_TEMPERATURE_READOUT_PERIOD_MS == SHT31_HUMIDITY_READOUT_PERIOD_MS);
 
 /* Temperature sensor section */
 static void temperature_register_new_sample_cb(TemperatureSensorNewSampleCb cb, void *user_data);
@@ -24,40 +32,78 @@ static HumiditySensor humidity_sensor = {
     .start = humidity_start,
 };
 
+/* Common private data */
+static EasTimer sht31_readout_timer;
+
 /* Temperature sensor private data */
-TemperatureSensorNewSampleCb temperature_new_sample_cb = NULL;
-void *temperature_new_sample_cb_user_data = NULL;
+static TemperatureSensorNewSampleCb temperature_new_sample_cb = NULL;
+static void *temperature_new_sample_cb_user_data = NULL;
+static bool temperature_started = false;
 
 /* Humidity sensor private data */
 HumiditySensorNewSampleCb humidity_new_sample_cb = NULL;
 void *humidity_new_sample_cb_user_data = NULL;
+static bool humidity_started = false;
 
-/* For temporary zephyr timers to generate samples. TODO: remove */
-#define TEMPERATURE_SENSOR_TIMER_PERIOD_MS 1000
-#define HUMIDITY_SENSOR_TIMER_PERIOD_MS 1000
-
-/* TODO: remove */
-static void temperature_sensor_timer_expiry_function(struct k_timer *timer)
+/**
+ * @brief Execute temperature new sample callback, if one is registered.
+ *
+ * @param sample Temperature sample to pass to the callback.
+ */
+static void temperature_execute_new_sample_cb(Temperature sample)
 {
     if (temperature_new_sample_cb) {
-        Temperature dummy_sample = 200; // 20.0 degrees Celsius
-        temperature_new_sample_cb(dummy_sample, temperature_new_sample_cb_user_data);
+        temperature_new_sample_cb(sample, temperature_new_sample_cb_user_data);
     }
 }
-K_TIMER_DEFINE(temperature_sensor_timer, temperature_sensor_timer_expiry_function, NULL);
 
-/* TODO: remove */
-static void humidity_sensor_timer_expiry_function(struct k_timer *timer)
+/**
+ * @brief Execute humidity new sample callback, if one is registered.
+ *
+ * @param sample Humidity sample to pass to the callback.
+ */
+static void humidity_execute_new_sample_cb(Humidity sample)
 {
     if (humidity_new_sample_cb) {
-        Humidity dummy_sample = 800; // 80.0% RH
-        humidity_new_sample_cb(dummy_sample, humidity_new_sample_cb_user_data);
+        humidity_new_sample_cb(sample, humidity_new_sample_cb_user_data);
     }
 }
-K_TIMER_DEFINE(humidity_sensor_timer, humidity_sensor_timer_expiry_function, NULL);
+
+static void sht31_meas_complete_cb(SHT31Measurement *meas, void *user_data)
+{
+    if (meas == NULL) {
+        EAS_LOG_INF("Failed to read SHT31 meas");
+        return;
+    }
+
+    EAS_LOG_INF("New measurement: temp: %f, humidity: %f", (double)meas->temperature, (double)meas->humidity);
+    /* TODO: error checking, there will be some sort of result indication whether measurement succeeded or not */
+    if (temperature_started) {
+        /* TODO: range checking */
+        /* One decimal point precision */
+        Temperature temperature = lroundf(meas->temperature * 10.0f);
+        temperature_execute_new_sample_cb(temperature);
+    }
+    if (humidity_started) {
+        /* TODO: range checking */
+        /* One decimal point precision */
+        Humidity humidity = lroundf(meas->humidity * 10.0f);
+        humidity_execute_new_sample_cb(humidity);
+    }
+}
+
+/* This callback will be executed from the central event queue context */
+static void sht31_readout_timer_cb(void *user_data)
+{
+    sht31_read_single_shot_measurement(sht31_meas_complete_cb, NULL);
+}
 
 SHT31VirtualInterfaces virtual_sht31_initialize()
 {
+    /* Using temperature readout period, assuming that it is the same as humidity readout period - there should be a
+     * static assert verifying this. */
+    sht31_readout_timer =
+        eas_timer_create(SHT31_TEMPERATURE_READOUT_PERIOD_MS, EAS_TIMER_PERIODIC, sht31_readout_timer_cb, NULL);
     return (SHT31VirtualInterfaces){&temperature_sensor, &humidity_sensor};
 }
 
@@ -72,8 +118,11 @@ static void temperature_register_new_sample_cb(TemperatureSensorNewSampleCb cb, 
 
 static void temperature_start()
 {
-    k_timer_start(&temperature_sensor_timer, K_MSEC(TEMPERATURE_SENSOR_TIMER_PERIOD_MS),
-                  K_MSEC(TEMPERATURE_SENSOR_TIMER_PERIOD_MS));
+    EAS_ASSERT(!temperature_started);
+    if (!temperature_started && !humidity_started) {
+        eas_timer_start(sht31_readout_timer);
+    }
+    temperature_started = true;
 }
 
 /* Virtual humidity sensor functions */
@@ -87,6 +136,9 @@ static void humidity_register_new_sample_cb(HumiditySensorNewSampleCb cb, void *
 
 static void humidity_start()
 {
-    k_timer_start(&humidity_sensor_timer, K_MSEC(HUMIDITY_SENSOR_TIMER_PERIOD_MS),
-                  K_MSEC(HUMIDITY_SENSOR_TIMER_PERIOD_MS));
+    EAS_ASSERT(!humidity_started);
+    if (!temperature_started && !humidity_started) {
+        eas_timer_start(sht31_readout_timer);
+    }
+    humidity_started = true;
 }
