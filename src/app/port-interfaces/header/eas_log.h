@@ -17,4 +17,7 @@
 /** Log macro. Uses printf-style argument formatting. */
 #define EAS_LOG_INF(...)
 
+// TODO: keep? Add docs?
+#define EAS_LOG_HEXDUMP_INF(data, length, string)
+
 #endif /* ENV_ALERT_SYSTEM_SRC_APP_PORT_INTERFACES_HEADER_EAS_LOG_H */

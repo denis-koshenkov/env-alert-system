@@ -10,4 +10,6 @@
 
 #define EAS_LOG_INF(...) LOG_INF(__VA_ARGS__)
 
+#define EAS_LOG_HEXDUMP_INF(data, length, string) LOG_HEXDUMP_INF(data, length, string)
+
 #endif /* ENV_ALERT_SYSTEM_SRC_PORT_NRF52840DK_INTERFACES_HEADER_EAS_LOG_H */

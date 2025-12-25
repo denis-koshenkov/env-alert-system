@@ -26,9 +26,10 @@ typedef enum EventId {
     EVENT_ID_NEW_PRESSURE_SAMPLE,
     EVENT_ID_NEW_HUMIDITY_SAMPLE,
     EVENT_ID_NEW_LIGHT_INTENSITY_SAMPLE,
-    /** Handler for this event executes a callback function provided in the event payload. User data parameter to pass
-     * to the callback is also a part of the payload. */
+    /** Handlers for these events execute a callback function provided in the event payload. Parameters to pass to the
+       callback are also a part of the payload. */
     EVENT_ID_VOID_CB_WITH_USER_DATA,
+    EVENT_ID_VOID_CB_WITH_BOOL_AND_USER_DATA_PARAMS,
 } EventId;
 
 /** Abstract event class that includes only event id. Events that have payload should put this struct as the first field
@@ -63,11 +64,19 @@ typedef struct VoidCbWithUserDataEvent {
     void *user_data;
 } VoidCbWithUserDataEvent;
 
+typedef struct VoidCbWithBoolAndUserDataParamsEvent {
+    Event event;
+    CentralEventQueueVoidCbWithBoolAndUserDataParams cb;
+    bool param_bool;
+    void *user_data;
+} VoidCbWithBoolAndUserDataParamsEvent;
+
 /* Wrapping in an enum, so that the value is a constant, and we can declare an array of this size */
 enum {
     CENTRAL_EVENT_QUEUE_MAX_MESSAGE_SIZE =
-        MAX5(sizeof(NewTemperatureSampleEvent), sizeof(NewPressureSampleEvent), sizeof(NewHumiditySampleEvent),
-             sizeof(NewLightIntensitySampleEvent), sizeof(VoidCbWithUserDataEvent))
+        MAX7(sizeof(Event), sizeof(NewTemperatureSampleEvent), sizeof(NewPressureSampleEvent),
+             sizeof(NewHumiditySampleEvent), sizeof(NewLightIntensitySampleEvent), sizeof(VoidCbWithUserDataEvent),
+             sizeof(VoidCbWithBoolAndUserDataParamsEvent))
 };
 
 static CentralEventQueue self;
@@ -111,6 +120,18 @@ static void handle_void_cb_with_user_data_event(const VoidCbWithUserDataEvent *c
     EAS_ASSERT(event);
     EAS_ASSERT(event->cb);
     event->cb(event->user_data);
+}
+
+/**
+ * @brief Handle "void cb with bool and user data params" event by invoking the callback.
+ *
+ * @param event "Void cb with bool and user data params" event.
+ */
+static void handle_void_cb_with_bool_and_user_data_params_event(const VoidCbWithBoolAndUserDataParamsEvent *const event)
+{
+    EAS_ASSERT(event);
+    EAS_ASSERT(event->cb);
+    event->cb(event->param_bool, event->user_data);
 }
 
 /**
@@ -161,6 +182,13 @@ static void central_event_queue_thread_run()
             EAS_ASSERT(message_size == sizeof(VoidCbWithUserDataEvent));
             const VoidCbWithUserDataEvent *const event = (const VoidCbWithUserDataEvent *const)message;
             handle_void_cb_with_user_data_event(event);
+            break;
+        }
+        case EVENT_ID_VOID_CB_WITH_BOOL_AND_USER_DATA_PARAMS: {
+            EAS_ASSERT(message_size == sizeof(VoidCbWithBoolAndUserDataParamsEvent));
+            const VoidCbWithBoolAndUserDataParamsEvent *const event =
+                (const VoidCbWithBoolAndUserDataParamsEvent *const)message;
+            handle_void_cb_with_bool_and_user_data_params_event(event);
             break;
         }
         default:
@@ -244,4 +272,17 @@ void central_event_queue_submit_void_cb_with_user_data_event(CentralEventQueueVo
         .user_data = user_data,
     };
     push_event_to_queue((const uint8_t *const)&event, sizeof(VoidCbWithUserDataEvent));
+}
+
+void central_event_queue_submit_void_cb_with_params_bool_user_data_event(
+    CentralEventQueueVoidCbWithBoolAndUserDataParams cb, bool param_bool, void *user_data)
+{
+    EAS_ASSERT(cb);
+    VoidCbWithBoolAndUserDataParamsEvent event = {
+        .event.id = EVENT_ID_VOID_CB_WITH_BOOL_AND_USER_DATA_PARAMS,
+        .cb = cb,
+        .param_bool = param_bool,
+        .user_data = user_data,
+    };
+    push_event_to_queue((const uint8_t *const)&event, sizeof(VoidCbWithBoolAndUserDataParamsEvent));
 }

@@ -32,6 +32,8 @@ typedef struct TemperatureSensor {
      * @brief Start the generation of temperature samples.
      *
      * If new sample callback is registered, it will start being invoked whenever a new sample becomes generated.
+     *
+     * This function must only be called once. If this function is called for the second time, an assert is raised.
      */
     void (*start)();
 } TemperatureSensor;
