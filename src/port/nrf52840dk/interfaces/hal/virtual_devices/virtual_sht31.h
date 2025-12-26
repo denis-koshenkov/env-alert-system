@@ -19,6 +19,9 @@ typedef struct SHT31VirtualInterfaces {
 /**
  * @brief Initialize virtual devices for the SHT31 implementation.
  *
+ * @pre SHT31 hardware is initialized. It is in the state where functions from the @ref TemperatureSensor and @ref
+ * HumiditySensor interfaces can be called.
+ *
  * @param sht3x_driver_inst Pointer to SHT3X driver instance.
  *
  * @return SHT31VirtualInterfaces Initialized virtual device interfaces that contain valid, ready-to-use function
