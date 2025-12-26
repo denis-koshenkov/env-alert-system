@@ -17,7 +17,7 @@ manifest:
       revision: 8df1f5a4827c0749e3556c99f8c3c24809327bcf # v4.0 + test assert plugin
     - name: sensirion-sht3x
       remote: denis-koshenkov
-      revision: v3.0.0
+      revision: v3.0.1
 
   self:
     west-commands: scripts/west-commands.yml
