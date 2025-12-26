@@ -4,7 +4,7 @@
 #include "virtual_led_mock.h"
 
 /* Unused in unit test port */
-void hw_platform_init()
+void hw_platform_init(HwPlatformCompleteCb cb, void *user_data)
 {
 }
 

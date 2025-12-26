@@ -63,6 +63,11 @@ void central_event_queue_init();
 void central_event_queue_submit_init_event();
 
 /**
+ * @brief Submit init part 2 event to the event queue.
+ */
+void central_event_queue_submit_init_part_2_event();
+
+/**
  * @brief Submit new temperature sample event to the event queue.
  *
  * @param temperature New temperature sample value.

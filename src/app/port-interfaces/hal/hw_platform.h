@@ -8,15 +8,25 @@
 #include "light_intensity_sensor.h"
 
 /**
+ * @brief Hardware platform operation complete callback.
+ *
+ * @param user_data User data.
+ */
+typedef void (*HwPlatformCompleteCb)(void *user_data);
+
+/**
  * @brief Initialize hardware platform.
  *
  * This function should be called on initialization. The application is only allowed to call the get functions to use
- * the virtual device interfaces after this function is called.
+ * the virtual device interfaces after @p cb passed to this function is executed.
  *
  * The implementation should do everything necessary to fully initialize the virtual devices returned by the get
  * functions.
+ *
+ * @param cb Callback to execute once hardware initialization is complete.
+ * @param user_data User data to pass to @p cb.
  */
-void hw_platform_init();
+void hw_platform_init(HwPlatformCompleteCb cb, void *user_data);
 
 /**
  * @brief Get led instance from hardware platform.

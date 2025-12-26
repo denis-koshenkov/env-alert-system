@@ -8,13 +8,42 @@
 #include "eas_timer_callback_executor.h"
 #include "hw_platform.h"
 #include "new_sample_callbacks.h"
+#include "central_event_queue.h"
+
+/* System initialization sequence:
+ * 1. main function submits INIT event to the event queue, which triggers the execution of
+ * init_handler_handle_init_event.
+ * 2. init_handler_handle_init_event performs the first part of system initialization. It triggers the hardware platform
+ * initialization and returns.
+ * 3. Hardware platform init complete callback is executed, which is the hw_platform_init_complete_cb function defined
+ * in this module. Inside this callback, we submit the INIT_PART_2 event to the central event queue. This triggers the
+ * init_handler_handle_init_part_2_event function to be called.
+ * 4. init_handler_handle_init_part_2_event executes part 2 of the system initialization. Initialization is now
+ * complete.
+ */
+
+/**
+ * @brief Callback to execute once hw platform initialization is complete.
+ *
+ * Submits an event to the event queue which triggers the execution of part 2 of system initialization.
+ *
+ * @param user_data User data, unused.
+ */
+static void hw_platform_init_complete_cb(void *user_data)
+{
+    central_event_queue_submit_init_part_2_event();
+}
 
 void init_handler_handle_init_event()
 {
     /* Done before initializing hardware platform, in case hw_platform_init starts timers. */
     eas_timer_set_execute_timer_expiry_function_cb(eas_timer_callback_executor_execute_callback);
 
-    hw_platform_init();
+    hw_platform_init(hw_platform_init_complete_cb, NULL);
+}
+
+void init_handler_handle_init_part_2_event()
+{
     hw_platform_get_temperature_sensor()->register_new_sample_cb(new_sample_callback_temperature, NULL);
     hw_platform_get_pressure_sensor()->register_new_sample_cb(new_sample_callback_pressure, NULL);
     hw_platform_get_humidity_sensor()->register_new_sample_cb(new_sample_callback_humidity, NULL);

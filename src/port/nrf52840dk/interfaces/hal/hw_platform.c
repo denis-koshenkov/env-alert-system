@@ -15,6 +15,9 @@
 #include "sht3x.h"
 #include "sht3x/get_instance_memory.h"
 #include "sht3x/interface.h"
+#include "eas_log.h"
+
+EAS_LOG_ENABLE_IN_FILE();
 
 /* Pin numbers are taken from nrf52840dk_nrf52840-pinctrl.dtsi */
 #define I2C_SCL_PIN 27
@@ -57,6 +60,21 @@ static const TemperatureSensor *temperature_sensor = NULL;
 static const HumiditySensor *humidity_sensor = NULL;
 static const PressureSensor *pressure_sensor = NULL;
 static const LightIntensitySensor *light_intensity_sensor = NULL;
+
+/* When hw_platform_init is called, the user passes a callback to execute once hw init is complete. That callback and
+ * its user data is stored here so that they can be invoked once hw platform init is complete.*/
+static HwPlatformCompleteCb hw_init_complete_cb = NULL;
+static void *hw_init_complete_cb_user_data = NULL;
+
+/**
+ * @brief Execute hw platform init complete callback, if one was provided.
+ */
+static void execute_hw_init_complete_cb()
+{
+    if (hw_init_complete_cb) {
+        hw_init_complete_cb(hw_init_complete_cb_user_data);
+    }
+}
 
 /* Executes the callback that was set by SHT3X driver. This function is a eas_timer expiry function, so it is
  * executed from the context of the central event queue. */
@@ -166,8 +184,51 @@ static void init_nrfx_twim()
     nrfx_twim_enable(&twim_inst);
 }
 
-void hw_platform_init()
+/**
+ * @brief Hardware platform initialization part 2.
+ *
+ * Performed after the SHT3X device was successfully reset.
+ *
+ * @param user_data This parameter is only here so that the function signature complies with what can be submitted to
+ * event queue as a callback. It is not used in the implementation.
+ */
+static void hw_platform_init_part_2(void *user_data)
 {
+    SHT31VirtualInterfaces sht31_interfaces = virtual_sht31_initialize(&sht3x_inst);
+    temperature_sensor = sht31_interfaces.temperature_sensor;
+    humidity_sensor = sht31_interfaces.humidity_sensor;
+
+    BMP280VirtualInterfaces bmp280_interfaces = virtual_bmp280_initialize();
+    pressure_sensor = bmp280_interfaces.pressure_sensor;
+
+    BH1750VirtualInterfaces bh1750_interfaces = virtual_bh1750_initialize();
+    light_intensity_sensor = bh1750_interfaces.light_intensity_sensor;
+
+    execute_hw_init_complete_cb();
+    EAS_LOG_INF("Hw platform init complete");
+}
+
+/**
+ * @brief Callback passed to SHT3X driver to be executed once the SHT3X device is reset.
+ *
+ * This submits part 2 of hw platform init to the central event queue as a callback, so that the rest of the hw platform
+ * init is performed.
+ *
+ * @param result_code Signifies whether the SHT3X reset was successful.
+ * @param user_data User data, unused in this callback.
+ */
+static void sht3x_reset_on_init_complete(uint8_t result_code, void *user_data)
+{
+    EAS_ASSERT(result_code == SHT3X_RESULT_CODE_OK);
+    central_event_queue_submit_void_cb_with_user_data_event(hw_platform_init_part_2, NULL);
+}
+
+void hw_platform_init(HwPlatformCompleteCb cb, void *user_data)
+{
+    uint8_t rc;
+    hw_init_complete_cb = cb;
+    hw_init_complete_cb_user_data = user_data;
+
     init_nrfx_twim();
     sht31_driver_timer = eas_timer_create(0, EAS_TIMER_ONE_SHOT, sht31_driver_timer_expired_cb, NULL);
 
@@ -182,18 +243,12 @@ void hw_platform_init()
         .start_timer_user_data = (void *)&sht3x_timer_data,
         .i2c_addr = SHT31_I2C_ADDR,
     };
-    uint8_t rc = sht3x_create(&sht3x_inst, &sht3x_cfg);
+    rc = sht3x_create(&sht3x_inst, &sht3x_cfg);
     EAS_ASSERT(rc == SHT3X_RESULT_CODE_OK);
 
-    SHT31VirtualInterfaces sht31_interfaces = virtual_sht31_initialize(&sht3x_inst);
-    temperature_sensor = sht31_interfaces.temperature_sensor;
-    humidity_sensor = sht31_interfaces.humidity_sensor;
-
-    BMP280VirtualInterfaces bmp280_interfaces = virtual_bmp280_initialize();
-    pressure_sensor = bmp280_interfaces.pressure_sensor;
-
-    BH1750VirtualInterfaces bh1750_interfaces = virtual_bh1750_initialize();
-    light_intensity_sensor = bh1750_interfaces.light_intensity_sensor;
+    /* Put SHT31 device into a known default state */
+    rc = sht3x_soft_reset_with_delay(sht3x_inst, sht3x_reset_on_init_complete, NULL);
+    EAS_ASSERT(rc == SHT3X_RESULT_CODE_OK);
 }
 
 const Led *const hw_platform_get_led()
