@@ -6,6 +6,8 @@ extern "C"
 {
 #endif
 
+#include <stdint.h>
+
 #include "temperature.h"
 #include "pressure.h"
 #include "humidity.h"
@@ -35,6 +37,18 @@ extern "C"
  * @param user_data User data.
  */
 typedef void (*CentralEventQueueVoidCbWithUserData)(void *user_data);
+
+/**
+ * @brief Callback type definition for a function without return value, one uint8_t parameter, and one void* parameter.
+ *
+ * This callback type definition is used for the "void cb with uint8 and user data" event. When this event is submitted
+ * to the event queue, the handling for this event invokes this callback with uint8_t and user data parameters. Both the
+ * callback and its two arguments are passed as event payload.
+ *
+ * @param param_uint8 uint8_t argument to pass to the callback.
+ * @param user_data User data.
+ */
+typedef void (*CentralEventQueueVoidCbWithUint8AndUserDataParams)(uint8_t param_uint8, void *user_data);
 
 /**
  * @brief Initialize central event queue.
@@ -82,10 +96,22 @@ void central_event_queue_submit_new_light_intensity_sample_event(LightIntensity 
  *
  * The handler for this event will execute @p cb and pass @p user_data as the parameter to @p cb.
  *
- * @param cb Callback to execute.
+ * @param cb Callback to execute. Cannot be NULL.
  * @param user_data User data to pass to the callback.
  */
 void central_event_queue_submit_void_cb_with_user_data_event(CentralEventQueueVoidCbWithUserData cb, void *user_data);
+
+/**
+ * @brief Submit void cb with uint8 and user data parameters event to the event queue.
+ *
+ * The handler for this event will execute @p cb and pass @p param_uint8 and @p user_data parameters to @p cb.
+ *
+ * @param cb Callback to execute. Cannot be NULL.
+ * @param param_uint8 uint8_t parameter to a pass as the first parameter to the callback.
+ * @param user_data User data to pass as the second parameter to the callback.
+ */
+void central_event_queue_submit_void_cb_with_params_uint8_user_data_event(
+    CentralEventQueueVoidCbWithUint8AndUserDataParams cb, uint8_t param_uint8, void *user_data);
 
 #ifdef __cplusplus
 }

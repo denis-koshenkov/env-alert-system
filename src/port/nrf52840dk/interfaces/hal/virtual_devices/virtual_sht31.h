@@ -8,6 +8,7 @@ extern "C"
 
 #include "temperature_sensor.h"
 #include "humidity_sensor.h"
+#include "sht3x.h"
 
 /** All virtual devices that are based on SHT31. */
 typedef struct SHT31VirtualInterfaces {
@@ -18,10 +19,12 @@ typedef struct SHT31VirtualInterfaces {
 /**
  * @brief Initialize virtual devices for the SHT31 implementation.
  *
+ * @param sht3x_driver_inst Pointer to SHT3X driver instance.
+ *
  * @return SHT31VirtualInterfaces Initialized virtual device interfaces that contain valid, ready-to-use function
  * pointers.
  */
-SHT31VirtualInterfaces virtual_sht31_initialize();
+SHT31VirtualInterfaces virtual_sht31_initialize(SHT3X *const sht3x_driver_inst);
 
 #ifdef __cplusplus
 }
