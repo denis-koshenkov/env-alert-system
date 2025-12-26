@@ -26,9 +26,10 @@ typedef enum EventId {
     EVENT_ID_NEW_PRESSURE_SAMPLE,
     EVENT_ID_NEW_HUMIDITY_SAMPLE,
     EVENT_ID_NEW_LIGHT_INTENSITY_SAMPLE,
-    /** Handler for this event executes a callback function provided in the event payload. User data parameter to pass
-     * to the callback is also a part of the payload. */
+    /** Handlers for these events execute a callback function provided in the event payload. Parameters to pass to the
+       callback are also a part of the payload. */
     EVENT_ID_VOID_CB_WITH_USER_DATA,
+    EVENT_ID_VOID_CB_WITH_UINT8,
 } EventId;
 
 /** Abstract event class that includes only event id. Events that have payload should put this struct as the first field
@@ -63,11 +64,18 @@ typedef struct VoidCbWithUserDataEvent {
     void *user_data;
 } VoidCbWithUserDataEvent;
 
+typedef struct VoidCbWithUint8Event {
+    Event event;
+    CentralEventQueueVoidCbWithUint8 cb;
+    uint8_t param_uint8;
+} VoidCbWithUint8Event;
+
 /* Wrapping in an enum, so that the value is a constant, and we can declare an array of this size */
 enum {
     CENTRAL_EVENT_QUEUE_MAX_MESSAGE_SIZE =
-        MAX5(sizeof(NewTemperatureSampleEvent), sizeof(NewPressureSampleEvent), sizeof(NewHumiditySampleEvent),
-             sizeof(NewLightIntensitySampleEvent), sizeof(VoidCbWithUserDataEvent))
+        MAX7(sizeof(Event), sizeof(NewTemperatureSampleEvent), sizeof(NewPressureSampleEvent),
+             sizeof(NewHumiditySampleEvent), sizeof(NewLightIntensitySampleEvent), sizeof(VoidCbWithUserDataEvent),
+             sizeof(VoidCbWithUint8Event))
 };
 
 static CentralEventQueue self;
@@ -111,6 +119,18 @@ static void handle_void_cb_with_user_data_event(const VoidCbWithUserDataEvent *c
     EAS_ASSERT(event);
     EAS_ASSERT(event->cb);
     event->cb(event->user_data);
+}
+
+/**
+ * @brief Handle "void cb with uint8" event by invoking the callback.
+ *
+ * @param event "Void cb with uint8" event.
+ */
+static void handle_void_cb_with_uint8_event(const VoidCbWithUint8Event *const event)
+{
+    EAS_ASSERT(event);
+    EAS_ASSERT(event->cb);
+    event->cb(event->param_uint8);
 }
 
 /**
@@ -161,6 +181,12 @@ static void central_event_queue_thread_run()
             EAS_ASSERT(message_size == sizeof(VoidCbWithUserDataEvent));
             const VoidCbWithUserDataEvent *const event = (const VoidCbWithUserDataEvent *const)message;
             handle_void_cb_with_user_data_event(event);
+            break;
+        }
+        case EVENT_ID_VOID_CB_WITH_UINT8: {
+            EAS_ASSERT(message_size == sizeof(VoidCbWithUint8Event));
+            const VoidCbWithUint8Event *const event = (const VoidCbWithUint8Event *const)message;
+            handle_void_cb_with_uint8_event(event);
             break;
         }
         default:
@@ -244,4 +270,15 @@ void central_event_queue_submit_void_cb_with_user_data_event(CentralEventQueueVo
         .user_data = user_data,
     };
     push_event_to_queue((const uint8_t *const)&event, sizeof(VoidCbWithUserDataEvent));
+}
+
+void central_event_queue_submit_void_cb_with_uint8_event(CentralEventQueueVoidCbWithUint8 cb, uint8_t param_uint8)
+{
+    EAS_ASSERT(cb);
+    VoidCbWithUint8Event event = {
+        .event.id = EVENT_ID_VOID_CB_WITH_UINT8,
+        .cb = cb,
+        .param_uint8 = param_uint8,
+    };
+    push_event_to_queue((const uint8_t *const)&event, sizeof(VoidCbWithUint8Event));
 }

@@ -1,5 +1,5 @@
-#ifndef ENV_ALERT_SYSTEM_SRC_APP_UTILS_UTIL_H
-#define ENV_ALERT_SYSTEM_SRC_APP_UTILS_UTIL_H
+#ifndef ENV_ALERT_SYSTEM_SRC_UTILS_UTIL_H
+#define ENV_ALERT_SYSTEM_SRC_UTILS_UTIL_H
 
 #ifdef __cplusplus
 extern "C"
@@ -28,33 +28,29 @@ extern "C"
 #endif
 
 /**
- * @brief Find maximum out of two values - a and b.
- *
- * @p a
- * @p b
+ * @brief Find maximum out of two values.
  */
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 
 /**
- * @brief Find maximum out of four values - a, b, c, and d.
- *
- * @p a
- * @p b
- * @p c
- * @p d
+ * @brief Find maximum out of four.
  */
 #define MAX4(a, b, c, d) MAX2(MAX2((a), (b)), MAX2((c), (d)))
 
 /**
- * @brief Find maximum out of five values - a, b, c, d, e.
- *
- * @p a
- * @p b
- * @p c
- * @p d
- * @p e
+ * @brief Find maximum out of five values.
  */
 #define MAX5(a, b, c, d, e) MAX2(MAX4(a, b, c, d), (e))
+
+/**
+ * @brief Find maximum out of six values.
+ */
+#define MAX6(a, b, c, d, e, f) MAX2(MAX5(a, b, c, d, e), (f))
+
+/**
+ * @brief Find maximum out of seven values.
+ */
+#define MAX7(a, b, c, d, e, f, g) MAX2(MAX6(a, b, c, d, e, f), (g))
 
 /** Makes x divisible by 4 by increasing its value, if necessary. */
 #define DIV4_UP(x) (((x) + 3) % 4)
@@ -63,4 +59,4 @@ extern "C"
 }
 #endif
 
-#endif /* ENV_ALERT_SYSTEM_SRC_APP_UTILS_UTIL_H */
+#endif /* ENV_ALERT_SYSTEM_SRC_UTILS_UTIL_H */

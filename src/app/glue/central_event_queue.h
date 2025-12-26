@@ -6,6 +6,8 @@ extern "C"
 {
 #endif
 
+#include <stdint.h>
+
 #include "temperature.h"
 #include "pressure.h"
 #include "humidity.h"
@@ -35,6 +37,17 @@ extern "C"
  * @param user_data User data.
  */
 typedef void (*CentralEventQueueVoidCbWithUserData)(void *user_data);
+
+/**
+ * @brief Callback type definition for a function without return value and one uint8_t parameter.
+ *
+ * This callback type definition is used for the "void cb with uint8" event. When this event is submitted to the event
+ * queue, the handling for this event invokes this callback with uint8_t parameter. Both the callback and its argument
+ * are passed as event payload.
+ *
+ * @param param_uint8 uint8_t argument to pass to the callback.
+ */
+typedef void (*CentralEventQueueVoidCbWithUint8)(uint8_t param_uint8);
 
 /**
  * @brief Initialize central event queue.
@@ -82,10 +95,20 @@ void central_event_queue_submit_new_light_intensity_sample_event(LightIntensity 
  *
  * The handler for this event will execute @p cb and pass @p user_data as the parameter to @p cb.
  *
- * @param cb Callback to execute.
+ * @param cb Callback to execute. Cannot be NULL.
  * @param user_data User data to pass to the callback.
  */
 void central_event_queue_submit_void_cb_with_user_data_event(CentralEventQueueVoidCbWithUserData cb, void *user_data);
+
+/**
+ * @brief Submit void cb with uint8 event to the event queue.
+ *
+ * The handler for this event will execute @p cb and pass @p param_uint8 parameter to @p cb.
+ *
+ * @param cb Callback to execute. Cannot be NULL.
+ * @param param_uint8 uint8_t parameter to a pass as the first parameter to the callback.
+ */
+void central_event_queue_submit_void_cb_with_uint8_event(CentralEventQueueVoidCbWithUint8 cb, uint8_t param_uint8);
 
 #ifdef __cplusplus
 }

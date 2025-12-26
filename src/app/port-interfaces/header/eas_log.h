@@ -17,4 +17,13 @@
 /** Log macro. Uses printf-style argument formatting. */
 #define EAS_LOG_INF(...)
 
+/**
+ * @brief Logs @p length bytes of @p data with a message.
+ *
+ * @param data Pointer to @p length bytes to be logged.
+ * @param length Number of bytes to log.
+ * @param msg Message to log together with the data.
+ */
+#define EAS_LOG_HEXDUMP_INF(data, length, msg)
+
 #endif /* ENV_ALERT_SYSTEM_SRC_APP_PORT_INTERFACES_HEADER_EAS_LOG_H */

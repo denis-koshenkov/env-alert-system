@@ -15,9 +15,12 @@
 #define CONFIG_VARIABLE_REQUIREMENT_LIST_MAX_NUM_INSTANCES 4
 #define CONFIG_ALERT_CONDITION_MAX_NUM_INSTANCES CONFIG_MAX_NUM_ALERTS
 #define CONFIG_ALERT_RAISER_MAX_NUM_INSTANCES CONFIG_MAX_NUM_ALERTS
-/* Each alert raiser creates two timer instances - warmup timer and cooldown timer. +1 is for LedManager - it uses one
- * timer instance to switch between LED notifications. */
-#define CONFIG_EAS_TIMER_MAX_NUM_INSTANCES ((CONFIG_ALERT_RAISER_MAX_NUM_INSTANCES * 2) + 1)
+/* Each alert raiser creates two timer instances - warmup timer and cooldown timer. +3 is for:
+ *   1. LedManager - it uses one timer instance to switch between LED notifications.
+ *   2. HwPlatform - uses one timer to implement timer interface for SHT3X driver.
+ *   3. VirtualSHT31 - uses a timer to periodically read out measurements from SHT31 sensor.
+ */
+#define CONFIG_EAS_TIMER_MAX_NUM_INSTANCES ((CONFIG_ALERT_RAISER_MAX_NUM_INSTANCES * 2) + 3)
 
 /* Chosen through trial and error. If set too low, static asserts will fire. */
 #define CONFIG_VARIABLE_REQUIREMENT_MAX_SIZE 16
