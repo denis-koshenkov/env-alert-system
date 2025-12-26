@@ -9,6 +9,7 @@ target_include_directories(port INTERFACE
 )
 
 add_subdirectory(interfaces)
+include(sensirion_sht3x.cmake)
 
 # app is the built-in Zephyr executable
-target_link_libraries(app PRIVATE eas_app port utils)
+target_link_libraries(app PRIVATE eas_app port utils sht3x_driver)
