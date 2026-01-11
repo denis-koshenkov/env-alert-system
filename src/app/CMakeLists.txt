@@ -41,4 +41,4 @@ target_include_directories(eas_app INTERFACE
 add_subdirectory(utils)
 add_subdirectory(middleware)
 add_subdirectory(glue)
-add_subdirectory(port-interfaces)
+add_subdirectory(interfaces)
