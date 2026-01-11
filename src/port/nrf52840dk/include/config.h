@@ -21,6 +21,8 @@
  *   3. VirtualSHT31 - uses a timer to periodically read out measurements from SHT31 sensor.
  */
 #define CONFIG_EAS_TIMER_MAX_NUM_INSTANCES ((CONFIG_ALERT_RAISER_MAX_NUM_INSTANCES * 2) + 3)
+/* One for queue of I2C operations in hw_platform */
+#define CONFIG_OPS_QUEUE_MAX_NUM_INSTANCES 1
 
 /* Chosen through trial and error. If set too low, static asserts will fire. */
 #define CONFIG_VARIABLE_REQUIREMENT_MAX_SIZE 16

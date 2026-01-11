@@ -14,6 +14,8 @@ OpsQueue ops_queue_create(size_t op_size, size_t num_ops, void *ops_buf, OpsQueu
 
 void ops_queue_add_op(OpsQueue self, void *op);
 
+void ops_queue_op_complete(OpsQueue self);
+
 #ifdef __cplusplus
 }
 #endif

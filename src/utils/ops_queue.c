@@ -2,6 +2,7 @@
 
 #include "ops_queue.h"
 #include "eas_assert.h"
+#include "config.h"
 
 #ifndef CONFIG_OPS_QUEUE_MAX_NUM_INSTANCES
 #define CONFIG_OPS_QUEUE_MAX_NUM_INSTANCES 1
@@ -30,4 +31,8 @@ OpsQueue ops_queue_create(size_t op_size, size_t num_ops, void *ops_buf, OpsQueu
 void ops_queue_add_op(OpsQueue self, void *op)
 {
     self->start_op(op, self->start_op_user_data);
+}
+
+void ops_queue_op_complete(OpsQueue self)
+{
 }

@@ -13,6 +13,7 @@
 /* This config has no effect on the behavior of the unit test port. The eas timer implementation for this port is a
  * mock, so it does not define a static array of size equal to the maximum number of instances. */
 #define CONFIG_EAS_TIMER_MAX_NUM_INSTANCES 1
+#define CONFIG_OPS_QUEUE_MAX_NUM_INSTANCES 2
 
 /** For the off-target unit test build, this config is used in mock variable requirement allocator to determine the size
  * of the buffer for one variable requirement. */
