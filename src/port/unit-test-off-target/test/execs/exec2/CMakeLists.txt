@@ -31,6 +31,7 @@ target_sources(app_test_exec2 PRIVATE
     msg_transceiver.cpp
     msg_transceiver_no_setup.c
     msg_transceiver_no_setup.cpp
+    ops_queue.cpp
 
     mocks/mock_value_holder.cpp
     mocks/mock_current_temperature.cpp
@@ -41,6 +42,7 @@ target_sources(app_test_exec2 PRIVATE
     mocks/mock_alert_notifier.cpp
     mocks/mock_connectivity_notification_sender.cpp
     mocks/mock_led_notification_executor.cpp
+    mocks/mock_ops_queue_start_op.cpp
 )
 
 target_link_libraries(app_test_exec2 PRIVATE test_common)

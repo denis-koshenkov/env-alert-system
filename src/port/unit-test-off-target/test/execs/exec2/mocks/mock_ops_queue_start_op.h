@@ -1,0 +1,15 @@
+#ifndef ENV_ALERT_SYSTEM_SRC_PORT_UNIT_TEST_OFF_TARGET_TEST_EXECS_EXEC2_MOCKS_MOCK_OPS_QUEUE_START_OP_H
+#define ENV_ALERT_SYSTEM_SRC_PORT_UNIT_TEST_OFF_TARGET_TEST_EXECS_EXEC2_MOCKS_MOCK_OPS_QUEUE_START_OP_H
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+void mock_ops_queue_start_op(void *op, void *user_data);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* ENV_ALERT_SYSTEM_SRC_PORT_UNIT_TEST_OFF_TARGET_TEST_EXECS_EXEC2_MOCKS_MOCK_OPS_QUEUE_START_OP_H */
