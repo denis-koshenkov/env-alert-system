@@ -18,6 +18,9 @@ manifest:
     - name: sensirion-sht3x
       remote: denis-koshenkov
       revision: v3.0.1
+    - name: rohm-bh1750fvi
+      remote: denis-koshenkov
+      revision: v1.0.0
 
   self:
     west-commands: scripts/west-commands.yml
