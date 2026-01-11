@@ -20,8 +20,8 @@ target_link_libraries(test_common INTERFACE
 add_subdirectory(internal)
 
 # Test executables of production code
-add_subdirectory(execs/app/exec1)
-add_subdirectory(execs/app/exec2)
+add_subdirectory(execs/exec1)
+add_subdirectory(execs/exec2)
 
 # Test executables of internal test helper modules
 add_subdirectory(execs/internal)
