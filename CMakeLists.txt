@@ -19,10 +19,13 @@ set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 if(BUILD_TESTS)
     set(PORT_DIR "unit-test-off-target")
+    set(HAL_DIR "unit-test-off-target")
 else()
     set(PORT_DIR "nrf52840dk")
+    set(HAL_DIR "nrf52840dk")
 endif()
 
 add_subdirectory(src/app)
 add_subdirectory("src/port/${PORT_DIR}")
+add_subdirectory("src/hal/${HAL_DIR}")
 add_subdirectory(src/utils)
