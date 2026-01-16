@@ -4,7 +4,6 @@ target_sources(port INTERFACE
     led_notification_allocator.cpp
     eas_timer.cpp
     virtual_led_mock.cpp
-    eas_current_time.c
     transceiver.cpp
 )
 
