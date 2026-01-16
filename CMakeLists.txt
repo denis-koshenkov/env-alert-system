@@ -25,19 +25,8 @@ else()
     set(HAL_DIR "nrf52840dk")
 endif()
 
-# Contains all chosen interface implementations for this build 
-add_library(interfaces INTERFACE)
-set(INTF_IMPL_DIR "src/interfaces/implementations")
-if (BUILD_TESTS)
-    add_subdirectory("${INTF_IMPL_DIR}/eas_assert/cpputest")
-    # Logging is not necessary when running unit tests
-    add_subdirectory("${INTF_IMPL_DIR}/eas_log/disabled")
-else()
-    add_subdirectory("${INTF_IMPL_DIR}/eas_assert/zephyr")
-    add_subdirectory("${INTF_IMPL_DIR}/eas_log/zephyr")
-endif()
-
 add_subdirectory(src/app)
 add_subdirectory("src/port/${PORT_DIR}")
 add_subdirectory("src/hal/${HAL_DIR}")
 add_subdirectory(src/utils)
+add_subdirectory(src/interfaces)

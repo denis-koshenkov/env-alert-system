@@ -1,6 +1,6 @@
 #include "osal/eas_message_queue.h"
 
-/* No implementation - when the application runs on unit test port, message queues are not used. */
+/* All functions do nothing. Use when message queues are not used in the build. */
 
 EasMessageQueue eas_message_queue_create(uint8_t *const buf, size_t buf_size, uint8_t max_message_size)
 {
