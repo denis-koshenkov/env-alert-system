@@ -30,8 +30,11 @@ add_library(interfaces INTERFACE)
 set(INTF_IMPL_DIR "src/interfaces/implementations")
 if (BUILD_TESTS)
     target_include_directories(interfaces INTERFACE "${INTF_IMPL_DIR}/eas_assert/cpputest")
+    # Logging is not necessary when running unit tests
+    add_subdirectory("${INTF_IMPL_DIR}/eas_log/disabled")
 else()
     target_include_directories(interfaces INTERFACE "${INTF_IMPL_DIR}/eas_assert/zephyr")
+    add_subdirectory("${INTF_IMPL_DIR}/eas_log/zephyr")
 endif()
 
 add_subdirectory(src/app)

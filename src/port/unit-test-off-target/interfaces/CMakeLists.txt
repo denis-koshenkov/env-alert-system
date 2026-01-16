@@ -13,4 +13,3 @@ target_include_directories(port INTERFACE
 )
 
 add_subdirectory(osal)
-add_subdirectory(header)
