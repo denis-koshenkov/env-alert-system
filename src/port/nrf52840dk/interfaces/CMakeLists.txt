@@ -5,5 +5,3 @@ target_sources(port INTERFACE
     eas_current_time.c
     eas_timer.c
 )
-
-add_subdirectory(osal)
