@@ -8,6 +8,7 @@ add_subdirectory(
 
 target_link_libraries(test_common INTERFACE
     eas_app
+    interfaces
     hal
     port
     utils

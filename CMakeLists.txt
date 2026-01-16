@@ -25,6 +25,15 @@ else()
     set(HAL_DIR "nrf52840dk")
 endif()
 
+# Contains all chosen interface implementations for this build 
+add_library(interfaces INTERFACE)
+set(INTF_IMPL_DIR "src/interfaces/implementations")
+if (BUILD_TESTS)
+    target_include_directories(interfaces INTERFACE "${INTF_IMPL_DIR}/eas_assert/cpputest")
+else()
+    target_include_directories(interfaces INTERFACE "${INTF_IMPL_DIR}/eas_assert/zephyr")
+endif()
+
 add_subdirectory(src/app)
 add_subdirectory("src/port/${PORT_DIR}")
 add_subdirectory("src/hal/${HAL_DIR}")

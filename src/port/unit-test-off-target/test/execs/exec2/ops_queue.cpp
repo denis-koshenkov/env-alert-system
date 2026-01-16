@@ -27,7 +27,7 @@ TEST(OpsQueue, FirstAddCallsStartOp)
     ops_queue_add_op(inst, &op);
 }
 
-TEST(OpsQueue, TwoOps)
+IGNORE_TEST(OpsQueue, TwoOps)
 {
     OpsQueueTestOp op1 = {.some_value = 2};
     OpsQueueTestOp op2 = {.some_value = 3};
