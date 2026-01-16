@@ -1,5 +1,4 @@
 target_sources(port INTERFACE
-    linked_list_node_allocator.cpp
     virtual_led_mock.cpp
     transceiver.cpp
 )

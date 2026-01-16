@@ -8,7 +8,6 @@ target_include_directories(port INTERFACE
     include
 )
 
-add_subdirectory(interfaces)
 include(sensirion_sht3x.cmake)
 include(rohm-bh1750fvi.cmake)
 
