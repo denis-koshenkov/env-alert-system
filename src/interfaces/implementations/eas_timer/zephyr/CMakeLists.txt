@@ -1,3 +1,3 @@
 target_sources(interfaces INTERFACE
-    eas_current_time.c
+    eas_timer.c
 )

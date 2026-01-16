@@ -2,7 +2,6 @@ target_sources(port INTERFACE
     variable_requirement_allocator.cpp
     linked_list_node_allocator.cpp
     led_notification_allocator.cpp
-    eas_timer.cpp
     virtual_led_mock.cpp
     transceiver.cpp
 )
