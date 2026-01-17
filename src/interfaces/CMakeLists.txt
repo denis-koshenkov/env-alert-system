@@ -8,8 +8,8 @@ add_library(interfaces INTERFACE)
 # and that can get ugly because the same macros are defined in both files.
 target_include_directories(interfaces INTERFACE defs/include)
 
-# Select implementations based on the build type
-if (BUILD_TESTS)
+# Select implementations based on the port
+if (${PORT} STREQUAL "unit-test-off-target")
     add_subdirectory("implementations/eas_assert/cpputest")
     # Logging is not necessary when running unit tests
     add_subdirectory("implementations/eas_log/disabled")
@@ -22,7 +22,7 @@ if (BUILD_TESTS)
     add_subdirectory("implementations/led_notification_allocator/cppumock")
     add_subdirectory("implementations/variable_requirement_allocator/cppumock")
     add_subdirectory("implementations/linked_list_node_allocator/cppumock")
-else()
+elseif(${PORT} STREQUAL "nrf52840dk")
     add_subdirectory("implementations/eas_assert/zephyr")
     add_subdirectory("implementations/eas_log/zephyr")
     add_subdirectory("implementations/osal/eas_message_queue/zephyr")
@@ -32,4 +32,6 @@ else()
     add_subdirectory("implementations/led_notification_allocator/zephyr_mem_blocks")
     add_subdirectory("implementations/variable_requirement_allocator/zephyr_mem_blocks")
     add_subdirectory("implementations/linked_list_node_allocator/zephyr_mem_blocks")
+else()
+    message(FATAL_ERROR "Unknown port ${PORT}")
 endif()
