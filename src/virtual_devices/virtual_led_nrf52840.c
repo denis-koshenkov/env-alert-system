@@ -1,4 +1,4 @@
-#include "led_nrf52840.h"
+#include "virtual_led_nrf52840.h"
 
 static void led_set(LedColor led_color, LedPattern led_pattern);
 static void led_turn_off();

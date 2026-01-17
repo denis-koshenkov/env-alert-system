@@ -5,7 +5,7 @@
 
 #include "hal/hw_platform.h"
 #include "hw_platform_private.h"
-#include "led_nrf52840.h"
+#include "virtual_led_nrf52840.h"
 #include "eas_assert.h"
 #include "virtual_sht31.h"
 #include "virtual_bmp280.h"
