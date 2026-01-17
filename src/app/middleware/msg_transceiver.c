@@ -1,5 +1,5 @@
 #include "msg_transceiver.h"
-#include "transceiver.h"
+#include "hw_platform.h"
 #include "eas_assert.h"
 
 #ifndef CONFIG_MSG_TRANSCEIVER_MAX_NUM_CONCURRENT_ALERT_STATUS_CHANGE_MESSAGES
@@ -596,7 +596,7 @@ void msg_transceiver_init()
     EAS_ASSERT(!initialized);
 
     reset_message_slots();
-    transceiver_set_receive_cb(receive_cb, NULL);
+    hw_platform_get_transceiver()->set_receive_cb(receive_cb, NULL);
     initialized = true;
 }
 
@@ -622,7 +622,7 @@ void msg_transceiver_send_alert_status_change_message(uint8_t alert_id, bool is_
     bytes[0] = MSG_TRANSCEIVER_MESSAGE_ID_ALERT_STATUS_CHANGE;
     bytes[1] = alert_id;
     bytes[2] = is_raised ? 0x1 : 0x0;
-    transceiver_transmit(bytes, 3, transmit_complete_cb, (void *)slot);
+    hw_platform_get_transceiver()->transmit(bytes, 3, transmit_complete_cb, (void *)slot);
 }
 
 void msg_transceiver_set_add_alert_cb(MsgTransceiverAddAlertCb cb, void *user_data)
@@ -655,6 +655,6 @@ void msg_transceiver_deinit()
     add_alert_cb = NULL;
     /* No need to clear user data for add and remove alert cbs, since it will get reset anyway when the new add/remove
      * alert callback is set */
-    transceiver_unset_receive_cb();
+    hw_platform_get_transceiver()->unset_receive_cb();
     initialized = false;
 }

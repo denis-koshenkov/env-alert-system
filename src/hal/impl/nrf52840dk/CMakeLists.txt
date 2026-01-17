@@ -1,12 +1,12 @@
 target_sources(hal INTERFACE
     hw_platform.c
-    transceiver.c
 
     # Virtual devices used by this hw_platform implementation
     ${VIRTUAL_DEVICES_DIR}/virtual_bh1750.c
     ${VIRTUAL_DEVICES_DIR}/virtual_bmp280.c
     ${VIRTUAL_DEVICES_DIR}/virtual_sht31.c
     ${VIRTUAL_DEVICES_DIR}/virtual_led_nrf52840.c
+    ${VIRTUAL_DEVICES_DIR}/virtual_transceiver_nrf_ble.c
 )
 
 # Add external device drivers to the build

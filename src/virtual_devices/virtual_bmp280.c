@@ -14,8 +14,8 @@ static PressureSensor pressure_sensor = {
     .start = pressure_start,
 };
 
-PressureSensorNewSampleCb pressure_new_sample_cb = NULL;
-void *pressure_new_sample_cb_user_data = NULL;
+static PressureSensorNewSampleCb pressure_new_sample_cb = NULL;
+static void *pressure_new_sample_cb_user_data = NULL;
 
 #define PRESSURE_SENSOR_TIMER_PERIOD_MS 1000
 

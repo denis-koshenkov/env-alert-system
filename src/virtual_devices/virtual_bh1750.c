@@ -14,8 +14,8 @@ static LightIntensitySensor light_intensity_sensor = {
     .start = light_intensity_start,
 };
 
-LightIntensitySensorNewSampleCb light_intensity_new_sample_cb = NULL;
-void *light_intensity_new_sample_cb_user_data = NULL;
+static LightIntensitySensorNewSampleCb light_intensity_new_sample_cb = NULL;
+static void *light_intensity_new_sample_cb_user_data = NULL;
 
 #define LIGHT_INTENSITY_SENSOR_TIMER_PERIOD_MS 1000
 

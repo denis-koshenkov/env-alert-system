@@ -6,6 +6,7 @@
 #include "pressure_sensor.h"
 #include "humidity_sensor.h"
 #include "light_intensity_sensor.h"
+#include "transceiver.h"
 
 /**
  * @brief Hardware platform operation complete callback.
@@ -73,5 +74,14 @@ const HumiditySensor *const hw_platform_get_humidity_sensor();
  * @return const LightIntensitySensor* const Light intensity sensor instance.
  */
 const LightIntensitySensor *const hw_platform_get_light_intensity_sensor();
+
+/**
+ * @brief Get transceiver instance from hardware platform.
+ *
+ * The implementation must return a transceiver interface initialized with valid functions.
+ *
+ * @return const Transceiver* const Transceiver instance.
+ */
+const Transceiver *const hw_platform_get_transceiver();
 
 #endif /* ENV_ALERT_SYSTEM_SRC_HAL_DEF_HW_PLATFORM_H */

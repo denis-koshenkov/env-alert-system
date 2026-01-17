@@ -10,6 +10,7 @@
 #include "virtual_sht31.h"
 #include "virtual_bmp280.h"
 #include "virtual_bh1750.h"
+#include "virtual_transceiver_nrf_ble.h"
 #include "central_event_queue.h"
 #include "eas_timer.h"
 #include "sht3x.h"
@@ -278,4 +279,9 @@ const LightIntensitySensor *const hw_platform_get_light_intensity_sensor()
 {
     EAS_ASSERT(light_intensity_sensor);
     return light_intensity_sensor;
+}
+
+const Transceiver *const hw_platform_get_transceiver()
+{
+    return virtual_transceiver_nrf_ble_get();
 }

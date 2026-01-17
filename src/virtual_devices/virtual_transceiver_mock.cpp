@@ -1,8 +1,19 @@
+#include "virtual_transceiver_mock.h"
 #include "CppUTestExt/MockSupport.h"
-#include "mock_transceiver.h"
 #include "eas_assert.h"
 
 static size_t cbs_index = 0;
+
+static void transceiver_transmit(const uint8_t *const bytes, size_t num_bytes, TransceiverTransmitCompleteCb cb,
+                                 void *user_data);
+static void transceiver_set_receive_cb(TransceiverReceiveCb cb, void *user_data);
+static void transceiver_unset_receive_cb();
+
+static Transceiver transceiver = {
+    .transmit = transceiver_transmit,
+    .set_receive_cb = transceiver_set_receive_cb,
+    .unset_receive_cb = transceiver_unset_receive_cb,
+};
 
 void transceiver_transmit(const uint8_t *const bytes, size_t num_bytes, TransceiverTransmitCompleteCb cb,
                           void *user_data)
@@ -44,7 +55,12 @@ void transceiver_unset_receive_cb()
     mock().actualCall("transceiver_unset_receive_cb");
 }
 
-void mock_transceiver_reset_cbs_index()
+const Transceiver *const virtual_transceiver_mock_get()
+{
+    return &transceiver;
+}
+
+void virtual_transceiver_mock_reset_cbs_index()
 {
     cbs_index = 0;
 }

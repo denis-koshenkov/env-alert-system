@@ -42,8 +42,8 @@ static void *temperature_new_sample_cb_user_data = NULL;
 static bool temperature_started = false;
 
 /* Humidity sensor private data */
-HumiditySensorNewSampleCb humidity_new_sample_cb = NULL;
-void *humidity_new_sample_cb_user_data = NULL;
+static HumiditySensorNewSampleCb humidity_new_sample_cb = NULL;
+static void *humidity_new_sample_cb_user_data = NULL;
 static bool humidity_started = false;
 
 /**

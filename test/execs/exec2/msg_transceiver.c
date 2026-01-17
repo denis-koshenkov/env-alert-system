@@ -5,7 +5,7 @@
 #include "CppUTestExt/TestAssertPlugin_c.h"
 
 #include "msg_transceiver.h"
-#include "mock_transceiver.h"
+#include "virtual_transceiver_mock.h"
 #include "config.h"
 #include "eas_assert.h"
 
@@ -86,7 +86,7 @@ TEST_GROUP_C_SETUP(MsgTransceiver)
     add_alert_cb_user_data = NULL;
     /* So that transceiver mock starts populating transmitCompleteCbs and their user data at index 0 at the beginning of
      * each test */
-    mock_transceiver_reset_cbs_index();
+    virtual_transceiver_mock_reset_cbs_index();
 
     mock_c()->strictOrder();
 
@@ -424,53 +424,40 @@ TEST_C(MsgTransceiver, AddAlert3)
 {
     /* Mock receiving a "add alert" message */
     uint8_t add_alert_bytes[36] = {
-        0x2, /* message id */
-        0x3, /* alert id */
-        0xA,
-        0x0,
-        0x0,
-        0x0, /* Warmup period - 10 ms */
-        0x14,
-        0x0,
-        0x0,
-        0x0, /* Cooldown period - 20 ms */
-        0x0, /* notification type - connectivity disabled, LED disabled */
-        0x2, /* Number of ORed requirements */
+        0x2,                 /* message id */
+        0x3,                 /* alert id */
+        0xA, 0x0, 0x0, 0x0,  /* Warmup period - 10 ms */
+        0x14, 0x0, 0x0, 0x0, /* Cooldown period - 20 ms */
+        0x0,                 /* notification type - connectivity disabled, LED disabled */
+        0x2,                 /* Number of ORed requirements */
 
         /* Start of first ORed requirement */
         0x2, /* Number of variable requirements in the first ORed requirement */
 
         /* Start of variable requirement 0 */
-        0x0, /* Temperature variable identifier */
-        0x0, /* Operator - greater than or equal to */
-        0xCD,
-        0x0, /* Constraint value 205 -> 20.5 degrees Celsius */
+        0x0,       /* Temperature variable identifier */
+        0x0,       /* Operator - greater than or equal to */
+        0xCD, 0x0, /* Constraint value 205 -> 20.5 degrees Celsius */
         /* Start of variable requirement 1 */
-        0x1, /* Pressure variable identifier */
-        0x0, /* Operator - greater than or equal to */
-        0x67,
-        0x2B, /* Constraint value 11111 -> 1111.1 hPa */
+        0x1,        /* Pressure variable identifier */
+        0x0,        /* Operator - greater than or equal to */
+        0x67, 0x2B, /* Constraint value 11111 -> 1111.1 hPa */
 
         /* Start of second ORed requirement */
         0x3, /* Number of variable requirements in the second ORed requirement */
 
         /* Start of variable requirement 0 */
-        0x3, /* Light intensity variable identifier */
-        0x1, /* Operator - less than or equal to */
-        0xA0,
-        0x86,
-        0x1,
-        0x0, /* Constraint value 100000 -> 100,000 lx */
+        0x3,                  /* Light intensity variable identifier */
+        0x1,                  /* Operator - less than or equal to */
+        0xA0, 0x86, 0x1, 0x0, /* Constraint value 100000 -> 100,000 lx */
         /* Start of variable requirement 1 */
-        0x2, /* Humidity variable identifier */
-        0x1, /* Operator - less than or equal to */
-        0xA4,
-        0x1, /* Constraint value 420 -> 42.0 % RH */
+        0x2,       /* Humidity variable identifier */
+        0x1,       /* Operator - less than or equal to */
+        0xA4, 0x1, /* Constraint value 420 -> 42.0 % RH */
         /* Start of variable requirement 2 */
-        0x0, /* Temperature variable identifier */
-        0x1, /* Operator - less than or equal to */
-        0xD3,
-        0xFE, /* Constraint value -301 -> -30.1 degrees Celsius */
+        0x0,        /* Temperature variable identifier */
+        0x1,        /* Operator - less than or equal to */
+        0xD3, 0xFE, /* Constraint value -301 -> -30.1 degrees Celsius */
     };
     receive_cb(add_alert_bytes, 36, receive_cb_user_data);
 
@@ -1202,83 +1189,64 @@ TEST_C(MsgTransceiver, AddAlertTooManyVariableRequirements)
 {
     /* Mock receiving a "add alert" message */
     uint8_t add_alert_bytes[60] = {
-        0x2, /* message id */
-        0x3, /* alert id */
-        0xA,
-        0x0,
-        0x0,
-        0x0, /* Warmup period - 10 ms */
-        0x14,
-        0x0,
-        0x0,
-        0x0, /* Cooldown period - 20 ms */
-        0x0, /* notification type - connectivity disabled, LED disabled */
-        0x2, /* Number of ORed requirements */
+        0x2,                 /* message id */
+        0x3,                 /* alert id */
+        0xA, 0x0, 0x0, 0x0,  /* Warmup period - 10 ms */
+        0x14, 0x0, 0x0, 0x0, /* Cooldown period - 20 ms */
+        0x0,                 /* notification type - connectivity disabled, LED disabled */
+        0x2,                 /* Number of ORed requirements */
 
         /* Start of first ORed requirement */
         0x2, /* Number of variable requirements in the first ORed requirement */
 
         /* Start of variable requirement 0 */
-        0x0, /* Temperature variable identifier */
-        0x0, /* Operator - greater than or equal to */
-        0xCD,
-        0x0, /* Constraint value 205 -> 20.5 degrees Celsius */
+        0x0,       /* Temperature variable identifier */
+        0x0,       /* Operator - greater than or equal to */
+        0xCD, 0x0, /* Constraint value 205 -> 20.5 degrees Celsius */
         /* Start of variable requirement 1 */
-        0x1, /* Pressure variable identifier */
-        0x0, /* Operator - greater than or equal to */
-        0x67,
-        0x2B, /* Constraint value 11111 -> 1111.1 hPa */
+        0x1,        /* Pressure variable identifier */
+        0x0,        /* Operator - greater than or equal to */
+        0x67, 0x2B, /* Constraint value 11111 -> 1111.1 hPa */
 
         /* Start of second ORed requirement */
         0x9, /* Number of variable requirements in the second ORed requirement */
 
         /* Start of variable requirement 2 */
-        0x3, /* Light intensity variable identifier */
-        0x1, /* Operator - less than or equal to */
-        0xA0,
-        0x86,
-        0x1,
-        0x0, /* Constraint value 100000 -> 100,000 lx */
+        0x3,                  /* Light intensity variable identifier */
+        0x1,                  /* Operator - less than or equal to */
+        0xA0, 0x86, 0x1, 0x0, /* Constraint value 100000 -> 100,000 lx */
         /* Start of variable requirement 3 */
-        0x2, /* Humidity variable identifier */
-        0x1, /* Operator - less than or equal to */
-        0xA4,
-        0x1, /* Constraint value 420 -> 42.0 % RH */
+        0x2,       /* Humidity variable identifier */
+        0x1,       /* Operator - less than or equal to */
+        0xA4, 0x1, /* Constraint value 420 -> 42.0 % RH */
         /* Start of variable requirement 4 */
-        0x0, /* Temperature variable identifier */
-        0x1, /* Operator - less than or equal to */
-        0xD3,
-        0xFE, /* Constraint value -301 -> -30.1 degrees Celsius */
+        0x0,        /* Temperature variable identifier */
+        0x1,        /* Operator - less than or equal to */
+        0xD3, 0xFE, /* Constraint value -301 -> -30.1 degrees Celsius */
         /* Start of variable requirement 5 */
-        0x0, /* Temperature variable identifier */
-        0x1, /* Operator - less than or equal to */
-        0x0,
-        0x0, /* Constraint value */
+        0x0,      /* Temperature variable identifier */
+        0x1,      /* Operator - less than or equal to */
+        0x0, 0x0, /* Constraint value */
         /* Start of variable requirement 6 */
-        0x0, /* Temperature variable identifier */
-        0x1, /* Operator - less than or equal to */
-        0x0,
-        0x0, /* Constraint value */
+        0x0,      /* Temperature variable identifier */
+        0x1,      /* Operator - less than or equal to */
+        0x0, 0x0, /* Constraint value */
         /* Start of variable requirement 7 */
-        0x0, /* Temperature variable identifier */
-        0x1, /* Operator - less than or equal to */
-        0x0,
-        0x0, /* Constraint value */
+        0x0,      /* Temperature variable identifier */
+        0x1,      /* Operator - less than or equal to */
+        0x0, 0x0, /* Constraint value */
         /* Start of variable requirement 8 */
-        0x0, /* Temperature variable identifier */
-        0x1, /* Operator - less than or equal to */
-        0x0,
-        0x0, /* Constraint value */
+        0x0,      /* Temperature variable identifier */
+        0x1,      /* Operator - less than or equal to */
+        0x0, 0x0, /* Constraint value */
         /* Start of variable requirement 9 */
-        0x0, /* Temperature variable identifier */
-        0x1, /* Operator - less than or equal to */
-        0x0,
-        0x0, /* Constraint value */
+        0x0,      /* Temperature variable identifier */
+        0x1,      /* Operator - less than or equal to */
+        0x0, 0x0, /* Constraint value */
         /* Start of variable requirement 10 - this one is out of bounds */
-        0x0, /* Temperature variable identifier */
-        0x1, /* Operator - less than or equal to */
-        0x0,
-        0x0, /* Constraint value */
+        0x0,      /* Temperature variable identifier */
+        0x1,      /* Operator - less than or equal to */
+        0x0, 0x0, /* Constraint value */
     };
     receive_cb(add_alert_bytes, 60, receive_cb_user_data);
 
