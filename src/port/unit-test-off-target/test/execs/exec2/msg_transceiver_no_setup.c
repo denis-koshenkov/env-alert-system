@@ -3,7 +3,7 @@
 #include "CppUTestExt/MockSupport_c.h"
 
 #include "msg_transceiver.h"
-#include "transceiver.h"
+#include "hal/transceiver.h"
 
 /* Transceiver mock object populates these every time msg_transceiver implementation calls transceiver_set_receive_cb */
 static TransceiverReceiveCb receive_cb = NULL;

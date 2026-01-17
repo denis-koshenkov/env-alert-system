@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-#include "light_intensity.h"
+#include "hal/light_intensity.h"
 #include "variable_requirement.h"
 
 /**

@@ -3,7 +3,7 @@
 
 #include "led_manager_private.h"
 #include "led_manager.h"
-#include "hw_platform.h"
+#include "hal/hw_platform.h"
 #include "eas_timer.h"
 #include "utils/linked_list.h"
 #include "config.h"

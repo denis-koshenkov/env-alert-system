@@ -1,5 +1,5 @@
-#ifndef ENV_ALERT_SYSTEM_SRC_APP_INTERFACES_HAL_HW_PLATFORM_H
-#define ENV_ALERT_SYSTEM_SRC_APP_INTERFACES_HAL_HW_PLATFORM_H
+#ifndef ENV_ALERT_SYSTEM_SRC_INTERFACES_DEFS_INCLUDE_HAL_HW_PLATFORM_H
+#define ENV_ALERT_SYSTEM_SRC_INTERFACES_DEFS_INCLUDE_HAL_HW_PLATFORM_H
 
 #include "led.h"
 #include "temperature_sensor.h"
@@ -74,4 +74,4 @@ const HumiditySensor *const hw_platform_get_humidity_sensor();
  */
 const LightIntensitySensor *const hw_platform_get_light_intensity_sensor();
 
-#endif /* ENV_ALERT_SYSTEM_SRC_APP_INTERFACES_HAL_HW_PLATFORM_H */
+#endif /* ENV_ALERT_SYSTEM_SRC_INTERFACES_DEFS_INCLUDE_HAL_HW_PLATFORM_H */

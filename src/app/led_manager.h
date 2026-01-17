@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-#include "led_defs.h"
+#include "hal/led_defs.h"
 
 /**
  * @brief Displays all added led notifications by periodically switching between them.

@@ -8,7 +8,7 @@ extern "C"
 
 #include <stdbool.h>
 
-#include "light_intensity.h"
+#include "hal/light_intensity.h"
 
 typedef struct LightIntensityValueStruct *LightIntensityValue;
 

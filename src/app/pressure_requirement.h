@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-#include "pressure.h"
+#include "hal/pressure.h"
 #include "variable_requirement.h"
 
 /**

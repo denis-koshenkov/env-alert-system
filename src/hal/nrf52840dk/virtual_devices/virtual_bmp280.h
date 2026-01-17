@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-#include "pressure_sensor.h"
+#include "hal/pressure_sensor.h"
 
 /** All virtual devices that are based on BMP280. */
 typedef struct BMP280VirtualInterfaces {

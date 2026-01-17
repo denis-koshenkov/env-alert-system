@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-#include "light_intensity.h"
+#include "hal/light_intensity.h"
 
 /**
  * @brief This module stores current light intensity and reports when it changes.

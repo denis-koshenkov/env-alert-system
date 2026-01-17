@@ -8,7 +8,6 @@
 #include "eas_assert.h"
 #include "config.h"
 #include "util.h"
-#include "humidity.h"
 #include "current_humidity.h"
 
 typedef struct HumidityRequirementStruct *HumidityRequirement;

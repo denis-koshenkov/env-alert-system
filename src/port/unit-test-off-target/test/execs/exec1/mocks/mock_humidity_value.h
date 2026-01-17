@@ -8,7 +8,7 @@ extern "C"
 
 #include <stdbool.h>
 
-#include "humidity.h"
+#include "hal/humidity.h"
 
 typedef struct HumidityValueStruct *HumidityValue;
 

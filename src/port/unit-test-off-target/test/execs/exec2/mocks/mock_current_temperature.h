@@ -8,7 +8,7 @@ extern "C"
 
 #include <stdbool.h>
 
-#include "temperature.h"
+#include "hal/temperature.h"
 
 void current_temperature_set(Temperature temperature);
 

@@ -8,7 +8,6 @@
 #include "eas_assert.h"
 #include "config.h"
 #include "util.h"
-#include "light_intensity.h"
 #include "current_light_intensity.h"
 
 typedef struct LightIntensityRequirementStruct *LightIntensityRequirement;

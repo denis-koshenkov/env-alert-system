@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-#include "temperature.h"
+#include "hal/temperature.h"
 
 /**
  * @brief This module stores current temperature and reports when it changes.

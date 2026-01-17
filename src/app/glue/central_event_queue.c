@@ -3,7 +3,6 @@
 #include "central_event_queue.h"
 #include "osal/eas_message_queue.h"
 #include "osal/eas_thread.h"
-#include "temperature.h"
 #include "eas_assert.h"
 #include "util.h"
 #include "new_sample_handler.h"

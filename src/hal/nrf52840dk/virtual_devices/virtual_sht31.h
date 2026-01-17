@@ -6,8 +6,8 @@ extern "C"
 {
 #endif
 
-#include "temperature_sensor.h"
-#include "humidity_sensor.h"
+#include "hal/temperature_sensor.h"
+#include "hal/humidity_sensor.h"
 #include "sht3x.h"
 
 /** All virtual devices that are based on SHT31. */
