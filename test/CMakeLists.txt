@@ -2,7 +2,7 @@ add_library(test_common INTERFACE)
 
 set(TESTS OFF) # Disable cpputest self-tests
 add_subdirectory(
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../cpputest
+    ${CMAKE_SOURCE_DIR}/../cpputest
     ${CMAKE_CURRENT_BINARY_DIR}/cpputest
 )
 

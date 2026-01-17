@@ -19,6 +19,7 @@ set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 if(BUILD_TESTS)
     set(PORT "unit-test-off-target")
+    add_subdirectory(test)
 else()
     set(PORT "nrf52840dk")
 endif()
