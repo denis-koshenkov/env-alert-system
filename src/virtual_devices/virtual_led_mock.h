@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-#include "hal/led.h"
+#include "led.h"
 
 /**
  * @brief Returns the LED interface with function pointers initialized to functions that call the CppUTest mocking

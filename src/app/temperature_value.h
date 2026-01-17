@@ -8,7 +8,7 @@ extern "C"
 
 #include <stdbool.h>
 
-#include "hal/temperature.h"
+#include "temperature.h"
 
 /**
  * @brief Stores a temperature value and reports when it changes.

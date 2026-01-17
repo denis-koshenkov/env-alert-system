@@ -6,7 +6,7 @@
 #include "msg_transceiver.h"
 #include "eas_timer.h"
 #include "eas_timer_callback_executor.h"
-#include "hal/hw_platform.h"
+#include "hw_platform.h"
 #include "new_sample_callbacks.h"
 #include "central_event_queue.h"
 

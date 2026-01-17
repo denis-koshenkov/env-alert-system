@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-#include "hal/pressure.h"
+#include "pressure.h"
 
 /**
  * @brief This module stores current pressure and reports when it changes.

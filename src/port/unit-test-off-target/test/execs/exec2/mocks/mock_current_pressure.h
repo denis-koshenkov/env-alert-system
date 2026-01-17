@@ -8,7 +8,7 @@ extern "C"
 
 #include <stdbool.h>
 
-#include "hal/pressure.h"
+#include "pressure.h"
 
 void current_pressure_set(Pressure pressure);
 

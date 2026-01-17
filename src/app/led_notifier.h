@@ -9,7 +9,7 @@ extern "C"
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "hal/led_defs.h"
+#include "led_defs.h"
 
 /**
  * @brief Executes led notifications for alerts that have led notifications enabled.

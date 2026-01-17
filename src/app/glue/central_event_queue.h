@@ -8,10 +8,10 @@ extern "C"
 
 #include <stdint.h>
 
-#include "hal/temperature.h"
-#include "hal/pressure.h"
-#include "hal/humidity.h"
-#include "hal/light_intensity.h"
+#include "temperature.h"
+#include "pressure.h"
+#include "humidity.h"
+#include "light_intensity.h"
 
 /**
  * @brief Central event queue for event processing.

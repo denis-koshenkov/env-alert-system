@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-#include "hal/transceiver.h"
+#include "transceiver.h"
 
 /**
  * @brief Defines an extension to the transceiver interface for the unit test port.

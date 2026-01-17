@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-#include "hal/light_intensity_sensor.h"
+#include "light_intensity_sensor.h"
 
 /** All virtual devices that are based on BH1750. */
 typedef struct BH1750VirtualInterfaces {

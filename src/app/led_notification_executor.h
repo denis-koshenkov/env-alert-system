@@ -8,7 +8,7 @@ extern "C"
 
 #include <stdbool.h>
 
-#include "hal/led_defs.h"
+#include "led_defs.h"
 
 /**
  * @brief Executes a led notification that an alert is raised or silenced.

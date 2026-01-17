@@ -3,7 +3,7 @@
 
 #include "nrfx_twim.h"
 
-#include "hal/hw_platform.h"
+#include "hw_platform.h"
 #include "hw_platform_private.h"
 #include "virtual_led_nrf52840.h"
 #include "eas_assert.h"

@@ -8,7 +8,7 @@ extern "C"
 
 #include <stdbool.h>
 
-#include "hal/light_intensity.h"
+#include "light_intensity.h"
 
 /**
  * @brief Stores a light_intensity value and reports when it changes.

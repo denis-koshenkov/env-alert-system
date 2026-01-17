@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-#include "hal/humidity.h"
+#include "humidity.h"
 #include "variable_requirement.h"
 
 /**

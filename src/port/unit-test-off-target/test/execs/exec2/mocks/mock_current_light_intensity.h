@@ -8,7 +8,7 @@ extern "C"
 
 #include <stdbool.h>
 
-#include "hal/light_intensity.h"
+#include "light_intensity.h"
 
 void current_light_intensity_set(LightIntensity light_intensity);
 
@@ -21,4 +21,3 @@ bool current_light_intensity_is_changed();
 #endif
 
 #endif /* ENV_ALERT_SYSTEM_SRC_PORT_UNIT_TEST_OFF_TARGET_TEST_EXECS_EXEC2_MOCKS_MOCK_CURRENT_LIGHT_INTENSITY_H */
-    

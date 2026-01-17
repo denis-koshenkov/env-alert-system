@@ -1,6 +1,6 @@
 #include <stddef.h>
 
-#include "hal/hw_platform.h"
+#include "hw_platform.h"
 #include "virtual_led_mock.h"
 
 /* Unused in unit test port */
