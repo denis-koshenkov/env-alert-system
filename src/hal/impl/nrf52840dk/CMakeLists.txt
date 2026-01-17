@@ -1,7 +1,3 @@
-add_library(hal INTERFACE)
-
-set(VIRTUAL_DEVICES_DIR "${CMAKE_SOURCE_DIR}/src/virtual_devices")
-
 target_sources(hal INTERFACE
     hw_platform.c
     transceiver.c
@@ -19,7 +15,6 @@ include(${CMAKE_SOURCE_DIR}/cmake/rohm-bh1750fvi.cmake)
 
 target_include_directories(hal INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${VIRTUAL_DEVICES_DIR}
 )
 
 add_subdirectory(drivers_glue)

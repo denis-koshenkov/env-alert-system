@@ -1,5 +1,3 @@
-add_library(port INTERFACE)
-
 target_sources(port INTERFACE
     main.c
 )

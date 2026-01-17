@@ -1,7 +1,3 @@
-add_library(hal INTERFACE)
-
-set(VIRTUAL_DEVICES_DIR "${CMAKE_SOURCE_DIR}/src/virtual_devices")
-
 target_sources(hal INTERFACE
     hw_platform.c
     transceiver.cpp
@@ -11,6 +7,6 @@ target_sources(hal INTERFACE
 )
 
 target_include_directories(hal INTERFACE
+    # So that unit tests can include mock_transceiver.h
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${VIRTUAL_DEVICES_DIR}
 )
