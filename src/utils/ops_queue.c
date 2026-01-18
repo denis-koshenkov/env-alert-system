@@ -48,6 +48,8 @@ void ops_queue_add_op(OpsQueue self, void *op)
 
 void ops_queue_op_complete(OpsQueue self)
 {
-    eas_ring_buf_pop(self->ops_ring_buf, self->op_buf);
-    self->start_op(self->op_buf, self->start_op_user_data);
+    bool popped = eas_ring_buf_pop(self->ops_ring_buf, self->op_buf);
+    if (popped) {
+        self->start_op(self->op_buf, self->start_op_user_data);
+    }
 }

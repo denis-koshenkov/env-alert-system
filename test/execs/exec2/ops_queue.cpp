@@ -61,3 +61,21 @@ TEST(OpsQueue, TwoOps)
         .withParameter("user_data", user_data);
     ops_queue_op_complete(inst);
 }
+
+TEST(OpsQueue, OneOpCompletes)
+{
+    OpsQueueTestOp op = {.some_value = 4};
+    void *user_data = (void *)0x3;
+
+    OpsQueue inst = ops_queue_create(sizeof(OpsQueueTestOp), OPS_QUEUE_TEST_NUM_OPS, ops_buf, &op_buf,
+                                     mock_ops_queue_start_op, user_data);
+
+    /* ops_queue_add_op */
+    mock()
+        .expectOneCall("mock_ops_queue_start_op")
+        .withMemoryBufferParameter("op", (const uint8_t *)&op, sizeof(OpsQueueTestOp))
+        .withParameter("user_data", user_data);
+    ops_queue_add_op(inst, &op);
+
+    ops_queue_op_complete(inst);
+}
