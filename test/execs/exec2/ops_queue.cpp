@@ -125,3 +125,23 @@ TEST(OpsQueue, AddOpAssertsWhenQueueFull)
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("pushed", "ops_queue_add_op");
     ops_queue_add_op(inst, &op4);
 }
+
+TEST(OpsQueue, OpCompleteAssertsIfCalledBeforeAddOp)
+{
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self->op_in_progress", "ops_queue_op_complete");
+    ops_queue_op_complete(inst);
+}
+
+TEST(OpsQueue, OpCompleteAssertsNoOpInProgress)
+{
+    OpsQueueTestOp op1 = {.some_value = 12};
+    mock()
+        .expectOneCall("mock_ops_queue_start_op")
+        .withMemoryBufferParameter("op", (const uint8_t *)&op1, sizeof(OpsQueueTestOp))
+        .withParameter("user_data", start_op_user_data);
+    ops_queue_add_op(inst, &op1);
+    ops_queue_op_complete(inst);
+
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self->op_in_progress", "ops_queue_op_complete");
+    ops_queue_op_complete(inst);
+}
