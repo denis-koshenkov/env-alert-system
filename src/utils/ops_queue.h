@@ -11,7 +11,7 @@ typedef struct OpsQueueStruct *OpsQueue;
 typedef void (*OpsQueueStartOp)(void *op, void *user_data);
 
 OpsQueue ops_queue_create(size_t op_size, size_t num_ops, void *ops_buf, void *op_buf, OpsQueueStartOp start_op,
-                          void *user_data);
+                          void *start_op_user_data);
 
 void ops_queue_add_op(OpsQueue self, void *op);
 

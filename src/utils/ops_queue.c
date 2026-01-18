@@ -21,14 +21,14 @@ static struct OpsQueueStruct instances[CONFIG_OPS_QUEUE_MAX_NUM_INSTANCES];
 static size_t instance_idx = 0;
 
 OpsQueue ops_queue_create(size_t op_size, size_t num_ops, void *ops_buf, void *op_buf, OpsQueueStartOp start_op,
-                          void *user_data)
+                          void *start_op_user_data)
 {
     EAS_ASSERT(instance_idx < CONFIG_OPS_QUEUE_MAX_NUM_INSTANCES);
     struct OpsQueueStruct *instance = &instances[instance_idx];
     instance_idx++;
 
     instance->start_op = start_op;
-    instance->start_op_user_data = user_data;
+    instance->start_op_user_data = start_op_user_data;
     instance->ops_ring_buf = eas_ring_buf_create(op_size, num_ops, ops_buf);
     instance->op_buf = op_buf;
     instance->op_in_progress = false;
