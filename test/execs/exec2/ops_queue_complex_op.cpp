@@ -2,6 +2,7 @@
 
 #include "CppUTest/TestHarness.h"
 #include "CppUTestExt/MockSupport.h"
+#include "CppUTestExt/TestAssertPlugin.h"
 
 #include "ops_queue.h"
 #include "mocks/mock_ops_queue_start_op.h"
@@ -125,4 +126,39 @@ TEST(OpsQueueComplexOp, StressTest)
     ops_queue_op_complete(inst);
 
     /* Queue is now empty */
+}
+
+TEST(OpsQueueComplexOp, CreateOpSize0)
+{
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("op_size > 0", "ops_queue_create");
+    inst = ops_queue_create(0, OPS_QUEUE_TEST_COMPLEX_OP_NUM_OPS, ops_buf, &op_buf, mock_ops_queue_start_op,
+                            start_op_user_data);
+}
+
+TEST(OpsQueueComplexOp, CreateNumOps0)
+{
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("num_ops > 1", "ops_queue_create");
+    inst =
+        ops_queue_create(sizeof(OpsQueueComplexOp), 0, ops_buf, &op_buf, mock_ops_queue_start_op, start_op_user_data);
+}
+
+TEST(OpsQueueComplexOp, CreateNumOps1)
+{
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("num_ops > 1", "ops_queue_create");
+    inst =
+        ops_queue_create(sizeof(OpsQueueComplexOp), 1, ops_buf, &op_buf, mock_ops_queue_start_op, start_op_user_data);
+}
+
+TEST(OpsQueueComplexOp, CreateStartOpNull)
+{
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("start_op", "ops_queue_create");
+    inst = ops_queue_create(sizeof(OpsQueueComplexOp), OPS_QUEUE_TEST_COMPLEX_OP_NUM_OPS, ops_buf, &op_buf, NULL,
+                            start_op_user_data);
+}
+
+TEST(OpsQueueComplexOp, CreateOpBufNull)
+{
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("op_buf", "ops_queue_create");
+    inst = ops_queue_create(sizeof(OpsQueueComplexOp), OPS_QUEUE_TEST_COMPLEX_OP_NUM_OPS, ops_buf, NULL,
+                            mock_ops_queue_start_op, start_op_user_data);
 }

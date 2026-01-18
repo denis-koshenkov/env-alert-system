@@ -226,3 +226,37 @@ TEST(OpsQueue, StressTest)
 
     /* Queue is now empty */
 }
+
+TEST(OpsQueue, AddOpSelfNull)
+{
+    OpsQueueTestOp op1 = {.some_value = 20};
+
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "ops_queue_add_op");
+    ops_queue_add_op(NULL, &op1);
+}
+
+TEST(OpsQueue, AddOpOpNull)
+{
+    OpsQueueTestOp op1 = {.some_value = 21};
+    mock()
+        .expectOneCall("mock_ops_queue_start_op")
+        .withMemoryBufferParameter("op", (const uint8_t *)&op1, sizeof(OpsQueueTestOp))
+        .withParameter("user_data", start_op_user_data);
+    ops_queue_add_op(inst, &op1);
+
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("op", "ops_queue_add_op");
+    ops_queue_add_op(inst, NULL);
+}
+
+TEST(OpsQueue, OpCompleteSelfNull)
+{
+    OpsQueueTestOp op1 = {.some_value = 22};
+    mock()
+        .expectOneCall("mock_ops_queue_start_op")
+        .withMemoryBufferParameter("op", (const uint8_t *)&op1, sizeof(OpsQueueTestOp))
+        .withParameter("user_data", start_op_user_data);
+    ops_queue_add_op(inst, &op1);
+
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self", "ops_queue_op_complete");
+    ops_queue_op_complete(NULL);
+}

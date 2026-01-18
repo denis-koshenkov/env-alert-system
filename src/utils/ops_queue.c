@@ -23,6 +23,11 @@ static size_t instance_idx = 0;
 OpsQueue ops_queue_create(size_t op_size, size_t num_ops, void *ops_buf, void *op_buf, OpsQueueStartOp start_op,
                           void *start_op_user_data)
 {
+    EAS_ASSERT(op_size > 0);
+    EAS_ASSERT(num_ops > 1);
+    EAS_ASSERT(op_buf);
+    EAS_ASSERT(start_op);
+
     EAS_ASSERT(instance_idx < CONFIG_OPS_QUEUE_MAX_NUM_INSTANCES);
     struct OpsQueueStruct *instance = &instances[instance_idx];
     instance_idx++;
@@ -38,6 +43,9 @@ OpsQueue ops_queue_create(size_t op_size, size_t num_ops, void *ops_buf, void *o
 
 void ops_queue_add_op(OpsQueue self, void *op)
 {
+    EAS_ASSERT(self);
+    EAS_ASSERT(op);
+
     if (!self->op_in_progress) {
         self->start_op(op, self->start_op_user_data);
         self->op_in_progress = true;
@@ -49,6 +57,7 @@ void ops_queue_add_op(OpsQueue self, void *op)
 
 void ops_queue_op_complete(OpsQueue self)
 {
+    EAS_ASSERT(self);
     EAS_ASSERT(self->op_in_progress);
 
     bool popped = eas_ring_buf_pop(self->ops_ring_buf, self->op_buf);
