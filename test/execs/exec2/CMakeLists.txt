@@ -32,6 +32,7 @@ target_sources(app_test_exec2 PRIVATE
     msg_transceiver_no_setup.c
     msg_transceiver_no_setup.cpp
     ops_queue.cpp
+    ops_queue_complex_op.cpp
 
     mocks/mock_value_holder.cpp
     mocks/mock_current_temperature.cpp

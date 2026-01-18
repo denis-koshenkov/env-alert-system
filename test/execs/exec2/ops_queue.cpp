@@ -145,3 +145,84 @@ TEST(OpsQueue, OpCompleteAssertsNoOpInProgress)
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("self->op_in_progress", "ops_queue_op_complete");
     ops_queue_op_complete(inst);
 }
+
+TEST(OpsQueue, StressTest)
+{
+    OpsQueueTestOp op1 = {.some_value = 13};
+    OpsQueueTestOp op2 = {.some_value = 14};
+    OpsQueueTestOp op3 = {.some_value = 15};
+    OpsQueueTestOp op4 = {.some_value = 16};
+    OpsQueueTestOp op5 = {.some_value = 17};
+    OpsQueueTestOp op6 = {.some_value = 18};
+    OpsQueueTestOp op7 = {.some_value = 19};
+
+    mock()
+        .expectOneCall("mock_ops_queue_start_op")
+        .withMemoryBufferParameter("op", (const uint8_t *)&op1, sizeof(OpsQueueTestOp))
+        .withParameter("user_data", start_op_user_data);
+    ops_queue_add_op(inst, &op1);
+    ops_queue_op_complete(inst);
+
+    mock()
+        .expectOneCall("mock_ops_queue_start_op")
+        .withMemoryBufferParameter("op", (const uint8_t *)&op2, sizeof(OpsQueueTestOp))
+        .withParameter("user_data", start_op_user_data);
+    ops_queue_add_op(inst, &op2);
+    ops_queue_add_op(inst, &op3);
+    ops_queue_add_op(inst, &op4);
+
+    /* Queue is full */
+
+    /* Op 2 is complete, op 3 is started */
+    mock()
+        .expectOneCall("mock_ops_queue_start_op")
+        .withMemoryBufferParameter("op", (const uint8_t *)&op3, sizeof(OpsQueueTestOp))
+        .withParameter("user_data", start_op_user_data);
+    ops_queue_op_complete(inst);
+
+    /* Add another op */
+    ops_queue_add_op(inst, &op5);
+
+    /* Queue is full again - ops 3 is in progress, 4 and 5 are pending */
+
+    /* Op 3 is complete, op 4 is started */
+    mock()
+        .expectOneCall("mock_ops_queue_start_op")
+        .withMemoryBufferParameter("op", (const uint8_t *)&op4, sizeof(OpsQueueTestOp))
+        .withParameter("user_data", start_op_user_data);
+    ops_queue_op_complete(inst);
+
+    /* Op 4 is complete, op 5 is started */
+    mock()
+        .expectOneCall("mock_ops_queue_start_op")
+        .withMemoryBufferParameter("op", (const uint8_t *)&op5, sizeof(OpsQueueTestOp))
+        .withParameter("user_data", start_op_user_data);
+    ops_queue_op_complete(inst);
+
+    /* Add another op */
+    ops_queue_add_op(inst, &op6);
+
+    /* Op 5 is complete, op 6 is started */
+    mock()
+        .expectOneCall("mock_ops_queue_start_op")
+        .withMemoryBufferParameter("op", (const uint8_t *)&op6, sizeof(OpsQueueTestOp))
+        .withParameter("user_data", start_op_user_data);
+    ops_queue_op_complete(inst);
+
+    /* Op 6 is complete */
+    ops_queue_op_complete(inst);
+
+    /* Queue is now empty */
+
+    /* Add another op - must be started immediately since there are no ops in progress */
+    mock()
+        .expectOneCall("mock_ops_queue_start_op")
+        .withMemoryBufferParameter("op", (const uint8_t *)&op7, sizeof(OpsQueueTestOp))
+        .withParameter("user_data", start_op_user_data);
+    ops_queue_add_op(inst, &op7);
+
+    /* Op 7 is complete */
+    ops_queue_op_complete(inst);
+
+    /* Queue is now empty */
+}
