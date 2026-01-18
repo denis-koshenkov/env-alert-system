@@ -13,7 +13,9 @@
 /* This config has no effect on the behavior of the unit test port. The eas timer implementation for this port is a
  * mock, so it does not define a static array of size equal to the maximum number of instances. */
 #define CONFIG_EAS_TIMER_MAX_NUM_INSTANCES 1
+/* Every ops queue uses one ring buffer */
 #define CONFIG_OPS_QUEUE_MAX_NUM_INSTANCES 2
+#define CONFIG_EAS_RING_BUF_MAX_NUM_INSTANCES CONFIG_OPS_QUEUE_MAX_NUM_INSTANCES
 
 /** For the off-target unit test build, this config is used in mock variable requirement allocator to determine the size
  * of the buffer for one variable requirement. */
@@ -78,5 +80,9 @@
 /** The maximal number of requirements that the fake variable requirement allocator module can allocate at the same
  * time. */
 #define CONFIG_FAKE_VARIABLE_REQUIREMENT_ALLOCATOR_NUM_REQUIREMENTS 10
+
+/* This is the number of instances of the external ring_buffer dependency. Each eas_ring_buf instance uses an external
+ * ring_buffer instance. */
+#define CONFIG_RING_BUFFER_MAX_NUM_INSTANCES CONFIG_EAS_RING_BUF_MAX_NUM_INSTANCES
 
 #endif /* ENV_ALERT_SYSTEM_SRC_PORT_UNIT_TEST_OFF_TARGET_INCLUDE_CONFIG_H */

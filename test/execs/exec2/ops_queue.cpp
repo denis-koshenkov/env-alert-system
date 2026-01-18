@@ -10,36 +10,45 @@ struct OpsQueueTestOp {
 
 #define OPS_QUEUE_TEST_NUM_OPS 2
 OpsQueueTestOp ops_buf[OPS_QUEUE_TEST_NUM_OPS];
+OpsQueueTestOp op_buf;
 
-TEST_GROUP(OpsQueue){};
+// clang-format off
+TEST_GROUP(OpsQueue){
+    void setup()
+    {
+        /* Pass op size to mock object, so that it can pass it to the `size` parameter of `withMemoryBufferParameter()` */
+        mock().setData("opSize", (unsigned int)sizeof(OpsQueueTestOp));
+    }
+};
+// clang-format on
 
 TEST(OpsQueue, FirstAddCallsStartOp)
 {
     OpsQueueTestOp op = {.some_value = 2};
     void *user_data = (void *)0x1;
 
-    OpsQueue inst =
-        ops_queue_create(sizeof(OpsQueueTestOp), OPS_QUEUE_TEST_NUM_OPS, ops_buf, mock_ops_queue_start_op, user_data);
+    OpsQueue inst = ops_queue_create(sizeof(OpsQueueTestOp), OPS_QUEUE_TEST_NUM_OPS, ops_buf, &op_buf,
+                                     mock_ops_queue_start_op, user_data);
     mock()
         .expectOneCall("mock_ops_queue_start_op")
-        .withParameter("op", (void *)&op)
+        .withMemoryBufferParameter("op", (const uint8_t *)&op, sizeof(OpsQueueTestOp))
         .withParameter("user_data", user_data);
     ops_queue_add_op(inst, &op);
 }
 
-IGNORE_TEST(OpsQueue, TwoOps)
+TEST(OpsQueue, TwoOps)
 {
     OpsQueueTestOp op1 = {.some_value = 2};
     OpsQueueTestOp op2 = {.some_value = 3};
     void *user_data = (void *)0x2;
 
-    OpsQueue inst =
-        ops_queue_create(sizeof(OpsQueueTestOp), OPS_QUEUE_TEST_NUM_OPS, ops_buf, mock_ops_queue_start_op, user_data);
+    OpsQueue inst = ops_queue_create(sizeof(OpsQueueTestOp), OPS_QUEUE_TEST_NUM_OPS, ops_buf, &op_buf,
+                                     mock_ops_queue_start_op, user_data);
 
     /* ops_queue_add_op for op1 */
     mock()
         .expectOneCall("mock_ops_queue_start_op")
-        .withParameter("op", (void *)&op1)
+        .withMemoryBufferParameter("op", (const uint8_t *)&op1, sizeof(OpsQueueTestOp))
         .withParameter("user_data", user_data);
     ops_queue_add_op(inst, &op1);
 
@@ -48,7 +57,7 @@ IGNORE_TEST(OpsQueue, TwoOps)
     /* Must be called from inside ops_queue_op_complete for op1 */
     mock()
         .expectOneCall("mock_ops_queue_start_op")
-        .withParameter("op", (void *)&op2)
+        .withMemoryBufferParameter("op", (const uint8_t *)&op2, sizeof(OpsQueueTestOp))
         .withParameter("user_data", user_data);
     ops_queue_op_complete(inst);
 }

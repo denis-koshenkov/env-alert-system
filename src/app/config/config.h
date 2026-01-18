@@ -24,6 +24,7 @@
 #define CONFIG_ALERT_RAISER_MAX_NUM_INSTANCES
 #define CONFIG_EAS_TIMER_MAX_NUM_INSTANCES
 #define CONFIG_OPS_QUEUE_MAX_NUM_INSTANCES
+#define CONFIG_EAS_RING_BUF_MAX_NUM_INSTANCES
 
 /** Maximal size of one variable requirement in bytes. We have different variable requirement types - e.g.
  * TemperatureVariableRequirement, PressureVariableRequirement, and so on. Each of these types might have a different

@@ -23,6 +23,8 @@
 #define CONFIG_EAS_TIMER_MAX_NUM_INSTANCES ((CONFIG_ALERT_RAISER_MAX_NUM_INSTANCES * 2) + 3)
 /* One for queue of I2C operations in hw_platform */
 #define CONFIG_OPS_QUEUE_MAX_NUM_INSTANCES 1
+/* Used by the ops_queue instance */
+#define CONFIG_EAS_RING_BUF_MAX_NUM_INSTANCES 1
 
 /* Chosen through trial and error. If set too low, static asserts will fire. */
 #define CONFIG_VARIABLE_REQUIREMENT_MAX_SIZE 16
@@ -76,5 +78,9 @@
 /** Main thread has priority 0 by default. The EAS thread has lower priority than main thread, so that main thread can
  * finish whatever it is doing before we start processing messages in the event queue. */
 #define CONFIG_EAS_THREAD_PRIORITY 1
+
+/* This is the number of instances of the external ring_buffer dependency. Each eas_ring_buf instance uses an external
+ * ring_buffer instance. */
+#define CONFIG_RING_BUFFER_MAX_NUM_INSTANCES CONFIG_EAS_RING_BUF_MAX_NUM_INSTANCES
 
 #endif /* ENV_ALERT_SYSTEM_SRC_PORT_NRF52840DK_INCLUDE_CONFIG_H */

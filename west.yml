@@ -21,6 +21,9 @@ manifest:
     - name: rohm-bh1750fvi
       remote: denis-koshenkov
       revision: v1.0.0
+    - name: ring-buffer
+      remote: denis-koshenkov
+      revision: v2.0.1
 
   self:
     west-commands: scripts/west-commands.yml
