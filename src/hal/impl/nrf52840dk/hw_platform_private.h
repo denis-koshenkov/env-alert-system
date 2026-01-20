@@ -9,40 +9,66 @@ extern "C"
 #include "nrfx_twim.h"
 
 #include "sht3x.h"
+#include "bh1750.h"
 #include "eas_timer.h"
 
+typedef enum {
+    /** Callback is of type SHT3X_I2CTransactionCompleteCb. */
+    I2C_COMPLETE_CB_TYPE_SHT3X,
+    /** Callback is of type BH1750_I2CCompleteCb. */
+    I2C_COMPLETE_CB_TYPE_BH1750,
+} I2cCompleteCbType;
+
+typedef union {
+    /** This field holds the value if cb_type field in I2cCompleteCbData is I2C_COMPLETE_CB_TYPE_SHT3X. */
+    SHT3X_I2CTransactionCompleteCb sht3x_cb;
+    /** This field holds the value if cb_type field in I2cCompleteCbData is I2C_COMPLETE_CB_TYPE_BH1750. */
+    BH1750_I2CCompleteCb bh1750_cb;
+} I2cCompleteCb;
+
+typedef struct {
+    /** Callback to execute when the I2C transaction is complete. */
+    I2cCompleteCb cb;
+    /** User data to pass to cb. */
+    void *user_data;
+    /** One of @ref I2cCompleteCbType. Defines what type of callback cb is. */
+    uint8_t cb_type;
+} I2cCompleteCbData;
+
 /**
- * @brief All data related to SHT3X driver I2C transaction complete callback.
+ * @brief All data related to a I2C operation.
  *
- * The callback stored in the cb field needs to be executed once our implementation of sht3x_driver_i2c_read or
- * sht3x_driver_i2c_write completed the requested I2C transaction.
+ * The callback stored in complete_cb_data.cb must be executed once the I2C transaction is complete.
  *
  * This struct is defined in a separate header, because it needs to be used in our implementations of
- * sht3x_driver_i2c_read and sht3x_driver_i2c_write functions, located in drivers_glue/sht3x/interface.c.
+ * i2c_read and i2c_write for SHT3X and BH1750 driver functions, located in drivers_glue directory.
  *
- * However, this struct also needs to be used in hw_platform.c in order to submit cb and user_data to the central event
- * queue from inside the NRF TWIM ISR.
+ * However, this struct also needs to be used in hw_platform.c in order to define and use the I2C operations queue.
  *
- * This header is then included both by drivers_glue/sht3x/interface.c and hw_platform.c.
+ * This header is then included both by hw_platform.c and the interface implementations for sensor drivers, located in
+ * drivers_glue directory.
  *
  * How the data is used:
- * 1. sht3x_driver_i2c_read or sht3x_driver_i2c_write is called by the SHT3X driver.
- * 2. The implementations of these functions populate the cb and user_data fields. cb is the callback that should be
- * invoked once I2C transaction is complete.
- * 3. sht3x_driver_i2c_read/sht3x_driver_i2c_write starts the I2C transaction using the NRF TWIM instance stored in
- * p_twim_inst.
- * 4. I2C transaction is complete. TWIM ISR handler pushes a callback defined in hw_platform.c to the event queue.
- * 5. The event queue handler invokes the hw_platform callback from the previous step, which in turn invokes cb with
- * user_data as a parameter.
+ * 1. i2c_read or i2c_write is called by SHT3X or BH1750 driver.
+ * 2. The implementations of these functions populate all fields of this struct to define what kind of I2C operation
+ * must be performed. The I2C operation is then submitted to a I2C operations queue.
+ * 3. I2C operations queue calls the used-defined function to start the operation (defined in hw_platform.c) - either
+ * right away if there are no ongoing I2C operations, or at a later point once all previously scheduled I2C operations
+ * are performed.
+ * 4. The user-defined function to start the I2C operation saves the complete_cb_data field of this struct to a private
+ * hw_platform variable. This is needed so that once the I2C operation is complete, hw_platform knows which I2C complete
+ * callback to execute.
+ * 5. The user-defined function to start the I2C operation starts the I2C operation using a NRF TWIM instance.
+ * 6. I2C transaction is complete. TWIM ISR handler pushes a callback defined in hw_platform.c to the event queue.
+ * 7. The event queue handler invokes the hw_platform callback from the previous step, which in turn invokes the
+ * callback with user data. It takes the callback from the private hw_platform variable described in step 4.
  */
 typedef struct {
-    /** @brief Callback that should be executed when the I2C transaction is complete. */
-    SHT3X_I2CTransactionCompleteCb cb;
-    /** @brief User data to pass to cb when it is invoked. Volatile for the same reason as cb. */
-    void *user_data;
-    /** @brief Pointer to NRF TWIM instance to use for the I2C transaction. */
-    nrfx_twim_t *p_twim_inst;
-} SHT3XDriverI2cData;
+    /** NRF TWIM I2C transaction descriptor. */
+    nrfx_twim_xfer_desc_t twim_xfer_desc;
+    /** All necessary data to execute a complete callback for this operation. */
+    I2cCompleteCbData complete_cb_data;
+} I2cOperation;
 
 /**
  * @brief All data related to the implementation of sht3x_driver_timer_start function that we pass to SHT3X driver.

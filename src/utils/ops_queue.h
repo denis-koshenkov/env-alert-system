@@ -6,6 +6,8 @@ extern "C"
 {
 #endif
 
+#include <stddef.h>
+
 typedef struct OpsQueueStruct *OpsQueue;
 
 /**
@@ -26,8 +28,8 @@ typedef void (*OpsQueueStartOp)(void *op, void *user_data);
  * @param[in] num_ops Number of operations that can be in progress at the same time. Must be > 1. This is the number of
  * times @p ops_queue_add_op can be called before it fires an assert (given that @p ops_queue_op_complete is not called
  * at all).
- * @param[in] ops_buf Must be of size (@p op_size * (@p num_ops - 1)). -1 because the first operation never needs to be
- * stored anywhere - it can be started immediately.
+ * @param[in] ops_buf Must be of size ( @p op_size * ( @p num_ops - 1 )). -1 because the first operation never needs to
+ * be stored anywhere - it can be started immediately.
  * @param[in] op_buf Buffer of size @p op_size. Needed for internal implementation of the operations queue.
  * @param[in] start_op User-defined callback that starts the operation.
  * @param[in] start_op_user_data User data to pass to @p start_op.
