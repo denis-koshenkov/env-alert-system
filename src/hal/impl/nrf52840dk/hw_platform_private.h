@@ -85,20 +85,30 @@ typedef struct {
  * How the data is used:
  * 1. sht3x_driver_timer_start is called by the SHT3X driver.
  * 2. The implementation of that function populates the cb and user_data fields. cb is the callback that should be
- * invoked once the time expires.
+ * invoked once the timer expires.
  * 3. sht3x_driver_timer_start starts the timer using the EAS timer instance that p_eas_timer_inst points to.
  * 4. Timer expires. Timer expiry function accesses cb and user_data fields of this struct, and executes cb with
  * user_data as parameter. All EAS timer expiry functions are executed from the central event queue thread, so this is
  * safe.
  */
 typedef struct {
-    /** @brief Callback that should be executed when the timer expires. */
+    /** Callback that should be executed when the timer expires. */
     SHT3XTimerExpiredCb cb;
-    /** @brief User data to pass to cb when it is invoked. */
+    /** User data to pass to cb when it is invoked. */
     void *user_data;
-    /** @brief Pointer to EAS timer instance to use for the timer. */
-    const EasTimer *const p_eas_timer_inst;
+    /** Pointer to EAS timer instance to use for the timer. */
+    const EasTimer *const eas_timer_inst_p;
 } SHT3XTimerData;
+
+/** Used in exactly the same fashion as @ref SHT3XTimerData, but for BH1750 driver. */
+typedef struct {
+    /** Callback that should be executed when the timer expires. */
+    BH1750TimerExpiredCb cb;
+    /** User data to pass to cb when it is invoked. */
+    void *user_data;
+    /** Pointer to EAS timer instance to use for the timer. */
+    const EasTimer *const eas_timer_inst_p;
+} BH1750TimerData;
 
 #ifdef __cplusplus
 }

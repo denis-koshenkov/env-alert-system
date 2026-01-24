@@ -9,19 +9,19 @@
 #include "eas_timer.h"
 #include "ops_queue.h"
 
-/* From the implementation of SHT3X driver - a I2C write transaction never has length > 2 */
-#define SHT3X_DRIVER_I2C_WRITE_BUF_SIZE 2
+/* From the implementation of BH1750 driver - a I2C write transaction never has length > 1 */
+#define BH1750_DRIVER_I2C_WRITE_BUF_SIZE 1
 
-void sht3x_driver_i2c_read(uint8_t *data, size_t length, uint8_t i2c_addr, void *user_data,
-                           SHT3X_I2CTransactionCompleteCb cb, void *cb_user_data)
+void bh1750_driver_i2c_read(uint8_t *data, size_t length, uint8_t i2c_addr, void *user_data, BH1750_I2CCompleteCb cb,
+                            void *cb_user_data)
 {
     EAS_ASSERT(data);
     EAS_ASSERT(user_data);
     OpsQueue *i2c_queue_p = (OpsQueue *)user_data;
 
     I2cOperation i2c_op = {
-        .complete_cb_data.cb_type = I2C_COMPLETE_CB_TYPE_SHT3X,
-        .complete_cb_data.cb.sht3x_cb = cb,
+        .complete_cb_data.cb_type = I2C_COMPLETE_CB_TYPE_BH1750,
+        .complete_cb_data.cb.bh1750_cb = cb,
         .complete_cb_data.user_data = cb_user_data,
     };
 
@@ -35,26 +35,26 @@ void sht3x_driver_i2c_read(uint8_t *data, size_t length, uint8_t i2c_addr, void 
     ops_queue_add_op(*i2c_queue_p, &i2c_op);
 }
 
-void sht3x_driver_i2c_write(uint8_t *data, size_t length, uint8_t i2c_addr, void *user_data,
-                            SHT3X_I2CTransactionCompleteCb cb, void *cb_user_data)
+void bh1750_driver_i2c_write(uint8_t *data, size_t length, uint8_t i2c_addr, void *user_data, BH1750_I2CCompleteCb cb,
+                             void *cb_user_data)
 {
     EAS_ASSERT(data);
     EAS_ASSERT(user_data);
     OpsQueue *i2c_queue_p = (OpsQueue *)user_data;
 
     I2cOperation i2c_op = {
-        .complete_cb_data.cb_type = I2C_COMPLETE_CB_TYPE_SHT3X,
-        .complete_cb_data.cb.sht3x_cb = cb,
+        .complete_cb_data.cb_type = I2C_COMPLETE_CB_TYPE_BH1750,
+        .complete_cb_data.cb.bh1750_cb = cb,
         .complete_cb_data.user_data = cb_user_data,
     };
 
-    /* data pointer will point to invalid data once this function returns - SHT3X driver does not provide any guarantees
-     * that it will keep pointing to valid memory. We make a copy of the data to be written, so that when the i2c queue
-     * actually starts the operation, the data to be written points to a valid buffer.
-     * SHT3X driver will never initiate another I2C write before the previous one is complete, so the data will not be
-     * overwritten by another write. */
-    static uint8_t write_buf[SHT3X_DRIVER_I2C_WRITE_BUF_SIZE];
-    EAS_ASSERT(length <= SHT3X_DRIVER_I2C_WRITE_BUF_SIZE);
+    /* data pointer will point to invalid data once this function returns - BH1750 driver does not provide any
+     * guarantees that it will keep pointing to valid memory. We make a copy of the data to be written, so that when the
+     * i2c queue actually starts the operation, the data to be written points to a valid buffer. BH1750 driver will
+     * never initiate another I2C write before the previous one is complete, so the data will not be overwritten by
+     * another write. */
+    static uint8_t write_buf[BH1750_DRIVER_I2C_WRITE_BUF_SIZE];
+    EAS_ASSERT(length <= BH1750_DRIVER_I2C_WRITE_BUF_SIZE);
     memcpy(write_buf, data, length);
 
     i2c_op.twim_xfer_desc.type = NRFX_TWIM_XFER_TX;
@@ -67,9 +67,9 @@ void sht3x_driver_i2c_write(uint8_t *data, size_t length, uint8_t i2c_addr, void
     ops_queue_add_op(*i2c_queue_p, &i2c_op);
 }
 
-void sht3x_driver_timer_start(uint32_t duration_ms, void *user_data, SHT3XTimerExpiredCb cb, void *cb_user_data)
+void bh1750_driver_timer_start(uint32_t duration_ms, void *user_data, BH1750TimerExpiredCb cb, void *cb_user_data)
 {
-    SHT3XTimerData *tmr_data = (SHT3XTimerData *)user_data;
+    BH1750TimerData *tmr_data = (BH1750TimerData *)user_data;
     EAS_ASSERT(tmr_data);
 
     tmr_data->cb = cb;

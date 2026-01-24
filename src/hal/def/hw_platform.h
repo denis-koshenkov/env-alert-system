@@ -11,9 +11,10 @@
 /**
  * @brief Hardware platform operation complete callback.
  *
+ * @param result True if operation succeeded, false otherwise.
  * @param user_data User data.
  */
-typedef void (*HwPlatformCompleteCb)(void *user_data);
+typedef void (*HwPlatformCompleteCb)(bool result, void *user_data);
 
 /**
  * @brief Initialize hardware platform.

@@ -15,12 +15,14 @@
 #define CONFIG_VARIABLE_REQUIREMENT_LIST_MAX_NUM_INSTANCES 4
 #define CONFIG_ALERT_CONDITION_MAX_NUM_INSTANCES CONFIG_MAX_NUM_ALERTS
 #define CONFIG_ALERT_RAISER_MAX_NUM_INSTANCES CONFIG_MAX_NUM_ALERTS
-/* Each alert raiser creates two timer instances - warmup timer and cooldown timer. +3 is for:
+/* Each alert raiser creates two timer instances - warmup timer and cooldown timer. +5 is for:
  *   1. LedManager - it uses one timer instance to switch between LED notifications.
  *   2. HwPlatform - uses one timer to implement timer interface for SHT3X driver.
  *   3. VirtualSHT31 - uses a timer to periodically read out measurements from SHT31 sensor.
+ *   4. HwPlatform - uses one timer to implement timer interface for BH1750 driver.
+ *   5. VirtualBH1750 - uses a timer to periodically read out measurements from BH1750 sensor.
  */
-#define CONFIG_EAS_TIMER_MAX_NUM_INSTANCES ((CONFIG_ALERT_RAISER_MAX_NUM_INSTANCES * 2) + 3)
+#define CONFIG_EAS_TIMER_MAX_NUM_INSTANCES ((CONFIG_ALERT_RAISER_MAX_NUM_INSTANCES * 2) + 5)
 /* One for queue of I2C operations in hw_platform */
 #define CONFIG_OPS_QUEUE_MAX_NUM_INSTANCES 1
 /* Used by the ops_queue instance */

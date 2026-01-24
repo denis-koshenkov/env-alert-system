@@ -9,6 +9,9 @@
 #include "hw_platform.h"
 #include "new_sample_callbacks.h"
 #include "central_event_queue.h"
+#include "eas_log.h"
+
+EAS_LOG_ENABLE_IN_FILE();
 
 /* System initialization sequence:
  * 1. main function submits INIT event to the event queue, which triggers the execution of
@@ -27,11 +30,16 @@
  *
  * Submits an event to the event queue which triggers the execution of part 2 of system initialization.
  *
+ * @param result True if hw platform init was successful, false otherwise.
  * @param user_data User data, unused.
  */
-static void hw_platform_init_complete_cb(void *user_data)
+static void hw_platform_init_complete_cb(bool result, void *user_data)
 {
-    central_event_queue_submit_init_part_2_event();
+    if (result) {
+        central_event_queue_submit_init_part_2_event();
+    } else {
+        LOG_INF("Hardware init failed");
+    }
 }
 
 void init_handler_handle_init_event()

@@ -17,10 +17,17 @@
 #include "sht3x.h"
 #include "sht3x/get_instance_memory.h"
 #include "sht3x/interface.h"
+#include "bh1750.h"
+#include "bh1750/get_instance_memory.h"
+#include "bh1750/interface.h"
 #include "eas_log.h"
 #include "ops_queue.h"
 
 EAS_LOG_ENABLE_IN_FILE();
+
+/* Macros to use as result parameter of hw platform init cb - for readability */
+#define HW_PLATFORM_INIT_SUCCESS true
+#define HW_PLATFORM_INIT_FAILURE false
 
 /* Pin numbers are taken from nrf52840dk_nrf52840-pinctrl.dtsi */
 #define I2C_SCL_PIN 27
@@ -29,6 +36,8 @@ EAS_LOG_ENABLE_IN_FILE();
 #define I2C_TWIM_FREQ NRF_TWIM_FREQ_400K
 
 #define SHT31_I2C_ADDR 0x44
+/* ADDR pin low */
+#define BH1750_I2C_ADDR 0x23
 
 /** @brief I2C result codes that describe the outcome of an I2C transaction. */
 typedef enum {
@@ -40,9 +49,12 @@ typedef enum {
     I2C_RESULT_CODE_ADDR_NACK,
 } I2cResultCode;
 
-/* Maximum number of I2C operations that can be in the queue at the same time. We have two I2C sensors, and each of them
- * can do at most one I2C operation at the same time, so the queue size is 2 (one for each sensor). */
-#define I2C_QUEUE_MAX_NUM_OPS 2
+/* Maximum number of I2C operations that can be in the queue at the same time. We have two I2C sensors. We reserve two
+ * slots in the queue for each sensor to handle the case when a sensor completes a I2C operation, the next operation
+ * is started (and pushed to the queue), and only then ops_queue_op_complete is called. This can result in two I2C
+ * operations being in the queue for one sensor. We have not seen asserts/crashes when queue size is 2, so this is
+ * mostly for safety, but this case is theoretically possible. */
+#define I2C_QUEUE_MAX_NUM_OPS 4
 static OpsQueue i2c_queue;
 static I2cOperation i2c_queue_ops_buf[I2C_QUEUE_MAX_NUM_OPS - 1];
 static I2cOperation i2c_queue_op_buf;
@@ -51,18 +63,25 @@ static I2cOperation i2c_queue_op_buf;
  * be executed. */
 static I2cCompleteCbData i2c_complete_cb_data;
 
-static SHT3X sht3x_inst;
-
-/* SHT31 driver I2C related */
 #define TWIM_INST_IDX 0
 static nrfx_twim_t twim_inst = NRFX_TWIM_INSTANCE(NRF_TWIM_INST_GET(TWIM_INST_IDX));
 
-/* SHT31 driver timer related */
+/* SHT31 driver related */
+static SHT3X sht3x_inst;
 static EasTimer sht31_driver_timer;
 static SHT3XTimerData sht3x_timer_data = {
     .cb = NULL,
     .user_data = NULL,
-    .p_eas_timer_inst = &sht31_driver_timer,
+    .eas_timer_inst_p = &sht31_driver_timer,
+};
+
+/* BH1750 driver related */
+static BH1750 bh1750_inst;
+static EasTimer bh1750_driver_timer;
+static BH1750TimerData bh1750_timer_data = {
+    .cb = NULL,
+    .user_data = NULL,
+    .eas_timer_inst_p = &bh1750_driver_timer,
 };
 
 static const TemperatureSensor *temperature_sensor = NULL;
@@ -77,11 +96,13 @@ static void *hw_init_complete_cb_user_data = NULL;
 
 /**
  * @brief Execute hw platform init complete callback, if one was provided.
+ *
+ * @param result Result to pass to the callback.
  */
-static void execute_hw_init_complete_cb()
+static void execute_hw_init_complete_cb(bool result)
 {
     if (hw_init_complete_cb) {
-        hw_init_complete_cb(hw_init_complete_cb_user_data);
+        hw_init_complete_cb(result, hw_init_complete_cb_user_data);
     }
 }
 
@@ -91,6 +112,15 @@ static void sht31_driver_timer_expired_cb(void *user_data)
 {
     if (sht3x_timer_data.cb) {
         sht3x_timer_data.cb(sht3x_timer_data.user_data);
+    }
+}
+
+/* Executes the callback that was set by BH1750 driver. This function is a eas_timer expiry function, so it is
+ * executed from the context of the central event queue. */
+static void bh1750_driver_timer_expired_cb(void *user_data)
+{
+    if (bh1750_timer_data.cb) {
+        bh1750_timer_data.cb(bh1750_timer_data.user_data);
     }
 }
 
@@ -209,15 +239,10 @@ static void execute_i2c_complete_cb(const I2cCompleteCbData *const cb_data, uint
  */
 static void handle_i2c_trans_complete(uint8_t i2c_rc)
 {
-    /* op_complete must be called before executing the I2C complete cb. op_complete will trigger the ops queue to start
-     * the next I2C operation, if one is pending. This will free up a spot in the I2C queue. Executing i2c_complete_cb
-     * might add a new operation to the I2C queue. Must be done in this order so that we are sure that there is a spot
-     * in the queue in case i2c_complete_cb adds an operation to the queue.
-     * The queue has size 2 - one slot for each I2C sensor. The assumption is that one sensor can never have more than
-     * one I2C operation in the queue. Calling first op_complete and only then executing the i2c complete cb ensures
-     * that that is indeed the case. */
-    ops_queue_op_complete(i2c_queue);
+    /* execute_i2c_complete_cb must be called before ops_queue_op_complete, because ops_queue_op_complete might start a
+     * new operation, which will overwrite the I2C callback for the operation that just finished. */
     execute_i2c_complete_cb(&i2c_complete_cb_data, i2c_rc);
+    ops_queue_op_complete(i2c_queue);
 }
 
 /**
@@ -302,14 +327,14 @@ static void init_nrfx_twim()
 }
 
 /**
- * @brief Hardware platform initialization part 2.
+ * @brief Hardware platform initialization part 4.
  *
- * Performed after the SHT3X device was successfully reset.
+ * Performed after all hardware is initialized to the state that virtual device functions can be called.
  *
  * @param user_data This parameter is only here so that the function signature complies with what can be submitted to
  * event queue as a callback. It is not used in the implementation.
  */
-static void hw_platform_init_part_2(void *user_data)
+static void hw_platform_init_part_4(void *user_data)
 {
     SHT31VirtualInterfaces sht31_interfaces = virtual_sht31_initialize(&sht3x_inst);
     temperature_sensor = sht31_interfaces.temperature_sensor;
@@ -318,26 +343,105 @@ static void hw_platform_init_part_2(void *user_data)
     BMP280VirtualInterfaces bmp280_interfaces = virtual_bmp280_initialize();
     pressure_sensor = bmp280_interfaces.pressure_sensor;
 
-    BH1750VirtualInterfaces bh1750_interfaces = virtual_bh1750_initialize();
+    BH1750VirtualInterfaces bh1750_interfaces = virtual_bh1750_initialize(&bh1750_inst);
     light_intensity_sensor = bh1750_interfaces.light_intensity_sensor;
 
-    execute_hw_init_complete_cb();
+    execute_hw_init_complete_cb(HW_PLATFORM_INIT_SUCCESS);
     EAS_LOG_INF("Hw platform init complete");
 }
 
 /**
- * @brief Callback passed to SHT3X driver to be executed once the SHT3X device is reset.
+ * @brief Callback to execute once part 3 of hw platform init is complete.
  *
- * This submits part 2 of hw platform init to the central event queue as a callback, so that the rest of the hw platform
- * init is performed.
+ * This submits part 4 of hw platform init to the central event queue as a callback to execute.
+ *
+ * @param result_code Signifies whether BH1750 measurement time was set successfully.
+ * @param user_data User data, unused in this callback.
+ */
+static void init_part_3_complete(uint8_t result_code, void *user_data)
+{
+    if (result_code == SHT3X_RESULT_CODE_OK) {
+        central_event_queue_submit_void_cb_with_user_data_event(hw_platform_init_part_4, NULL);
+    } else {
+        execute_hw_init_complete_cb(HW_PLATFORM_INIT_FAILURE);
+    }
+}
+
+/**
+ * @brief Hardware platform initialization part 3.
+ *
+ * @param user_data This parameter is only here so that the function signature complies with what can be submitted to
+ * event queue as a callback. It is not used in the implementation.
+ */
+static void hw_platform_init_part_3(void *user_data)
+{
+    /* Lowest possible to capture the widest possible range of lx measurements */
+    uint8_t meas_time = 31;
+    uint8_t rc = bh1750_set_measurement_time(bh1750_inst, meas_time, init_part_3_complete, NULL);
+    EAS_ASSERT(rc == BH1750_RESULT_CODE_OK);
+}
+
+/**
+ * @brief Callback to execute once part 2 of hw platform init is complete.
+ *
+ * This submits part 3 of hw platform init to the central event queue as a callback to execute.
+ *
+ * @param result_code Signifies whether BH1750 initialization was successful.
+ * @param user_data User data, unused in this callback.
+ */
+static void init_part_2_complete(uint8_t result_code, void *user_data)
+{
+    if (result_code == SHT3X_RESULT_CODE_OK) {
+        central_event_queue_submit_void_cb_with_user_data_event(hw_platform_init_part_3, NULL);
+    } else {
+        execute_hw_init_complete_cb(HW_PLATFORM_INIT_FAILURE);
+    }
+}
+
+/**
+ * @brief Hardware platform initialization part 2.
+ *
+ * @param user_data This parameter is only here so that the function signature complies with what can be submitted to
+ * event queue as a callback. It is not used in the implementation.
+ */
+static void hw_platform_init_part_2(void *user_data)
+{
+    uint8_t rc;
+    BH1750InitConfig bh1750_cfg = {
+        .get_instance_memory = bh1750_driver_get_instance_memory,
+        .get_instance_memory_user_data = NULL,
+        .i2c_write = bh1750_driver_i2c_write,
+        /* So that i2c_write pushes I2C operations to I2C queue */
+        .i2c_write_user_data = (void *)&i2c_queue,
+        .i2c_read = bh1750_driver_i2c_read,
+        /* So that i2c_read pushes I2C operations to I2C queue */
+        .i2c_read_user_data = (void *)&i2c_queue,
+        .start_timer = bh1750_driver_timer_start,
+        .start_timer_user_data = (void *)&bh1750_timer_data,
+        .i2c_addr = BH1750_I2C_ADDR,
+    };
+    rc = bh1750_create(&bh1750_inst, &bh1750_cfg);
+    EAS_ASSERT(rc == BH1750_RESULT_CODE_OK);
+
+    rc = bh1750_init(bh1750_inst, init_part_2_complete, NULL);
+    EAS_ASSERT(rc == BH1750_RESULT_CODE_OK);
+}
+
+/**
+ * @brief Callback to execute once part 1 of hw platform init is complete.
+ *
+ * This submits part 2 of hw platform init to the central event queue as a callback to execute.
  *
  * @param result_code Signifies whether the SHT3X reset was successful.
  * @param user_data User data, unused in this callback.
  */
-static void sht3x_reset_on_init_complete(uint8_t result_code, void *user_data)
+static void init_part_1_complete(uint8_t result_code, void *user_data)
 {
-    EAS_ASSERT(result_code == SHT3X_RESULT_CODE_OK);
-    central_event_queue_submit_void_cb_with_user_data_event(hw_platform_init_part_2, NULL);
+    if (result_code == SHT3X_RESULT_CODE_OK) {
+        central_event_queue_submit_void_cb_with_user_data_event(hw_platform_init_part_2, NULL);
+    } else {
+        execute_hw_init_complete_cb(HW_PLATFORM_INIT_FAILURE);
+    }
 }
 
 void hw_platform_init(HwPlatformCompleteCb cb, void *user_data)
@@ -348,6 +452,7 @@ void hw_platform_init(HwPlatformCompleteCb cb, void *user_data)
 
     init_nrfx_twim();
     sht31_driver_timer = eas_timer_create(0, EAS_TIMER_ONE_SHOT, sht31_driver_timer_expired_cb, NULL);
+    bh1750_driver_timer = eas_timer_create(0, EAS_TIMER_ONE_SHOT, bh1750_driver_timer_expired_cb, NULL);
     /* Pass twim_inst as user data to i2c_queue_start_op - it uses the twim inst to start I2C transactions */
     i2c_queue = ops_queue_create(sizeof(I2cOperation), I2C_QUEUE_MAX_NUM_OPS, i2c_queue_ops_buf, &i2c_queue_op_buf,
                                  i2c_queue_start_op, &twim_inst);
@@ -367,7 +472,7 @@ void hw_platform_init(HwPlatformCompleteCb cb, void *user_data)
     EAS_ASSERT(rc == SHT3X_RESULT_CODE_OK);
 
     /* Put SHT31 device into a known default state */
-    rc = sht3x_soft_reset_with_delay(sht3x_inst, sht3x_reset_on_init_complete, NULL);
+    rc = sht3x_soft_reset_with_delay(sht3x_inst, init_part_1_complete, NULL);
     EAS_ASSERT(rc == SHT3X_RESULT_CODE_OK);
 }
 
