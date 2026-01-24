@@ -20,7 +20,7 @@ manifest:
       revision: v3.0.1
     - name: rohm-bh1750fvi
       remote: denis-koshenkov
-      revision: v1.0.0
+      revision: v1.1.0
     - name: ring-buffer
       remote: denis-koshenkov
       revision: v2.0.1
