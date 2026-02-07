@@ -11,7 +11,7 @@ target_sources(hal INTERFACE
 
 # Add external device drivers to the build
 include(${CMAKE_SOURCE_DIR}/cmake/sensirion_sht3x.cmake)
-include(${CMAKE_SOURCE_DIR}/cmake/rohm-bh1750fvi.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/rohm_bh1750fvi.cmake)
 
 target_include_directories(hal INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}
