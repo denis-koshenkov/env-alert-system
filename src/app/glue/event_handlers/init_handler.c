@@ -38,7 +38,7 @@ static void hw_platform_init_complete_cb(bool result, void *user_data)
     if (result) {
         central_event_queue_submit_init_part_2_event();
     } else {
-        LOG_INF("Hardware init failed");
+        EAS_LOG_INF("Hardware init failed");
     }
 }
 
