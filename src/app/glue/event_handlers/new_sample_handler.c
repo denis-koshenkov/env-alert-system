@@ -131,15 +131,19 @@ static void set_current_light_intensity_value(const void *const sample)
  * @p sample is passed as a parameter to this callback function.
  * @param handle_sample_value_change The implementation of this callback function should update the alert condition
  * result of all alert conditions that contain a variable requirement of this variable type.
+ * @param is_value_changed The implementation of this function should return true if the current value of that variable
+ * changed with this sample, and false otherwise. @p set_current_sample_value is called before calling this function, so
+ * this function should be simply current_<variable_name>_is_changed.
  */
 static void new_sample_handler(const void *const sample, void (*notify_alert_evaluation_readiness)(),
                                void (*set_current_sample_value)(const void *const sample),
-                               void (*handle_sample_value_change)())
+                               void (*handle_sample_value_change)(), bool (*is_value_changed)())
 {
     EAS_ASSERT(sample);
     EAS_ASSERT(notify_alert_evaluation_readiness);
     EAS_ASSERT(set_current_sample_value);
     EAS_ASSERT(handle_sample_value_change);
+    EAS_ASSERT(is_value_changed);
 
     bool is_ready_before = alert_evaluation_readiness_is_ready();
     notify_alert_evaluation_readiness();
@@ -158,7 +162,7 @@ static void new_sample_handler(const void *const sample, void (*notify_alert_eva
         handle_pressure_value_change();
         handle_humidity_value_change();
         handle_light_intensity_value_change();
-    } else if (current_temperature_is_changed()) {
+    } else if (is_value_changed()) {
         handle_sample_value_change();
     }
 }
@@ -167,26 +171,27 @@ void new_sample_handler_temperature(Temperature temperature)
 {
     EAS_LOG_INF("New temperature sample %d", temperature);
     new_sample_handler(&temperature, alert_evaluation_readiness_notify_received_temperature_sample,
-                       set_current_temperature_value, handle_temperature_value_change);
+                       set_current_temperature_value, handle_temperature_value_change, current_temperature_is_changed);
 }
 
 void new_sample_handler_pressure(Pressure pressure)
 {
     EAS_LOG_INF("New pressure sample %d", pressure);
     new_sample_handler(&pressure, alert_evaluation_readiness_notify_received_pressure_sample,
-                       set_current_pressure_value, handle_pressure_value_change);
+                       set_current_pressure_value, handle_pressure_value_change, current_pressure_is_changed);
 }
 
 void new_sample_handler_humidity(Humidity humidity)
 {
     EAS_LOG_INF("New humidity sample %d", humidity);
     new_sample_handler(&humidity, alert_evaluation_readiness_notify_received_humidity_sample,
-                       set_current_humidity_value, handle_humidity_value_change);
+                       set_current_humidity_value, handle_humidity_value_change, current_humidity_is_changed);
 }
 
 void new_sample_handler_light_intensity(LightIntensity light_intensity)
 {
     EAS_LOG_INF("New light intensity sample %d", light_intensity);
     new_sample_handler(&light_intensity, alert_evaluation_readiness_notify_received_light_intensity_sample,
-                       set_current_light_intensity_value, handle_light_intensity_value_change);
+                       set_current_light_intensity_value, handle_light_intensity_value_change,
+                       current_light_intensity_is_changed);
 }
