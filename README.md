@@ -76,7 +76,6 @@ As the `nrf-sdk` version changes, the dependencies listed in the `requirements*.
 
 In order not to keep track if these files were updated as a part of a `nrf-sdk` version update, it is easier to always rebuild the docker image whenever the `nrf-sdk` version used in this project changes. In order to rebuild the docker image, use the `docker build` command mentioned above.
 
-
 # Flashing
 Run the following outside the docker container from the `env-alert-system` directory:
 ```
