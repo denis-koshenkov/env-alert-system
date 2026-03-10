@@ -45,6 +45,14 @@ EAS_LOG_ENABLE_IN_FILE();
 /* ADDR pin low */
 #define BH1750_I2C_ADDR 0x23
 
+/* Time that it takes for all sensors to be powered on after a power-on reset. Hw platform init waits for this amount of
+ * time before communicating with any sensors. This is the maximum of the following values:
+ * - BMP280: 2 ms
+ * - SHT31: 1.5 ms
+ * - BH1750: unknown
+ */
+#define HW_PLATFORM_MAX_SENSOR_POWER_ON_TIME_MS 2
+
 /* Forward declaration to assign this function as callback to a static variable */
 static void zephyr_spi_callback(const struct device *dev, int result, void *data);
 
@@ -121,6 +129,8 @@ static const LightIntensitySensor *light_intensity_sensor = NULL;
  * its user data is stored here so that they can be invoked once hw platform init is complete.*/
 static HwPlatformCompleteCb hw_init_complete_cb = NULL;
 static void *hw_init_complete_cb_user_data = NULL;
+
+static EasTimer hw_platform_timer;
 
 /**
  * @brief Execute hw platform init complete callback, if one was provided.
@@ -651,22 +661,9 @@ static void init_part_1_complete(uint8_t result_code, void *user_data)
     }
 }
 
-void hw_platform_init(HwPlatformCompleteCb cb, void *user_data)
+static void hw_platform_init_part_1(void *user_data)
 {
     uint8_t rc;
-    hw_init_complete_cb = cb;
-    hw_init_complete_cb_user_data = user_data;
-
-    init_nrfx_twim();
-    sht31_driver_timer = eas_timer_create(0, EAS_TIMER_ONE_SHOT, sht31_driver_timer_expired_cb, NULL);
-    bh1750_driver_timer = eas_timer_create(0, EAS_TIMER_ONE_SHOT, bh1750_driver_timer_expired_cb, NULL);
-    bmp280_driver_timer = eas_timer_create(0, EAS_TIMER_ONE_SHOT, bmp280_driver_timer_expired_cb, NULL);
-    /* Pass twim_inst as user data to i2c_queue_start_op - it uses the twim inst to start I2C transactions */
-    i2c_queue = ops_queue_create(sizeof(I2cOperation), I2C_QUEUE_MAX_NUM_OPS, i2c_queue_ops_buf, &i2c_queue_op_buf,
-                                 i2c_queue_start_op, &twim_inst);
-
-    EAS_ASSERT(spi_is_ready_dt(&spi_spec));
-
     SHT3XInitConfig sht3x_cfg = {
         .get_instance_memory = sht3x_driver_get_instance_memory,
         .get_instance_memory_user_data = NULL,
@@ -684,6 +681,31 @@ void hw_platform_init(HwPlatformCompleteCb cb, void *user_data)
     /* Put SHT31 device into a known default state */
     rc = sht3x_soft_reset_with_delay(sht3x_inst, init_part_1_complete, NULL);
     EAS_ASSERT(rc == SHT3X_RESULT_CODE_OK);
+}
+
+static void init_part_0_complete(void *user_data)
+{
+    central_event_queue_submit_void_cb_with_user_data_event(hw_platform_init_part_1, NULL);
+}
+
+void hw_platform_init(HwPlatformCompleteCb cb, void *user_data)
+{
+    hw_init_complete_cb = cb;
+    hw_init_complete_cb_user_data = user_data;
+
+    init_nrfx_twim();
+    sht31_driver_timer = eas_timer_create(0, EAS_TIMER_ONE_SHOT, sht31_driver_timer_expired_cb, NULL);
+    bh1750_driver_timer = eas_timer_create(0, EAS_TIMER_ONE_SHOT, bh1750_driver_timer_expired_cb, NULL);
+    bmp280_driver_timer = eas_timer_create(0, EAS_TIMER_ONE_SHOT, bmp280_driver_timer_expired_cb, NULL);
+    /* Pass twim_inst as user data to i2c_queue_start_op - it uses the twim inst to start I2C transactions */
+    i2c_queue = ops_queue_create(sizeof(I2cOperation), I2C_QUEUE_MAX_NUM_OPS, i2c_queue_ops_buf, &i2c_queue_op_buf,
+                                 i2c_queue_start_op, &twim_inst);
+
+    EAS_ASSERT(spi_is_ready_dt(&spi_spec));
+
+    hw_platform_timer =
+        eas_timer_create(HW_PLATFORM_MAX_SENSOR_POWER_ON_TIME_MS, EAS_TIMER_ONE_SHOT, init_part_0_complete, NULL);
+    eas_timer_start(hw_platform_timer);
 }
 
 const Led *const hw_platform_get_led()
