@@ -5,3 +5,4 @@ target_include_directories(hal INTERFACE
 
 add_subdirectory(sht3x)
 add_subdirectory(bh1750)
+add_subdirectory(bmp280)

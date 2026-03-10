@@ -2,6 +2,9 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <zephyr/drivers/spi.h>
+#include <zephyr/devicetree.h>
+
 #include "nrfx_twim.h"
 
 #include "hw_platform.h"
@@ -20,6 +23,9 @@
 #include "bh1750.h"
 #include "bh1750/get_instance_memory.h"
 #include "bh1750/interface.h"
+#include "bmp280.h"
+#include "bmp280/get_inst_buf.h"
+#include "bmp280/interface.h"
 #include "eas_log.h"
 #include "ops_queue.h"
 
@@ -39,6 +45,9 @@ EAS_LOG_ENABLE_IN_FILE();
 /* ADDR pin low */
 #define BH1750_I2C_ADDR 0x23
 
+/* Forward declaration to assign this function as callback to a static variable */
+static void zephyr_spi_callback(const struct device *dev, int result, void *data);
+
 /** @brief I2C result codes that describe the outcome of an I2C transaction. */
 typedef enum {
     /** @brief I2C transaction successful. */
@@ -48,6 +57,10 @@ typedef enum {
     /** @brief NACK after sending the address byte. */
     I2C_RESULT_CODE_ADDR_NACK,
 } I2cResultCode;
+
+#define SPI_OP_FLAGS (SPI_OP_MODE_MASTER | SPI_TRANSFER_MSB | SPI_WORD_SET(8))
+#define SPI_CS_DELAY 0
+static const struct spi_dt_spec spi_spec = SPI_DT_SPEC_GET(DT_NODELABEL(bmp280), SPI_OP_FLAGS, SPI_CS_DELAY);
 
 /* Maximum number of I2C operations that can be in the queue at the same time. We have two I2C sensors. We reserve two
  * slots in the queue for each sensor to handle the case when a sensor completes a I2C operation, the next operation
@@ -82,6 +95,21 @@ static BH1750TimerData bh1750_timer_data = {
     .cb = NULL,
     .user_data = NULL,
     .eas_timer_inst_p = &bh1750_driver_timer,
+};
+
+/* BMP280 driver related */
+static BMP280 bmp280_inst;
+static SpiOpData spi_op_data = {
+    .cb = NULL,        // Will be populated by bmp280_driver_read/write_reg(s)
+    .user_data = NULL, // Will be populated by bmp280_driver_read/write_reg(s)
+    .spi_spec = &spi_spec,
+    .zephyr_spi_cb = zephyr_spi_callback,
+};
+static EasTimer bmp280_driver_timer;
+static BMP280TimerData bmp280_timer_data = {
+    .cb = NULL,        // Will be populated by bmp280_driver_start_timer
+    .user_data = NULL, // Will be populated by bmp280_driver_start_timer
+    .eas_timer_inst_p = &bmp280_driver_timer,
 };
 
 static const TemperatureSensor *temperature_sensor = NULL;
@@ -121,6 +149,15 @@ static void bh1750_driver_timer_expired_cb(void *user_data)
 {
     if (bh1750_timer_data.cb) {
         bh1750_timer_data.cb(bh1750_timer_data.user_data);
+    }
+}
+
+/* Executes the callback that was set by BMP280 driver. This function is a eas_timer expiry function, so it is
+ * executed from the context of the central event queue. */
+static void bmp280_driver_timer_expired_cb(void *user_data)
+{
+    if (bmp280_timer_data.cb) {
+        bmp280_timer_data.cb(bmp280_timer_data.user_data);
     }
 }
 
@@ -302,6 +339,46 @@ static void i2c_queue_start_op(void *op, void *user_data)
 }
 
 /**
+ * @brief Execute BMP280 IO complete callback, if it is not NULL.
+ *
+ * This callback is populated by the bmp280_write/read_reg(s) functions.
+ *
+ * @param spi_op_data Contains callback to execute and user data to pass to the callback.
+ * @param spi_rc Result code to pass to cb. Must be one of @ref BMP280_IOResultCode.
+ */
+static void execute_bmp280_io_complete_cb(const SpiOpData *const spi_op_data, uint8_t spi_rc)
+{
+    if (spi_op_data->cb) {
+        spi_op_data->cb(spi_rc, spi_op_data->user_data);
+    }
+}
+
+/**
+ * @brief Handler for SPI transaction being complete.
+ *
+ * This function is executed from the context of the central event queue.
+ *
+ * @param spi_rc SPI result code. One of @ref BMP280_IOResultCode.
+ */
+static void handle_spi_trans_complete(uint8_t spi_rc)
+{
+    execute_bmp280_io_complete_cb(&spi_op_data, spi_rc);
+}
+
+/**
+ * @brief Callback to pass to zephyr API spi_transceive_cb as SPI completion callback.
+ *
+ * @param[in] dev Unused by this function.
+ * @param[in] result Zephyr-specific SPI operation result code.
+ * @param[in] data Unused by this function
+ */
+static void zephyr_spi_callback(const struct device *dev, int result, void *data)
+{
+    uint8_t spi_rc = (result == 0) ? BMP280_IO_RESULT_CODE_OK : BMP280_IO_RESULT_CODE_ERR;
+    central_event_queue_submit_void_cb_with_uint8_event(handle_spi_trans_complete, spi_rc);
+}
+
+/**
  * @brief Initialize NRF TWIM driver - performs I2C transactions.
  */
 static void init_nrfx_twim()
@@ -326,21 +403,13 @@ static void init_nrfx_twim()
     nrfx_twim_enable(&twim_inst);
 }
 
-/**
- * @brief Hardware platform initialization part 4.
- *
- * Performed after all hardware is initialized to the state that virtual device functions can be called.
- *
- * @param user_data This parameter is only here so that the function signature complies with what can be submitted to
- * event queue as a callback. It is not used in the implementation.
- */
-static void hw_platform_init_part_4(void *user_data)
+static void hw_platform_init_part_11(void *user_data)
 {
     SHT31VirtualInterfaces sht31_interfaces = virtual_sht31_initialize(&sht3x_inst);
     temperature_sensor = sht31_interfaces.temperature_sensor;
     humidity_sensor = sht31_interfaces.humidity_sensor;
 
-    BMP280VirtualInterfaces bmp280_interfaces = virtual_bmp280_initialize();
+    BMP280VirtualInterfaces bmp280_interfaces = virtual_bmp280_initialize(&bmp280_inst);
     pressure_sensor = bmp280_interfaces.pressure_sensor;
 
     BH1750VirtualInterfaces bh1750_interfaces = virtual_bh1750_initialize(&bh1750_inst);
@@ -348,6 +417,144 @@ static void hw_platform_init_part_4(void *user_data)
 
     execute_hw_init_complete_cb(HW_PLATFORM_INIT_SUCCESS);
     EAS_LOG_INF("Hw platform init complete");
+}
+
+static void init_part_10_complete(uint8_t rc, void *user_data)
+{
+    if (rc == BMP280_RESULT_CODE_OK) {
+        central_event_queue_submit_void_cb_with_user_data_event(hw_platform_init_part_11, NULL);
+    } else {
+        execute_hw_init_complete_cb(HW_PLATFORM_INIT_FAILURE);
+    }
+}
+
+static void hw_platform_init_part_10(void *user_data)
+{
+    uint8_t rc = bmp280_set_pres_oversampling(bmp280_inst, BMP280_OVERSAMPLING_1, init_part_10_complete, NULL);
+    EAS_ASSERT(rc == BMP280_RESULT_CODE_OK);
+}
+
+static void init_part_9_complete(uint8_t rc, void *user_data)
+{
+    if (rc == BMP280_RESULT_CODE_OK) {
+        central_event_queue_submit_void_cb_with_user_data_event(hw_platform_init_part_10, NULL);
+    } else {
+        execute_hw_init_complete_cb(HW_PLATFORM_INIT_FAILURE);
+    }
+}
+
+static void hw_platform_init_part_9(void *user_data)
+{
+    uint8_t rc = bmp280_set_temp_oversampling(bmp280_inst, BMP280_OVERSAMPLING_1, init_part_9_complete, NULL);
+    EAS_ASSERT(rc == BMP280_RESULT_CODE_OK);
+}
+
+static void init_part_8_complete(uint8_t rc, void *user_data)
+{
+    if (rc == BMP280_RESULT_CODE_OK) {
+        central_event_queue_submit_void_cb_with_user_data_event(hw_platform_init_part_9, NULL);
+    } else {
+        execute_hw_init_complete_cb(HW_PLATFORM_INIT_FAILURE);
+    }
+}
+
+static void hw_platform_init_part_8(void *user_data)
+{
+    uint8_t rc = bmp280_set_spi_3_wire_interface(bmp280_inst, BMP280_SPI_3_WIRE_DIS, init_part_8_complete, NULL);
+    EAS_ASSERT(rc == BMP280_RESULT_CODE_OK);
+}
+
+static void init_part_7_complete(uint8_t rc, void *user_data)
+{
+    if (rc == BMP280_RESULT_CODE_OK) {
+        central_event_queue_submit_void_cb_with_user_data_event(hw_platform_init_part_8, NULL);
+    } else {
+        execute_hw_init_complete_cb(HW_PLATFORM_INIT_FAILURE);
+    }
+}
+
+static void hw_platform_init_part_7(void *user_data)
+{
+    uint8_t rc = bmp280_set_filter_coefficient(bmp280_inst, BMP280_FILTER_COEFF_FILTER_OFF, init_part_7_complete, NULL);
+    EAS_ASSERT(rc == BMP280_RESULT_CODE_OK);
+}
+
+static void init_part_6_complete(uint8_t rc, void *user_data)
+{
+    if (rc == BMP280_RESULT_CODE_OK) {
+        central_event_queue_submit_void_cb_with_user_data_event(hw_platform_init_part_7, NULL);
+    } else {
+        execute_hw_init_complete_cb(HW_PLATFORM_INIT_FAILURE);
+    }
+}
+
+static void hw_platform_init_part_6(void *user_data)
+{
+    uint8_t rc = bmp280_init_meas(bmp280_inst, init_part_6_complete, NULL);
+    EAS_ASSERT(rc == BMP280_RESULT_CODE_OK);
+}
+
+static void init_part_5_complete(uint8_t rc, void *user_data)
+{
+    if (rc == BMP280_RESULT_CODE_OK) {
+        central_event_queue_submit_void_cb_with_user_data_event(hw_platform_init_part_6, NULL);
+    } else {
+        execute_hw_init_complete_cb(HW_PLATFORM_INIT_FAILURE);
+    }
+}
+
+static void hw_platform_init_part_5(void *user_data)
+{
+    uint8_t *bmp280_chip_id_p = (uint8_t *)user_data;
+    EAS_ASSERT(bmp280_chip_id_p);
+
+    if (*bmp280_chip_id_p != BMP280_CHIP_ID) {
+        EAS_LOG_INF("Unexpected BMP280 chip id: 0x%2X, expected 0x%2X", *bmp280_chip_id_p, BMP280_CHIP_ID);
+        execute_hw_init_complete_cb(HW_PLATFORM_INIT_FAILURE);
+        return;
+    }
+
+    uint8_t rc = bmp280_reset_with_delay(bmp280_inst, init_part_5_complete, NULL);
+    EAS_ASSERT(rc == BMP280_RESULT_CODE_OK);
+}
+
+static void init_part_4_complete(uint8_t rc, void *user_data)
+{
+    if (rc == BMP280_RESULT_CODE_OK) {
+        uint8_t *bmp280_chip_id_p = (uint8_t *)user_data;
+        EAS_ASSERT(bmp280_chip_id_p);
+        central_event_queue_submit_void_cb_with_user_data_event(hw_platform_init_part_5, (void *)bmp280_chip_id_p);
+    } else {
+        execute_hw_init_complete_cb(HW_PLATFORM_INIT_FAILURE);
+    }
+}
+
+/**
+ * @brief Hardware platform initialization part 4.
+ *
+ * @param user_data This parameter is only here so that the function signature complies with what can be submitted to
+ * event queue as a callback. It is not used in the implementation.
+ */
+static void hw_platform_init_part_4(void *user_data)
+{
+    uint8_t rc;
+    BMP280InitCfg bmp280_cfg = {
+        .get_inst_buf = bmp280_driver_get_inst_buf,
+        .get_inst_buf_user_data = NULL,
+        .read_regs = bmp280_driver_read_regs,
+        .read_regs_user_data = (void *)&spi_op_data,
+        .write_reg = bmp280_driver_write_reg,
+        .write_reg_user_data = (void *)&spi_op_data,
+        .start_timer = bmp280_driver_start_timer,
+        .start_timer_user_data = (void *)&bmp280_timer_data,
+    };
+    rc = bmp280_create(&bmp280_inst, &bmp280_cfg);
+    EAS_ASSERT(rc == BMP280_RESULT_CODE_OK);
+
+    static uint8_t chip_id;
+    /* Passing chip_id as user data to verify that the correct chip id was read out */
+    rc = bmp280_get_chip_id(bmp280_inst, &chip_id, init_part_4_complete, (void *)&chip_id);
+    EAS_ASSERT(rc == BMP280_RESULT_CODE_OK);
 }
 
 /**
@@ -453,9 +660,12 @@ void hw_platform_init(HwPlatformCompleteCb cb, void *user_data)
     init_nrfx_twim();
     sht31_driver_timer = eas_timer_create(0, EAS_TIMER_ONE_SHOT, sht31_driver_timer_expired_cb, NULL);
     bh1750_driver_timer = eas_timer_create(0, EAS_TIMER_ONE_SHOT, bh1750_driver_timer_expired_cb, NULL);
+    bmp280_driver_timer = eas_timer_create(0, EAS_TIMER_ONE_SHOT, bmp280_driver_timer_expired_cb, NULL);
     /* Pass twim_inst as user data to i2c_queue_start_op - it uses the twim inst to start I2C transactions */
     i2c_queue = ops_queue_create(sizeof(I2cOperation), I2C_QUEUE_MAX_NUM_OPS, i2c_queue_ops_buf, &i2c_queue_op_buf,
                                  i2c_queue_start_op, &twim_inst);
+
+    EAS_ASSERT(spi_is_ready_dt(&spi_spec));
 
     SHT3XInitConfig sht3x_cfg = {
         .get_instance_memory = sht3x_driver_get_instance_memory,

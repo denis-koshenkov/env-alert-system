@@ -6,10 +6,13 @@ extern "C"
 {
 #endif
 
+#include <zephyr/drivers/spi.h>
+
 #include "nrfx_twim.h"
 
 #include "sht3x.h"
 #include "bh1750.h"
+#include "bmp280.h"
 #include "eas_timer.h"
 
 typedef enum {
@@ -70,6 +73,20 @@ typedef struct {
     I2cCompleteCbData complete_cb_data;
 } I2cOperation;
 
+/** A pointer to this struct is passed as user data to bmp280_read/write_reg(s). */
+typedef struct {
+    /** Callback to execute when the SPI operation is complete. Populated by the bmp280_read/write_reg(s) function. */
+    BMP280_IOCompleteCb cb;
+    /** User data to pass to cb. Populated by the bmp280_read/write_reg(s) function. */
+    void *user_data;
+    /** SPI device tree spec to use for the SPI operation. Populated by hw_platform, used by bmp280_read/write_reg(s).
+     */
+    const struct spi_dt_spec *spi_spec;
+    /** Zephyr SPI complete callback. Populated by hw_platform, used by bmp280_read/write_reg(s). This cb is passed as
+     * SPI completion callback to spi_transceive_cb. */
+    spi_callback_t zephyr_spi_cb;
+} SpiOpData;
+
 /**
  * @brief All data related to the implementation of sht3x_driver_timer_start function that we pass to SHT3X driver.
  *
@@ -109,6 +126,16 @@ typedef struct {
     /** Pointer to EAS timer instance to use for the timer. */
     const EasTimer *const eas_timer_inst_p;
 } BH1750TimerData;
+
+/** Used in exactly the same fashion as @ref SHT3XTimerData, but for BMP280 driver. */
+typedef struct {
+    /** Callback that should be executed when the timer expires. */
+    BMP280TimerExpiredCb cb;
+    /** User data to pass to cb when it is invoked. */
+    void *user_data;
+    /** Pointer to EAS timer instance to use for the timer. */
+    const EasTimer *const eas_timer_inst_p;
+} BMP280TimerData;
 
 #ifdef __cplusplus
 }

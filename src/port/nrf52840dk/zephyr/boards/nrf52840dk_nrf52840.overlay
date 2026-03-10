@@ -1,0 +1,12 @@
+&spi1 {
+    compatible = "nordic,nrf-spim";
+    status = "okay";
+    cs-gpios = <&gpio0 29 GPIO_ACTIVE_LOW>;
+
+	bmp280: bmp280@0 {
+		compatible = "vnd,spi-device";
+        status = "okay";
+		reg = <0>;
+        spi-max-frequency = <DT_FREQ_M(10)>;
+	};
+};
