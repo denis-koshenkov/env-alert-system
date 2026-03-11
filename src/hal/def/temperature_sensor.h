@@ -18,6 +18,9 @@ typedef void (*TemperatureSensorNewSampleCb)(Temperature sample, void *user_data
 
 /**
  * @brief Temperature sensor HAL interface definition.
+ *
+ * The implementation is allowed to execute new sample callbacks from any context (threads, ISRs). The callback
+ * implementation should not make any assumptions about the context it is executed from.
  */
 typedef struct TemperatureSensor {
     /**
