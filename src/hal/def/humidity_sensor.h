@@ -1,6 +1,11 @@
 #ifndef ENV_ALERT_SYSTEM_SRC_HAL_DEF_HUMIDITY_SENSOR_H
 #define ENV_ALERT_SYSTEM_SRC_HAL_DEF_HUMIDITY_SENSOR_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include "humidity.h"
 
 /**
@@ -35,5 +40,9 @@ typedef struct {
      */
     void (*start)();
 } HumiditySensor;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* ENV_ALERT_SYSTEM_SRC_HAL_DEF_HUMIDITY_SENSOR_H */

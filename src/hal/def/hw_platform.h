@@ -1,6 +1,11 @@
 #ifndef ENV_ALERT_SYSTEM_SRC_HAL_DEF_HW_PLATFORM_H
 #define ENV_ALERT_SYSTEM_SRC_HAL_DEF_HW_PLATFORM_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include "led.h"
 #include "temperature_sensor.h"
 #include "pressure_sensor.h"
@@ -84,5 +89,9 @@ const LightIntensitySensor *const hw_platform_get_light_intensity_sensor();
  * @return const Transceiver* const Transceiver instance.
  */
 const Transceiver *const hw_platform_get_transceiver();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* ENV_ALERT_SYSTEM_SRC_HAL_DEF_HW_PLATFORM_H */
