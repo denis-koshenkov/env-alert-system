@@ -1,5 +1,6 @@
 target_sources(hal INTERFACE
     hw_platform.c
+    my_lbs.c
 
     # Virtual devices used by this hw_platform implementation
     ${VIRTUAL_DEVICES_DIR}/virtual_bh1750.c
