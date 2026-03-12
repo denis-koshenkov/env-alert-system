@@ -19,3 +19,4 @@ target_include_directories(hal INTERFACE
 )
 
 add_subdirectory(drivers_glue)
+add_subdirectory(ble)
