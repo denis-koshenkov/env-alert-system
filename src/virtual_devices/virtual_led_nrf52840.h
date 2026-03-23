@@ -8,13 +8,11 @@ extern "C"
 
 #include "led.h"
 
-/**
- * @brief Returns the LED interface with function pointers initialized to functions that implement the Led interface for
- * nrf52840 led.
- *
- * @return const Led* const nrf52840 LED interface.
- */
-const Led *const led_nrf52840_get();
+typedef struct Nrf52840LedVirtualInterfaces {
+    const Led *const led;
+} Nrf52840LedVirtualInterfaces;
+
+Nrf52840LedVirtualInterfaces virtual_led_nrf52840_initialize();
 
 #ifdef __cplusplus
 }

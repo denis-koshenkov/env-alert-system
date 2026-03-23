@@ -124,6 +124,7 @@ static const TemperatureSensor *temperature_sensor = NULL;
 static const HumiditySensor *humidity_sensor = NULL;
 static const PressureSensor *pressure_sensor = NULL;
 static const LightIntensitySensor *light_intensity_sensor = NULL;
+static const Led *led = NULL;
 
 /* When hw_platform_init is called, the user passes a callback to execute once hw init is complete. That callback and
  * its user data is stored here so that they can be invoked once hw platform init is complete.*/
@@ -425,6 +426,9 @@ static void hw_platform_init_part_11(void *user_data)
     BH1750VirtualInterfaces bh1750_interfaces = virtual_bh1750_initialize(&bh1750_inst);
     light_intensity_sensor = bh1750_interfaces.light_intensity_sensor;
 
+    Nrf52840LedVirtualInterfaces nrf_led_interfaces = virtual_led_nrf52840_initialize();
+    led = nrf_led_interfaces.led;
+
     execute_hw_init_complete_cb(HW_PLATFORM_INIT_SUCCESS);
     EAS_LOG_INF("Hw platform init complete");
 }
@@ -710,7 +714,8 @@ void hw_platform_init(HwPlatformCompleteCb cb, void *user_data)
 
 const Led *const hw_platform_get_led()
 {
-    return led_nrf52840_get();
+    EAS_ASSERT(led);
+    return led;
 }
 
 const TemperatureSensor *const hw_platform_get_temperature_sensor()

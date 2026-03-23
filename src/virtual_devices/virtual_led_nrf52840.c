@@ -16,7 +16,7 @@ static void led_turn_off()
 {
 }
 
-const Led *const led_nrf52840_get()
+Nrf52840LedVirtualInterfaces virtual_led_nrf52840_initialize()
 {
-    return &led;
+    return (Nrf52840LedVirtualInterfaces){.led = &led};
 }

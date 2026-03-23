@@ -10,8 +10,6 @@ extern "C"
 
 /**
  * @brief Abstract HAL interface for setting the LED.
- *
- * This defines the abstract interface. The port layer should provide an implementation of this interface.
  */
 typedef struct Led {
     /**
