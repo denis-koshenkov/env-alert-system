@@ -1,12 +1,18 @@
+/* Standard C */
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
+/* Zephyr */
 #include <zephyr/drivers/spi.h>
+#include <zephyr/drivers/pwm.h>
+#include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 
+/* Nrfx drivers */
 #include "nrfx_twim.h"
 
+/* EAS modules */
 #include "hw_platform.h"
 #include "hw_platform_private.h"
 #include "virtual_led_nrf52840.h"
@@ -118,6 +124,13 @@ static BMP280TimerData bmp280_timer_data = {
     .cb = NULL,        // Will be populated by bmp280_driver_start_timer
     .user_data = NULL, // Will be populated by bmp280_driver_start_timer
     .eas_timer_inst_p = &bmp280_driver_timer,
+};
+
+/* This structure is passed to the led virtual device, so that it can control the leds using zephyr PWM API. */
+static const ZephyrPwms zephyr_pwms = {
+    .red_pwm_led = PWM_DT_SPEC_GET(DT_NODELABEL(red_pwm_led)),
+    .green_pwm_led = PWM_DT_SPEC_GET(DT_NODELABEL(green_pwm_led)),
+    .blue_pwm_led = PWM_DT_SPEC_GET(DT_NODELABEL(blue_pwm_led)),
 };
 
 static const TemperatureSensor *temperature_sensor = NULL;
@@ -426,7 +439,7 @@ static void hw_platform_init_part_11(void *user_data)
     BH1750VirtualInterfaces bh1750_interfaces = virtual_bh1750_initialize(&bh1750_inst);
     light_intensity_sensor = bh1750_interfaces.light_intensity_sensor;
 
-    Nrf52840LedVirtualInterfaces nrf_led_interfaces = virtual_led_nrf52840_initialize();
+    Nrf52840LedVirtualInterfaces nrf_led_interfaces = virtual_led_nrf52840_initialize(&zephyr_pwms);
     led = nrf_led_interfaces.led;
 
     execute_hw_init_complete_cb(HW_PLATFORM_INIT_SUCCESS);
@@ -706,6 +719,10 @@ void hw_platform_init(HwPlatformCompleteCb cb, void *user_data)
                                  i2c_queue_start_op, &twim_inst);
 
     EAS_ASSERT(spi_is_ready_dt(&spi_spec));
+
+    EAS_ASSERT(pwm_is_ready_dt(&zephyr_pwms.red_pwm_led));
+    EAS_ASSERT(pwm_is_ready_dt(&zephyr_pwms.green_pwm_led));
+    EAS_ASSERT(pwm_is_ready_dt(&zephyr_pwms.blue_pwm_led));
 
     hw_platform_timer =
         eas_timer_create(HW_PLATFORM_MAX_SENSOR_POWER_ON_TIME_MS, EAS_TIMER_ONE_SHOT, init_part_0_complete, NULL);
