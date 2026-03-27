@@ -3,7 +3,6 @@
 
 #include "led_manager_private.h"
 #include "led_manager.h"
-#include "hw_platform.h"
 #include "eas_timer.h"
 #include "utils/linked_list.h"
 #include "config.h"
@@ -12,6 +11,7 @@
 #include "utils/eas_time.h"
 #include "eas_current_time.h"
 #include "util.h"
+#include "led_setter.h"
 
 #define LED_MANAGER_NOTIFICATION_DURATION_MS (CONFIG_LED_MANAGER_NOTIFICATION_DURATION_SECONDS * 1000)
 /* Eas timer does not allow to start a timer with 0 ms. It also does not make sense to not display any notifications. */
@@ -125,7 +125,7 @@ static void reset_iterator_and_iterate_until(const LedNotification *led_notifica
 static void display_notification(const LedNotification *led_notification)
 {
     displayed_notification = led_notification;
-    hw_platform_get_led()->set(led_notification->led_color, led_notification->led_pattern);
+    led_setter_set(led_notification->led_color, led_notification->led_pattern);
 }
 
 /**
@@ -134,7 +134,7 @@ static void display_notification(const LedNotification *led_notification)
 static void turn_off_led()
 {
     displayed_notification = NULL;
-    hw_platform_get_led()->turn_off();
+    led_setter_turn_off();
 }
 
 /**

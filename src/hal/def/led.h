@@ -13,14 +13,13 @@ extern "C"
  */
 typedef struct Led {
     /**
-     * @brief Set LED to a ceratin color and pattern.
+     * @brief Set LED to a ceratin color.
      *
-     * After a call to this function, the LED should be displaying the requested color and pattern.
+     * After a call to this function, the LED should be displaying the requested color.
      *
      * @param led_color Color.
-     * @param led_pattern Pattern.
      */
-    void (*set)(LedColor led_color, LedPattern led_pattern);
+    void (*set)(LedColor led_color);
 
     /**
      * @brief Turn off the LED.

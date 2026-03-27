@@ -44,6 +44,7 @@ target_sources(app_test_exec2 PRIVATE
     mocks/mock_connectivity_notification_sender.cpp
     mocks/mock_led_notification_executor.cpp
     mocks/mock_ops_queue_start_op.cpp
+    mocks/mock_led_setter.cpp
 )
 
 target_link_libraries(app_test_exec2 PRIVATE test_common)
