@@ -88,4 +88,13 @@
  * ring_buffer instance. */
 #define CONFIG_RING_BUFFER_MAX_NUM_INSTANCES CONFIG_EAS_RING_BUF_MAX_NUM_INSTANCES
 
+/** Defines the number "transmit cb data" blocks that can be allocated by the transmit cb data allocator at the same
+ * time. Thus, this also defines the number of transmit operations that can be ongoing at the same time.
+ *
+ * We transmit only alert status change messages, no other data is transmitted. In most cases, there can only be one
+ * alert status change in progress for an alert. However, it is theoretically possible that another alert status change
+ * message needs to be transmitted before the previous one finished transmitting. For this reason, we reserve two
+ * transmit cb data slots for each alert. */
+#define CONFIG_TRANSMIT_CB_DATA_ALLOCATOR_NUM_BLOCKS (CONFIG_MAX_NUM_ALERTS * 2)
+
 #endif /* ENV_ALERT_SYSTEM_SRC_PORT_NRF52840DK_INCLUDE_CONFIG_H */

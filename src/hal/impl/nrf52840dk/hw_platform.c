@@ -8,6 +8,10 @@
 #include <zephyr/drivers/pwm.h>
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
+#include <zephyr/bluetooth/bluetooth.h>
+#include <zephyr/bluetooth/gap.h>
+#include <zephyr/bluetooth/uuid.h>
+#include <zephyr/bluetooth/conn.h>
 
 /* Nrfx drivers */
 #include "nrfx_twim.h"
@@ -34,6 +38,7 @@
 #include "bmp280/interface.h"
 #include "eas_log.h"
 #include "ops_queue.h"
+#include "eass.h"
 
 EAS_LOG_ENABLE_IN_FILE();
 
@@ -133,11 +138,49 @@ static const ZephyrPwms zephyr_pwms = {
     .blue_pwm_led = PWM_DT_SPEC_GET(DT_NODELABEL(blue_pwm_led)),
 };
 
+/* Bluetooth related */
+
+#define DEVICE_NAME CONFIG_BT_DEVICE_NAME
+#define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
+
+/* Advertising packet */
+static const struct bt_data ad[] = {
+    BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
+    /* Include full device name in advertising packet data */
+    BT_DATA(BT_DATA_NAME_COMPLETE, DEVICE_NAME, DEVICE_NAME_LEN),
+};
+
+/* Scan response packet */
+static const struct bt_data sd[] = {
+    BT_DATA_BYTES(BT_DATA_UUID128_ALL, BT_UUID_EASS_VAL),
+};
+
+// clang-format off
+static const struct bt_le_adv_param *adv_param = BT_LE_ADV_PARAM(
+    (BT_LE_ADV_OPT_CONN | BT_LE_ADV_OPT_USE_IDENTITY),
+    800,  /* Min Advertising Interval 500ms (800*0.625ms) */
+    801,  /* Max Advertising Interval 500.625ms (801*0.625ms) */
+    NULL /* Set to NULL for undirected advertising */
+);
+// clang-format on
+
+/* Forward declarations to assign function pointers to members of a static struct */
+static void on_connected(struct bt_conn *conn, uint8_t err);
+static void on_disconnected(struct bt_conn *conn, uint8_t reason);
+static void recycled_cb(void);
+
+static struct bt_conn_cb connection_callbacks = {
+    .connected = on_connected,
+    .disconnected = on_disconnected,
+    .recycled = recycled_cb,
+};
+
 static const TemperatureSensor *temperature_sensor = NULL;
 static const HumiditySensor *humidity_sensor = NULL;
 static const PressureSensor *pressure_sensor = NULL;
 static const LightIntensitySensor *light_intensity_sensor = NULL;
 static const Led *led = NULL;
+static const Transceiver *transceiver = NULL;
 
 /* When hw_platform_init is called, the user passes a callback to execute once hw init is complete. That callback and
  * its user data is stored here so that they can be invoked once hw platform init is complete.*/
@@ -145,6 +188,44 @@ static HwPlatformCompleteCb hw_init_complete_cb = NULL;
 static void *hw_init_complete_cb_user_data = NULL;
 
 static EasTimer hw_platform_timer;
+
+static void start_advertising_impl(void *user_data)
+{
+    int err = bt_le_adv_start(adv_param, ad, ARRAY_SIZE(ad), sd, ARRAY_SIZE(sd));
+
+    if (err) {
+        EAS_LOG_INF("Advertising failed to start (err %d)", err);
+        return;
+    }
+
+    EAS_LOG_INF("Advertising successfully started");
+}
+
+static void submit_start_advertising_event(void)
+{
+    central_event_queue_submit_void_cb_with_user_data_event(start_advertising_impl, NULL);
+}
+
+static void on_connected(struct bt_conn *conn, uint8_t err)
+{
+    if (err) {
+        EAS_LOG_INF("Connection failed (err %u)", err);
+        return;
+    }
+
+    EAS_LOG_INF("Connected\n");
+}
+
+static void on_disconnected(struct bt_conn *conn, uint8_t reason)
+{
+    EAS_LOG_INF("Disconnected (reason %u)", reason);
+}
+
+static void recycled_cb(void)
+{
+    EAS_LOG_INF("Connection object available from previous conn. Disconnect is complete!");
+    submit_start_advertising_event();
+}
 
 /**
  * @brief Execute hw platform init complete callback, if one was provided.
@@ -427,8 +508,11 @@ static void init_nrfx_twim()
     nrfx_twim_enable(&twim_inst);
 }
 
-static void hw_platform_init_part_11(void *user_data)
+static void hw_platform_init_part_12(void *user_data)
 {
+    bt_conn_cb_register(&connection_callbacks);
+    submit_start_advertising_event();
+
     SHT31VirtualInterfaces sht31_interfaces = virtual_sht31_initialize(&sht3x_inst);
     temperature_sensor = sht31_interfaces.temperature_sensor;
     humidity_sensor = sht31_interfaces.humidity_sensor;
@@ -442,8 +526,31 @@ static void hw_platform_init_part_11(void *user_data)
     Nrf52840LedVirtualInterfaces nrf_led_interfaces = virtual_led_nrf52840_initialize(&zephyr_pwms);
     led = nrf_led_interfaces.led;
 
+    NrfBleTransceiverVirtualInterfaces ble_interfaces = virtual_transceiver_nrf_ble_initialize();
+    transceiver = ble_interfaces.transceiver;
+
     execute_hw_init_complete_cb(HW_PLATFORM_INIT_SUCCESS);
     EAS_LOG_INF("Hw platform init complete");
+}
+
+static void init_part_11_complete(int err)
+{
+    if (err == 0) {
+        central_event_queue_submit_void_cb_with_user_data_event(hw_platform_init_part_12, NULL);
+    } else {
+        EAS_LOG_INF("Failed to enable Bluetooth");
+        execute_hw_init_complete_cb(HW_PLATFORM_INIT_FAILURE);
+    }
+}
+
+static void hw_platform_init_part_11(void *user_data)
+{
+    int err = bt_enable(init_part_11_complete);
+    if (err) {
+        EAS_LOG_INF("Bluetooth init failed (err %d)", err);
+        execute_hw_init_complete_cb(HW_PLATFORM_INIT_FAILURE);
+        return;
+    }
 }
 
 static void init_part_10_complete(uint8_t rc, void *user_data)
@@ -761,5 +868,6 @@ const LightIntensitySensor *const hw_platform_get_light_intensity_sensor()
 
 const Transceiver *const hw_platform_get_transceiver()
 {
-    return virtual_transceiver_nrf_ble_get();
+    EAS_ASSERT(transceiver);
+    return transceiver;
 }

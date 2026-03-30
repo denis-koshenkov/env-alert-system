@@ -570,7 +570,7 @@ static AlertStatusChangeMessageSlot *find_empty_message_slot()
  * @param num_bytes Number of elements in the @p bytes array.
  * @param user_data User data.
  */
-static void receive_cb(uint8_t *bytes, size_t num_bytes, void *user_data)
+static void receive_cb(const uint8_t *bytes, size_t num_bytes, void *user_data)
 {
     EAS_ASSERT(bytes);
     if (num_bytes == 0) {

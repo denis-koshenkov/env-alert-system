@@ -18,6 +18,9 @@
 #include "light_intensity_requirement_list.h"
 #include "alert_evaluation_readiness.h"
 #include "alert_validator.h"
+#include "eas_log.h"
+
+EAS_LOG_ENABLE_IN_FILE();
 
 /**
  * @brief Map LED color from message transceiver to led color from LED HAL module.
@@ -86,6 +89,10 @@ map_msg_transceiver_operator_to_variable_requirement_operator(MsgTransceiverRequ
 void alert_adder_add_alert(const MsgTransceiverAlert *const alert, void *user_data)
 {
     EAS_ASSERT(alert);
+
+    EAS_LOG_INF("Adding alert: id %u, warmup %u, cooldown %u, connectivity notification %u, led notification %u",
+                alert->alert_id, alert->warmup_period, alert->cooldown_period, alert->notification_type.connectivity,
+                alert->notification_type.led);
 
     /* Do not add an invalid alert */
     if (!alert_validator_is_alert_valid(alert)) {

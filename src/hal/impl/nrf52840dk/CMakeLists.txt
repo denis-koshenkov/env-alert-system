@@ -6,7 +6,8 @@ target_sources(hal INTERFACE
     ${VIRTUAL_DEVICES_DIR}/virtual_bmp280.c
     ${VIRTUAL_DEVICES_DIR}/virtual_sht31.c
     ${VIRTUAL_DEVICES_DIR}/virtual_led_nrf52840.c
-    ${VIRTUAL_DEVICES_DIR}/virtual_transceiver_nrf_ble.c
+    ${VIRTUAL_DEVICES_DIR}/nrf_ble/virtual_transceiver_nrf_ble.c
+    ${VIRTUAL_DEVICES_DIR}/nrf_ble/transmit_cb_data_allocator.c
 )
 
 # Add external device drivers to the build
@@ -16,6 +17,9 @@ include(${CMAKE_SOURCE_DIR}/cmake/bosch_bmp280.cmake)
 
 target_include_directories(hal INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${VIRTUAL_DEVICES_DIR}
+    ${VIRTUAL_DEVICES_DIR}/nrf_ble
 )
 
 add_subdirectory(drivers_glue)
+add_subdirectory(ble)
