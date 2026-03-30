@@ -2,6 +2,7 @@
 
 #include "hw_platform.h"
 #include "virtual_transceiver_mock.h"
+#include "virtual_led_mock.h"
 
 /* Unused in unit test port */
 void hw_platform_init(HwPlatformCompleteCb cb, void *user_data)
@@ -10,7 +11,7 @@ void hw_platform_init(HwPlatformCompleteCb cb, void *user_data)
 
 const Led *const hw_platform_get_led()
 {
-    return NULL;
+    return virtual_led_mock_get();
 }
 
 /* Unused in unit test port */

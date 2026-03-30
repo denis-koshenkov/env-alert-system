@@ -33,6 +33,7 @@ target_sources(eas_app INTERFACE
     led_manager.c
     alert_evaluation_readiness.c
     led_setter.c
+    led_controller.c
 )
 
 target_include_directories(eas_app INTERFACE
