@@ -15,8 +15,13 @@
 #include "alert_raiser.h"
 #include "eas_assert.h"
 #include "eas_log.h"
+#include "eas_current_time.h"
+#include "utils/eas_time.h"
 
 EAS_LOG_ENABLE_IN_FILE();
+
+/** Defines how often new samples are logged. */
+#define NEW_SAMPLE_LOG_PERIOD_MS 15000
 
 /**
  * @brief Evaluate variable requirement and if its result changed, also evaluate the alert condition it is a part of.
@@ -167,30 +172,65 @@ static void new_sample_handler(const void *const sample, void (*notify_alert_eva
     }
 }
 
+/**
+ * @brief Check whether a new sample must be logged.
+ *
+ * @param[in] last_sample_time Last timestamp when the sample for this variable was logged.
+ *
+ * @retval true New sample must be logged.
+ * @retval false New sample must not be logged.
+ */
+static bool should_log_new_sample(EasTime last_sample_time)
+{
+    EasTime curr_time = eas_current_time_get();
+    return eas_time_is_equal_or_after(curr_time,
+                                      eas_time_offset_into_future(last_sample_time, NEW_SAMPLE_LOG_PERIOD_MS));
+}
+
 void new_sample_handler_temperature(Temperature temperature)
 {
-    EAS_LOG_INF("New temperature sample %d", temperature);
+    static EasTime last_sample_time = 0;
+    if (should_log_new_sample(last_sample_time)) {
+        last_sample_time = eas_current_time_get();
+        EAS_LOG_INF("New temperature sample %d", temperature);
+    }
+
     new_sample_handler(&temperature, alert_evaluation_readiness_notify_received_temperature_sample,
                        set_current_temperature_value, handle_temperature_value_change, current_temperature_is_changed);
 }
 
 void new_sample_handler_pressure(Pressure pressure)
 {
-    EAS_LOG_INF("New pressure sample %d", pressure);
+    static EasTime last_sample_time = 0;
+    if (should_log_new_sample(last_sample_time)) {
+        last_sample_time = eas_current_time_get();
+        EAS_LOG_INF("New pressure sample %d", pressure);
+    }
+
     new_sample_handler(&pressure, alert_evaluation_readiness_notify_received_pressure_sample,
                        set_current_pressure_value, handle_pressure_value_change, current_pressure_is_changed);
 }
 
 void new_sample_handler_humidity(Humidity humidity)
 {
-    EAS_LOG_INF("New humidity sample %d", humidity);
+    static EasTime last_sample_time = 0;
+    if (should_log_new_sample(last_sample_time)) {
+        last_sample_time = eas_current_time_get();
+        EAS_LOG_INF("New humidity sample %d", humidity);
+    }
+
     new_sample_handler(&humidity, alert_evaluation_readiness_notify_received_humidity_sample,
                        set_current_humidity_value, handle_humidity_value_change, current_humidity_is_changed);
 }
 
 void new_sample_handler_light_intensity(LightIntensity light_intensity)
 {
-    EAS_LOG_INF("New light intensity sample %d", light_intensity);
+    static EasTime last_sample_time = 0;
+    if (should_log_new_sample(last_sample_time)) {
+        last_sample_time = eas_current_time_get();
+        EAS_LOG_INF("New light intensity sample %d", light_intensity);
+    }
+
     new_sample_handler(&light_intensity, alert_evaluation_readiness_notify_received_light_intensity_sample,
                        set_current_light_intensity_value, handle_light_intensity_value_change,
                        current_light_intensity_is_changed);
