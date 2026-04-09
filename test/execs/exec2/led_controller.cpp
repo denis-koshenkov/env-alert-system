@@ -1,5 +1,6 @@
 #include "CppUTest/TestHarness.h"
 #include "CppUTestExt/MockSupport.h"
+#include "CppUTestExt/TestAssertPlugin.h"
 
 #include "led_controller.h"
 #include "eas_timer_defs.h"
@@ -69,4 +70,12 @@ TEST(LedController, AlertPatternRed)
     timer_cb(timer_cb_user_data);
     timer_cb(timer_cb_user_data);
     timer_cb(timer_cb_user_data);
+}
+
+TEST(LedController, InvalidPattern)
+{
+    TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("controller_pattern", "led_controller_set_color_pattern");
+
+    LedPattern invalid_pattern = (LedPattern)0x55;
+    led_controller_set_color_pattern(LED_COLOR_BLUE, invalid_pattern);
 }

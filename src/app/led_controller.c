@@ -1,6 +1,7 @@
 #include "led_controller.h"
 #include "hw_platform.h"
 #include "eas_timer.h"
+#include "eas_assert.h"
 
 #define LED_CONTROLLER_ALERT_PATTERN_TIMER_PERIOD_MS 300
 
@@ -106,5 +107,6 @@ void led_controller_turn_off()
 void led_controller_set_color_pattern(LedColor color, LedPattern pattern)
 {
     LedControllerPattern *controller_pattern = led_pattern_to_controller_pattern(pattern);
+    EAS_ASSERT(controller_pattern);
     controller_pattern->start(color);
 }
