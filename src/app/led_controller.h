@@ -6,7 +6,11 @@ extern "C"
 {
 #endif
 
+#include "led_defs.h"
+
 void led_controller_turn_off();
+
+void led_controller_set_color_pattern(LedColor color, LedPattern pattern);
 
 #ifdef __cplusplus
 }
