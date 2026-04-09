@@ -88,3 +88,42 @@ TEST_ORDERED(LedController, InvalidPattern, 1)
     LedPattern invalid_pattern = (LedPattern)0x55;
     led_controller_set_color_pattern(LED_COLOR_BLUE, invalid_pattern);
 }
+
+TEST_ORDERED(LedController, DoubleSetAlert, 1)
+{
+    LedColor color = LED_COLOR_GREEN;
+    /* Called by led_controller_set_color_pattern */
+    mock().expectOneCall("led_set").withParameter("led_color", color);
+    mock().expectOneCall("eas_timer_start").withParameter("self", timer);
+    /* Called by timer_cb */
+    mock().expectOneCall("led_turn_off");
+    /* Called by timer_cb */
+    mock().expectOneCall("led_set").withParameter("led_color", color);
+    /* Called by timer_cb */
+    mock().expectOneCall("led_turn_off");
+
+    led_controller_set_color_pattern(color, LED_PATTERN_ALERT);
+    timer_cb(timer_cb_user_data);
+    /* Should do nothing - this color and pattern is already set */
+    led_controller_set_color_pattern(color, LED_PATTERN_ALERT);
+    timer_cb(timer_cb_user_data);
+    /* Should do nothing - this color and pattern is already set */
+    led_controller_set_color_pattern(color, LED_PATTERN_ALERT);
+    led_controller_set_color_pattern(color, LED_PATTERN_ALERT);
+    timer_cb(timer_cb_user_data);
+}
+
+TEST_ORDERED(LedController, ClearColorPatternWhenTurnedOff, 1)
+{
+    LedColor color = LED_COLOR_BLUE;
+    /* Called by led_controller_set_color_pattern */
+    mock().expectOneCall("led_set").withParameter("led_color", color);
+    /* Called by led_controller_turn_off */
+    mock().expectOneCall("led_turn_off");
+    /* Called by led_controller_set_color_pattern */
+    mock().expectOneCall("led_set").withParameter("led_color", color);
+
+    led_controller_set_color_pattern(color, LED_PATTERN_STATIC);
+    led_controller_turn_off();
+    led_controller_set_color_pattern(color, LED_PATTERN_STATIC);
+}
