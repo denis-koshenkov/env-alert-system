@@ -28,6 +28,12 @@ TEST_GROUP(LedController)
         mock().setData("timerCbsUserData", &timer_cb_user_data);
         mock().setData("numTimerCbs", (unsigned int)1);        
     }
+
+    void teardown() {
+        /* Bring led controller state to default - led off */
+        mock().expectOneCall("led_turn_off");
+        led_controller_turn_off();
+    }
 };
 // clang-format on
 
