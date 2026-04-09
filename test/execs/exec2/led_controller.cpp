@@ -1,6 +1,7 @@
 #include "CppUTest/TestHarness.h"
 #include "CppUTestExt/MockSupport.h"
 #include "CppUTestExt/TestAssertPlugin.h"
+#include "CppUTestExt/OrderedTest.h"
 
 #include "led_controller.h"
 #include "eas_timer_defs.h"
@@ -30,25 +31,9 @@ TEST_GROUP(LedController)
 };
 // clang-format on
 
-TEST(LedController, TurnOffSetsLedToOff)
-{
-    mock().expectOneCall("led_turn_off");
-    led_controller_turn_off();
-}
-
-TEST(LedController, SetStaticPatternSetLedRed)
-{
-    mock().expectOneCall("led_set").withParameter("led_color", LED_COLOR_RED);
-    led_controller_set_color_pattern(LED_COLOR_RED, LED_PATTERN_STATIC);
-}
-
-TEST(LedController, SetStaticPatternSetLedGreen)
-{
-    mock().expectOneCall("led_set").withParameter("led_color", LED_COLOR_GREEN);
-    led_controller_set_color_pattern(LED_COLOR_GREEN, LED_PATTERN_STATIC);
-}
-
-TEST(LedController, AlertPatternRed)
+/* This is the first test - it expects a call to eas_timer_create when the alert pattern is set. The timer only needs to
+ * be created once, so subsequent tests will not expect a call to eas_timer_create. */
+TEST_ORDERED(LedController, AlertPatternRed, 0)
 {
     /* Called by led_controller_set_color_pattern */
     mock().expectOneCall("led_set").withParameter("led_color", LED_COLOR_RED);
@@ -72,7 +57,25 @@ TEST(LedController, AlertPatternRed)
     timer_cb(timer_cb_user_data);
 }
 
-TEST(LedController, InvalidPattern)
+TEST_ORDERED(LedController, TurnOffSetsLedToOff, 1)
+{
+    mock().expectOneCall("led_turn_off");
+    led_controller_turn_off();
+}
+
+TEST_ORDERED(LedController, SetStaticPatternSetLedRed, 1)
+{
+    mock().expectOneCall("led_set").withParameter("led_color", LED_COLOR_RED);
+    led_controller_set_color_pattern(LED_COLOR_RED, LED_PATTERN_STATIC);
+}
+
+TEST_ORDERED(LedController, SetStaticPatternSetLedGreen, 1)
+{
+    mock().expectOneCall("led_set").withParameter("led_color", LED_COLOR_GREEN);
+    led_controller_set_color_pattern(LED_COLOR_GREEN, LED_PATTERN_STATIC);
+}
+
+TEST_ORDERED(LedController, InvalidPattern, 1)
 {
     TEST_ASSERT_PLUGIN_EXPECT_ASSERTION("controller_pattern", "led_controller_set_color_pattern");
 
