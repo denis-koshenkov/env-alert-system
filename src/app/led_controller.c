@@ -65,12 +65,26 @@ static EasTimer get_timer_instance()
     return instance;
 }
 
+/**
+ * @brief Check if an alert pattern is currently active.
+ *
+ * @retval true Alert pattern is currently active.
+ * @retval false Another pattern is active or no pattern is active.
+ */
+static bool is_alert_pattern_active()
+{
+    return (is_active && (current_pattern == LED_PATTERN_ALERT));
+}
+
 static void alert_pattern_start(LedColor color)
 {
     hw_platform_get_led()->set(color);
     is_led_on = true;
     alert_color = color;
-    eas_timer_start(get_timer_instance());
+
+    if (!is_alert_pattern_active()) {
+        eas_timer_start(get_timer_instance());
+    }
 }
 
 static void alert_pattern_stop()
@@ -140,8 +154,12 @@ void led_controller_set_color_pattern(LedColor color, LedPattern pattern)
         return;
     }
 
-    set_current_color_pattern(color, pattern);
     LedControllerPattern *controller_pattern = led_pattern_to_controller_pattern(pattern);
     EAS_ASSERT(controller_pattern);
+    EAS_ASSERT(controller_pattern->start);
     controller_pattern->start(color);
+
+    /* Must be done after calling start, because the start logic needs to check the current state before the call to
+     * this function */
+    set_current_color_pattern(color, pattern);
 }

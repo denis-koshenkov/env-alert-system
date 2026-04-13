@@ -126,3 +126,35 @@ TEST_ORDERED(LedController, ClearColorPatternWhenTurnedOff, 1)
     led_controller_turn_off();
     led_controller_set_color_pattern(LED_COLOR_BLUE, LED_PATTERN_STATIC);
 }
+
+TEST_ORDERED(LedController, AlertPatternWithAnotherColorAlreadyOngoingLedOn, 1)
+{
+    LedColor first_color = LED_COLOR_RED;
+    LedColor second_color = LED_COLOR_BLUE;
+
+    /* Called by led_controller_set_color_pattern */
+    mock().expectOneCall("led_set").withParameter("led_color", first_color);
+    mock().expectOneCall("eas_timer_start").withParameter("self", timer);
+    /* Called by timer_cb */
+    mock().expectOneCall("led_turn_off");
+    /* Called by timer_cb */
+    mock().expectOneCall("led_set").withParameter("led_color", first_color);
+    /* Called by led_controller_set_color_pattern */
+    mock().expectOneCall("led_set").withParameter("led_color", second_color);
+    /* Called by timer_cb */
+    mock().expectOneCall("led_turn_off");
+    /* Called by timer_cb */
+    mock().expectOneCall("led_set").withParameter("led_color", second_color);
+
+    led_controller_set_color_pattern(first_color, LED_PATTERN_ALERT);
+    /* Turns off led */
+    timer_cb(timer_cb_user_data);
+    /* Turns on led */
+    timer_cb(timer_cb_user_data);
+    /* Sets led to second color */
+    led_controller_set_color_pattern(second_color, LED_PATTERN_ALERT);
+    /* Turns off led */
+    timer_cb(timer_cb_user_data);
+    /* Turns on led */
+    timer_cb(timer_cb_user_data);
+}
