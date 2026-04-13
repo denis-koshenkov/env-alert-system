@@ -10,6 +10,13 @@ typedef struct {
     void (*stop)();
 } LedControllerPattern;
 
+/** Color that is being displayed. Only valid if is_active == true. */
+static LedColor current_color;
+/** Pattern that is being displayed. Only valid if is_active == true. */
+static LedPattern current_pattern;
+/** True if a color pattern is being displayed, false otherwise. */
+static bool is_active = false;
+
 /*--------------------------- Static pattern ----------------------------------------- */
 
 static void static_pattern_start(LedColor color)
@@ -99,13 +106,41 @@ static LedControllerPattern *led_pattern_to_controller_pattern(LedPattern patter
     return controller_pattern;
 }
 
+/**
+ * @brief Initialize local state to indicate that a color pattern is being displayed.
+ *
+ * @param[in] color Color to set.
+ * @param[in] pattern Pattern to set.
+ */
+static void set_current_color_pattern(LedColor color, LedPattern pattern)
+{
+    current_color = color;
+    current_pattern = pattern;
+    is_active = true;
+}
+
+/**
+ * @brief Set local state to indicate that no color pattern is currently being displayed.
+ */
+static void clear_current_color_pattern()
+{
+    is_active = false;
+}
+
 void led_controller_turn_off()
 {
+    clear_current_color_pattern();
     hw_platform_get_led()->turn_off();
 }
 
 void led_controller_set_color_pattern(LedColor color, LedPattern pattern)
 {
+    if (is_active && (color == current_color) && (pattern == current_pattern)) {
+        /* These color and pattern are already set */
+        return;
+    }
+
+    set_current_color_pattern(color, pattern);
     LedControllerPattern *controller_pattern = led_pattern_to_controller_pattern(pattern);
     EAS_ASSERT(controller_pattern);
     controller_pattern->start(color);
