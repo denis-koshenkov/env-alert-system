@@ -6,7 +6,34 @@
 #define LED_CONTROLLER_ALERT_PATTERN_TIMER_PERIOD_MS 300
 
 typedef struct {
+    /**
+     * @brief Start a pattern.
+     *
+     * @pre No pattern is currently ongoing, the led is off.
+     *
+     * Call this function to start a pattern if this pattern is not already active.
+     *
+     * @param[in] color Led color.
+     */
     void (*start)(LedColor color);
+
+    /**
+     * @brief Set color for an already ongoing pattern.
+     *
+     * Call this function only if this pattern is already ongoing, but with a different color. This function must not be
+     * called when:
+     * - This pattern is not ongoing; or
+     * - This pattern is already ongoing with @p color.
+     *
+     * @param[in] color Color to set.
+     */
+    void (*set_color)(LedColor color);
+
+    /**
+     * @brief Stop a currently ongoing pattern.
+     *
+     * The caller must check that the pattern is already ongoing before calling this function.
+     */
     void (*stop)();
 } LedControllerPattern;
 
@@ -24,12 +51,17 @@ static void static_pattern_start(LedColor color)
     hw_platform_get_led()->set(color);
 }
 
+static void static_pattern_set_color(LedColor color)
+{
+}
+
 static void static_pattern_stop()
 {
 }
 
 static LedControllerPattern static_pattern = {
     .start = static_pattern_start,
+    .set_color = static_pattern_set_color,
     .stop = static_pattern_stop,
 };
 
@@ -81,10 +113,17 @@ static void alert_pattern_start(LedColor color)
     hw_platform_get_led()->set(color);
     is_led_on = true;
     alert_color = color;
+    eas_timer_start(get_timer_instance());
+}
 
-    if (!is_alert_pattern_active()) {
-        eas_timer_start(get_timer_instance());
+static void alert_pattern_set_color(LedColor color)
+{
+    if (is_led_on) {
+        hw_platform_get_led()->set(color);
     }
+    /* If the led is off, we only need to assign the color to a variable, so that when the timer next expires, it will
+     * set the new color. */
+    alert_color = color;
 }
 
 static void alert_pattern_stop()
@@ -93,6 +132,7 @@ static void alert_pattern_stop()
 
 static LedControllerPattern alert_pattern = {
     .start = alert_pattern_start,
+    .set_color = alert_pattern_set_color,
     .stop = alert_pattern_stop,
 };
 
@@ -157,7 +197,15 @@ void led_controller_set_color_pattern(LedColor color, LedPattern pattern)
     LedControllerPattern *controller_pattern = led_pattern_to_controller_pattern(pattern);
     EAS_ASSERT(controller_pattern);
     EAS_ASSERT(controller_pattern->start);
-    controller_pattern->start(color);
+    EAS_ASSERT(controller_pattern->set_color);
+
+    if (is_active && (pattern == current_pattern)) {
+        /* This pattern is already ongoing, but with a different color */
+        controller_pattern->set_color(color);
+    } else {
+        /* This pattern is not ongoing */
+        controller_pattern->start(color);
+    }
 
     /* Must be done after calling start, because the start logic needs to check the current state before the call to
      * this function */
