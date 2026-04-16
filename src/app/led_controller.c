@@ -40,14 +40,17 @@ typedef struct {
     void (*stop)();
 } LedControllerPattern;
 
-/** Color that is being displayed. Only valid if is_active == true. */
+/** Color that is being displayed. Only valid if current_controller_pattern != NULL. */
 static LedColor current_color;
-/** Pattern that is being displayed. Only valid if is_active == true. */
+/** Pattern that is being displayed. Only valid if current_controller_pattern != NULL. */
 static LedPattern current_pattern;
-/** Pointer to pattern object that corresponds to pattern being displayed. Only valid if is_active == true. */
+/** Pointer to pattern object that corresponds to pattern being displayed. NULL if no pattern is being displayed. */
 static const LedControllerPattern *current_controller_pattern = NULL;
-/** True if a color pattern is being displayed, false otherwise. */
-static bool is_active = false;
+
+static bool is_displaying_pattern()
+{
+    return (current_controller_pattern != NULL);
+}
 
 /*--------------------------- Static pattern ----------------------------------------- */
 
@@ -111,7 +114,7 @@ static EasTimer get_timer_instance()
  */
 static bool is_alert_pattern_active()
 {
-    return (is_active && (current_pattern == LED_PATTERN_ALERT));
+    return (is_displaying_pattern() && (current_pattern == LED_PATTERN_ALERT));
 }
 
 static void alert_pattern_start(LedColor color)
@@ -180,7 +183,6 @@ static void set_current_color_pattern(LedColor color, LedPattern pattern,
     current_color = color;
     current_pattern = pattern;
     current_controller_pattern = controller_pattern;
-    is_active = true;
 }
 
 /**
@@ -188,7 +190,7 @@ static void set_current_color_pattern(LedColor color, LedPattern pattern,
  */
 static void clear_current_color_pattern()
 {
-    is_active = false;
+    current_controller_pattern = NULL;
 }
 
 void led_controller_turn_off()
@@ -199,7 +201,7 @@ void led_controller_turn_off()
 
 void led_controller_set_color_pattern(LedColor color, LedPattern pattern)
 {
-    if (is_active && (color == current_color) && (pattern == current_pattern)) {
+    if (is_displaying_pattern() && (color == current_color) && (pattern == current_pattern)) {
         /* These color and pattern are already set */
         return;
     }
@@ -210,11 +212,11 @@ void led_controller_set_color_pattern(LedColor color, LedPattern pattern)
     EAS_ASSERT(controller_pattern->set_color);
     EAS_ASSERT(controller_pattern->stop);
 
-    if (is_active && (pattern == current_pattern)) {
+    if (is_displaying_pattern() && (pattern == current_pattern)) {
         /* This pattern is already ongoing, but with a different color */
         controller_pattern->set_color(color);
     } else {
-        if (is_active) {
+        if (is_displaying_pattern()) {
             /* A different pattern is ongoing - needs to be stopped before starting this one */
             current_controller_pattern->stop(color);
         }
