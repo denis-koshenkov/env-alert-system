@@ -53,6 +53,7 @@ static void static_pattern_start(LedColor color)
 
 static void static_pattern_set_color(LedColor color)
 {
+    hw_platform_get_led()->set(color);
 }
 
 static void static_pattern_stop()

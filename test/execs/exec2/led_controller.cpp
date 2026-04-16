@@ -189,3 +189,25 @@ TEST_ORDERED(LedController, AlertPatternWithAnotherColorAlreadyOngoingLedOff, 1)
     /* Turns on led */
     timer_cb(timer_cb_user_data);
 }
+
+TEST_ORDERED(LedController, DoubleSetStatic, 1)
+{
+    LedColor color = LED_COLOR_BLUE;
+    /* Called by led_controller_set_color_pattern */
+    mock().expectOneCall("led_set").withParameter("led_color", color);
+
+    led_controller_set_color_pattern(color, LED_PATTERN_STATIC);
+    /* Should do nothing - this color and pattern is already set */
+    led_controller_set_color_pattern(color, LED_PATTERN_STATIC);
+}
+
+TEST_ORDERED(LedController, StaticPatternWithAnotherColorAlreadyOngoing, 1)
+{
+    /* Called by led_controller_set_color_pattern */
+    mock().expectOneCall("led_set").withParameter("led_color", LED_COLOR_RED);
+    /* Called by led_controller_set_color_pattern */
+    mock().expectOneCall("led_set").withParameter("led_color", LED_COLOR_BLUE);
+
+    led_controller_set_color_pattern(LED_COLOR_RED, LED_PATTERN_STATIC);
+    led_controller_set_color_pattern(LED_COLOR_BLUE, LED_PATTERN_STATIC);
+}
