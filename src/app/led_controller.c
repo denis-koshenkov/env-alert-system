@@ -33,6 +33,9 @@ typedef struct {
      * @brief Stop a currently ongoing pattern.
      *
      * The caller must check that the pattern is already ongoing before calling this function.
+     *
+     * The implementation must NOT turn off the led. It should only clean up all the internal state of the pattern (e.g.
+     * stopping alert pattern timer). Generic logic turns off the led when when a pattern is stopped.
      */
     void (*stop)();
 } LedControllerPattern;
@@ -41,6 +44,8 @@ typedef struct {
 static LedColor current_color;
 /** Pattern that is being displayed. Only valid if is_active == true. */
 static LedPattern current_pattern;
+/** Pointer to pattern object that corresponds to pattern being displayed. Only valid if is_active == true. */
+static const LedControllerPattern *current_controller_pattern = NULL;
 /** True if a color pattern is being displayed, false otherwise. */
 static bool is_active = false;
 
@@ -129,6 +134,7 @@ static void alert_pattern_set_color(LedColor color)
 
 static void alert_pattern_stop()
 {
+    eas_timer_stop(get_timer_instance());
 }
 
 static LedControllerPattern alert_pattern = {
@@ -167,10 +173,13 @@ static LedControllerPattern *led_pattern_to_controller_pattern(LedPattern patter
  * @param[in] color Color to set.
  * @param[in] pattern Pattern to set.
  */
-static void set_current_color_pattern(LedColor color, LedPattern pattern)
+static void set_current_color_pattern(LedColor color, LedPattern pattern,
+                                      const LedControllerPattern *controller_pattern)
 {
+    EAS_ASSERT(controller_pattern);
     current_color = color;
     current_pattern = pattern;
+    current_controller_pattern = controller_pattern;
     is_active = true;
 }
 
@@ -199,16 +208,20 @@ void led_controller_set_color_pattern(LedColor color, LedPattern pattern)
     EAS_ASSERT(controller_pattern);
     EAS_ASSERT(controller_pattern->start);
     EAS_ASSERT(controller_pattern->set_color);
+    EAS_ASSERT(controller_pattern->stop);
 
     if (is_active && (pattern == current_pattern)) {
         /* This pattern is already ongoing, but with a different color */
         controller_pattern->set_color(color);
     } else {
-        /* This pattern is not ongoing */
+        if (is_active) {
+            /* A different pattern is ongoing - needs to be stopped before starting this one */
+            current_controller_pattern->stop(color);
+        }
         controller_pattern->start(color);
     }
 
     /* Must be done after calling start, because the start logic needs to check the current state before the call to
      * this function */
-    set_current_color_pattern(color, pattern);
+    set_current_color_pattern(color, pattern, controller_pattern);
 }

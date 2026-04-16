@@ -211,3 +211,24 @@ TEST_ORDERED(LedController, StaticPatternWithAnotherColorAlreadyOngoing, 1)
     led_controller_set_color_pattern(LED_COLOR_RED, LED_PATTERN_STATIC);
     led_controller_set_color_pattern(LED_COLOR_BLUE, LED_PATTERN_STATIC);
 }
+
+TEST_ORDERED(LedController, StaticPatternAlertOngoingLedOff, 1)
+{
+    LedColor first_color = LED_COLOR_GREEN;
+    LedColor second_color = LED_COLOR_RED;
+
+    /* Called by led_controller_set_color_pattern */
+    mock().expectOneCall("led_set").withParameter("led_color", first_color);
+    mock().expectOneCall("eas_timer_start").withParameter("self", timer);
+    /* Called by timer_cb */
+    mock().expectOneCall("led_turn_off");
+    /* Called by led_controller_set_color_pattern */
+    mock().expectOneCall("eas_timer_stop").withParameter("self", timer);
+    mock().expectOneCall("led_set").withParameter("led_color", second_color);
+
+    led_controller_set_color_pattern(first_color, LED_PATTERN_ALERT);
+    /* Turns off led */
+    timer_cb(timer_cb_user_data);
+    /* Stops the timer, sets led to second color, since the pattern is static */
+    led_controller_set_color_pattern(second_color, LED_PATTERN_STATIC);
+}
