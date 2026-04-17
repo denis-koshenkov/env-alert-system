@@ -228,7 +228,5 @@ void led_controller_set_color_pattern(LedColor color, LedPattern pattern)
         controller_pattern->start(color);
     }
 
-    /* Must be done after calling start, because the start logic needs to check the current state before the call to
-     * this function */
     set_current_color_pattern(color, pattern, controller_pattern);
 }
