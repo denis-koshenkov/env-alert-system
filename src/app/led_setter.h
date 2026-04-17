@@ -16,8 +16,8 @@ extern "C"
  * LedManager calls this function whenever it needs to set the led to a certain color and pattern. This abstract
  * interface guarantees that the led gets set to these color and pattern.
  *
- * @param color Led color.
- * @param pattern Led pattern.
+ * @param[in] color Led color.
+ * @param[in] pattern Led pattern.
  */
 void led_setter_set(LedColor led_color, LedPattern led_pattern);
 
