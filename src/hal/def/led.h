@@ -15,16 +15,18 @@ typedef struct Led {
     /**
      * @brief Set LED to a ceratin color.
      *
-     * After a call to this function, the LED should be displaying the requested color.
+     * After a call to this function, the LED should be displaying the requested color. It is alowed to call this
+     * function when the led is already set to @p color .
      *
-     * @param led_color Color.
+     * @param[in] led_color Color.
      */
     void (*set)(LedColor led_color);
 
     /**
      * @brief Turn off the LED.
      *
-     * After a call to this function, the LED should be off.
+     * After a call to this function, the LED should be off. It is allowed to call this function when the led is already
+     * off.
      */
     void (*turn_off)();
 } Led;
