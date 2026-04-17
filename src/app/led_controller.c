@@ -195,8 +195,13 @@ static void clear_current_color_pattern()
 
 void led_controller_turn_off()
 {
-    clear_current_color_pattern();
-    hw_platform_get_led()->turn_off();
+    if (is_displaying_pattern()) {
+        /* current_controller_pattern is not NULL if and only if a pattern is being displayed */
+        EAS_ASSERT(current_controller_pattern);
+        current_controller_pattern->stop();
+        clear_current_color_pattern();
+        hw_platform_get_led()->turn_off();
+    }
 }
 
 void led_controller_set_color_pattern(LedColor color, LedPattern pattern)
