@@ -79,8 +79,23 @@ static LedControllerPattern static_pattern = {
 static bool is_led_on = false;
 static LedColor alert_color;
 
+/**
+ * @brief Check if an alert pattern is currently being displayed.
+ *
+ * @retval true Alert pattern is currently being displayed.
+ * @retval false Another pattern is active or no pattern is being displayed.
+ */
+static bool is_displaying_alert_pattern()
+{
+    return (is_displaying_pattern() && (current_pattern == LED_PATTERN_ALERT));
+}
+
 static void alert_timer_cb(void *user_data)
 {
+    if (!is_displaying_alert_pattern()) {
+        return;
+    }
+
     if (is_led_on) {
         hw_platform_get_led()->turn_off();
     } else {
@@ -104,17 +119,6 @@ static EasTimer get_timer_instance()
         is_created = true;
     }
     return instance;
-}
-
-/**
- * @brief Check if an alert pattern is currently active.
- *
- * @retval true Alert pattern is currently active.
- * @retval false Another pattern is active or no pattern is active.
- */
-static bool is_alert_pattern_active()
-{
-    return (is_displaying_pattern() && (current_pattern == LED_PATTERN_ALERT));
 }
 
 static void alert_pattern_start(LedColor color)

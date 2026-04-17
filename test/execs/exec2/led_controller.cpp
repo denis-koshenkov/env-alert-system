@@ -413,3 +413,58 @@ TEST_ORDERED(LedController, AlertPatternStaticOngoingSameColor, 1)
     mock().expectOneCall("led_turn_off");
     led_controller_turn_off();
 }
+
+TEST_ORDERED(LedController, AlertTimerCbDoesNothingAfterLedTurnedOff, 1)
+{
+    LedColor color = LED_COLOR_BLUE;
+    /* Called by led_controller_set_color_pattern */
+    mock().expectOneCall("led_set").withParameter("led_color", color);
+    mock().expectOneCall("eas_timer_start").withParameter("self", timer);
+    /* Called by timer_cb */
+    mock().expectOneCall("led_turn_off");
+    /* Called by led_controller_turn_off */
+    mock().expectOneCall("eas_timer_stop").withParameter("self", timer);
+    mock().expectOneCall("led_turn_off");
+
+    /* Sets the led and starts the timer */
+    led_controller_set_color_pattern(color, LED_PATTERN_ALERT);
+    /* Turns off the led */
+    timer_cb(timer_cb_user_data);
+    /* Stops the timer and turns off the led */
+    led_controller_turn_off();
+    /* Must do nothing since alert pattern was already stopped */
+    timer_cb(timer_cb_user_data);
+
+    /* Clean up not needed - all patterns are stopped and led is off */
+}
+
+TEST_ORDERED(LedController, AlertTimerCbDoesNothingAfterAnotherPatternGetsSet, 1)
+{
+    LedColor alert_color = LED_COLOR_RED;
+    LedColor static_color = LED_COLOR_BLUE;
+
+    /* Called by led_controller_set_color_pattern */
+    mock().expectOneCall("led_set").withParameter("led_color", alert_color);
+    mock().expectOneCall("eas_timer_start").withParameter("self", timer);
+    /* Called by timer_cb */
+    mock().expectOneCall("led_turn_off");
+    /* Called by timer_cb */
+    mock().expectOneCall("led_set").withParameter("led_color", alert_color);
+    /* Called by led_controller_set_color_pattern */
+    mock().expectOneCall("eas_timer_stop").withParameter("self", timer);
+    mock().expectOneCall("led_set").withParameter("led_color", static_color);
+
+    /* Sets the led and starts the timer */
+    led_controller_set_color_pattern(alert_color, LED_PATTERN_ALERT);
+    timer_cb(timer_cb_user_data);
+    /* Turns on the led */
+    timer_cb(timer_cb_user_data);
+    /* Stops the timer and turns off the led */
+    led_controller_set_color_pattern(static_color, LED_PATTERN_STATIC);
+    /* Must do nothing since alert pattern was already stopped */
+    timer_cb(timer_cb_user_data);
+
+    /* Clean up */
+    mock().expectOneCall("led_turn_off");
+    led_controller_turn_off();
+}
