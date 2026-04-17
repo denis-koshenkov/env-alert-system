@@ -47,6 +47,12 @@ static LedPattern current_pattern;
 /** Pointer to pattern object that corresponds to pattern being displayed. NULL if no pattern is being displayed. */
 static const LedControllerPattern *current_controller_pattern = NULL;
 
+/**
+ * @brief Check if a pattern is currently being displayed.
+ *
+ * @retval true A pattern is being displayed.
+ * @retval false No pattern is being displayed.
+ */
 static bool is_displaying_pattern()
 {
     return (current_controller_pattern != NULL);
@@ -90,6 +96,13 @@ static bool is_displaying_alert_pattern()
     return (is_displaying_pattern() && (current_pattern == LED_PATTERN_ALERT));
 }
 
+/**
+ * @brief Alert timer callback.
+ *
+ * Toggles between led on and off for the alert pattern. Does nothing if alert pattern is not ongoing anymore.
+ *
+ * @param[in] user_data Unused.
+ */
 static void alert_timer_cb(void *user_data)
 {
     if (!is_displaying_alert_pattern()) {
